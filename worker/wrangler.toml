@@ -6,5 +6,5 @@ compatibility_date = "2025-01-01"
 name = "EMAIL"
 
 kv_namespaces = [
-  { binding = "ARACHNID_KV", id = "TODO_PROD_KV_ID" }
+  { binding = "ARACHNID_KV", id = "f78521e41f184d16969bb4b0a70fa859" }
 ]
