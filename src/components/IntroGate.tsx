@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { getApiUrl } from '../utils/api'
 
 type IntroGateProps = {
   token?: string | null
@@ -145,7 +146,7 @@ function IntroGate({ token, codename, onAccepted }: IntroGateProps) {
 
     if (token) {
       try {
-        const response = await fetch('/api/intro-accept', {
+        const response = await fetch(getApiUrl('/api/intro-accept'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ token }),

@@ -265,20 +265,20 @@ button {
 .intro-accept {
   position: absolute;
   left: 50%;
-  bottom: calc(env(safe-area-inset-bottom) + 32px);
+  top: 50%;
   display: grid;
   gap: 8px;
   justify-items: center;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.24s ease, transform 0.24s ease;
-  transform: translate(-50%, 6px);
+  transform: translate(-50%, -50%) translateY(6px);
 }
 
 .intro-accept.is-visible {
   opacity: 1;
   pointer-events: auto;
-  transform: translate(-50%, 0);
+  transform: translate(-50%, -50%);
 }
 
 .intro-accept-button {

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
 import MissionCard, { type MissionStatus } from './MissionCard'
+import { getApiUrl } from '../utils/api'
 
 type FeedbackFormProps = {
   first: string
@@ -100,7 +101,7 @@ function FeedbackForm({
   onStatusChange,
 }: FeedbackFormProps) {
   const tokenValue = useMemo(() => token.trim(), [token])
-  const feedbackUrl = import.meta.env.VITE_WORKER_URL || '/api/feedback'
+  const feedbackUrl = useMemo(() => getApiUrl('/api/feedback'), [])
   const timeoutsRef = useRef<number[]>([])
   const [missionStatus, setMissionStatus] = useState<MissionStatusMap>(defaultStatus)
   const [missionStages, setMissionStages] = useState<MissionStageMap>(defaultStages)

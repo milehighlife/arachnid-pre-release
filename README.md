@@ -23,6 +23,10 @@ KV setup:
 - Create a KV namespace in the Cloudflare dashboard (Workers → KV).
 - Copy the namespace ID into `worker/wrangler.toml` at `ARACHNID_KV`.
 
+Domain routing:
+- Worker routes are configured for `arachnidagent.com/api/*` in `worker/wrangler.toml`.
+- Ensure the `arachnidagent.com` zone is in the same Cloudflare account used to deploy the Worker.
+
 Worker deploy:
 - `cd worker`
 - `npx wrangler deploy`

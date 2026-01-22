@@ -9,6 +9,7 @@ import MissionHeader from './components/MissionHeader'
 import useClock from './hooks/useClock'
 import IntroGate from './components/IntroGate'
 import type { ProgressPayload } from './components/FeedbackForm'
+import { getApiUrl } from './utils/api'
 
 type Personalization = {
   first: string
@@ -160,7 +161,7 @@ function App() {
     if (personalization.handle) {
       params.set('handle', personalization.handle)
     }
-    fetch(`/api/status?${params.toString()}`)
+    fetch(`${getApiUrl('/api/status')}?${params.toString()}`)
       .then((response) => response.json())
       .then((data) => {
         if (!active) {
