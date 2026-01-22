@@ -29,7 +29,7 @@ Worker deploy:
 - `npx wrangler deploy`
 
 Test:
-- `/api/status?token=TK_test&first=Test&last=User&handle=tester`
+- `/api/status?token=TK_test&first=Test&last=User`
 
 Email Routing notes:
 - Enable Email Routing on the Cloudflare account.

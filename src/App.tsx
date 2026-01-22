@@ -12,21 +12,19 @@ import type { ProgressPayload } from './components/FeedbackForm'
 type Personalization = {
   first: string
   last: string
-  handle: string
   token: string
   firstName: string
   fullName: string
   codename: string
 }
 
-const sanitizeHandle = (value: string) => value.replace(/^@+/, '').trim()
+const sanitizeToken = (value: string) => value.replace(/^@+/, '').trim()
 
 const getPersonalization = (): Personalization => {
   if (typeof window === 'undefined') {
     return {
       first: '',
       last: '',
-      handle: '',
       token: '',
       firstName: 'tester',
       fullName: 'tester',
@@ -37,14 +35,13 @@ const getPersonalization = (): Personalization => {
   const params = new URLSearchParams(window.location.search)
   const first = (params.get('first') || '').trim()
   const last = (params.get('last') || '').trim()
-  const handleRaw = sanitizeHandle(params.get('handle') || '')
-  const handle = handleRaw
   const token = (params.get('token') || '').trim()
+  const tokenTag = sanitizeToken(token)
   const firstName = first || 'tester'
   const fullName = first && last ? `${first} ${last}` : firstName
-  const codename = handle ? `@${handle}` : `@${firstName}`
+  const codename = tokenTag ? `@${tokenTag}` : `@${firstName}`
 
-  return { first, last, handle, token, firstName, fullName, codename }
+  return { first, last, token, firstName, fullName, codename }
 }
 
 function App() {
@@ -136,10 +133,6 @@ function App() {
     if (personalization.last) {
       params.set('last', personalization.last)
     }
-    if (personalization.handle) {
-      params.set('handle', personalization.handle)
-    }
-
     fetch(`/api/status?${params.toString()}`)
       .then((response) => response.json())
       .then((data) => {
@@ -159,7 +152,7 @@ function App() {
     return () => {
       active = false
     }
-  }, [personalization.first, personalization.handle, personalization.last, personalization.token])
+  }, [personalization.first, personalization.last, personalization.token])
 
   const handleSkipBriefing = () => {
     setBriefingSeen(true)
@@ -210,7 +203,6 @@ function App() {
           first={personalization.first}
           last={personalization.last}
           fullName={personalization.fullName}
-          handle={personalization.handle}
           token={personalization.token}
           progress={progress}
           onProgressUpdate={setProgress}

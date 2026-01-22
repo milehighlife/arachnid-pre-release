@@ -11,14 +11,13 @@ type MissionsProps = {
   first: string
   last: string
   fullName: string
-  handle: string
   codename: string
   token: string
   progress: ProgressPayload | null
   onProgressUpdate: (progress: ProgressPayload) => void
 }
 
-function Missions({ first, last, fullName, handle, codename, token, progress, onProgressUpdate }: MissionsProps) {
+function Missions({ first, last, fullName, codename, token, progress, onProgressUpdate }: MissionsProps) {
   const [statusMap, setStatusMap] = useState<MissionStatusMap>(defaultStatus)
 
   const handleStatusChange = useCallback((nextStatus: MissionStatusMap) => {
@@ -73,7 +72,6 @@ function Missions({ first, last, fullName, handle, codename, token, progress, on
           first={first}
           last={last}
           fullName={fullName}
-          handle={handle}
           codename={codename}
           token={token}
           progress={progress}

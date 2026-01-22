@@ -8,13 +8,22 @@ type MissionProgressStatus = 'NOT_STARTED' | 'LOCKED'
 type MissionProgress = {
   status: MissionProgressStatus
   lastSubmittedAt?: string
+  data?: {
+    feel?: string
+    flight?: string
+    videoUrl?: string
+    shirtSize?: string
+    confirmDistance200?: boolean
+    confirmRights?: boolean
+    aceUrl?: string
+    hoodieSize?: string
+  }
 }
 
 type ProgressRecord = {
   token: string
   first: string
   last: string
-  handle: string
   codename: string
   missions: Record<MissionId, MissionProgress>
   submissionCount: number
@@ -27,9 +36,6 @@ type FeedbackPayload = {
   token?: string
   first?: string
   last?: string
-  fullName?: string
-  handle?: string
-  codename?: string
   userAgent?: string
   timestampISO?: string
   pageUrl?: string
@@ -64,7 +70,7 @@ const jsonResponse = (payload: Record<string, unknown>, status = 200) =>
     },
   })
 
-const sanitizeHandle = (value: string) => value.replace(/^@+/, '').trim()
+const sanitizeToken = (value: string) => value.replace(/^@+/, '').trim()
 
 const isHttpUrl = (value: string) => value.startsWith('http')
 const parseMissionId = (value: string): MissionId | null =>
@@ -81,21 +87,18 @@ const buildProgressRecord = ({
   token,
   first,
   last,
-  handle,
   codename,
   nowISO,
 }: {
   token: string
   first: string
   last: string
-  handle: string
   codename: string
   nowISO: string
 }): ProgressRecord => ({
   token,
   first,
   last,
-  handle,
   codename,
   missions: defaultMissions(),
   submissionCount: 0,
@@ -124,9 +127,8 @@ export default {
 
       const first = (url.searchParams.get('first') || '').trim()
       const last = (url.searchParams.get('last') || '').trim()
-      const handleRaw = (url.searchParams.get('handle') || '').trim()
-      const handle = sanitizeHandle(handleRaw)
-      const codename = handle ? `@${handle}` : `@${first || 'tester'}`
+      const tokenTag = sanitizeToken(tokenParam)
+      const codename = tokenTag ? `@${tokenTag}` : `@${first || 'tester'}`
       const nowISO = new Date().toISOString()
       const key = buildProgressKey(tokenParam)
 
@@ -135,6 +137,7 @@ export default {
       const record = existing
         ? {
             ...existing,
+            codename,
             lastSeenAt: nowISO,
             updatedAt: nowISO,
           }
@@ -142,7 +145,6 @@ export default {
             token: tokenParam,
             first,
             last,
-            handle,
             codename,
             nowISO,
           })
@@ -188,9 +190,8 @@ export default {
 
     const first = typeof payload.first === 'string' ? payload.first.trim() : ''
     const last = typeof payload.last === 'string' ? payload.last.trim() : ''
-    const handleRaw = typeof payload.handle === 'string' ? payload.handle.trim() : ''
-    const handle = sanitizeHandle(handleRaw)
-    const codename = handle ? `@${handle}` : `@${first || 'tester'}`
+    const tokenTag = sanitizeToken(token)
+    const codename = tokenTag ? `@${tokenTag}` : `@${first || 'tester'}`
 
     const missionIdRaw =
       typeof payload.missionMeta?.missionId === 'string' ? payload.missionMeta.missionId.trim() : ''
@@ -243,6 +244,23 @@ export default {
     }
 
     try {
+      const missionData =
+        missionId === 'm1'
+          ? { feel: mission1Feel }
+          : missionId === 'm2'
+            ? {
+                flight: mission2Flight,
+                videoUrl: mission2VideoUrl,
+                shirtSize: mission2ShirtSize,
+                confirmDistance200: mission2ConfirmDistance,
+                confirmRights: mission2ConfirmRights,
+              }
+            : {
+                aceUrl: mission3AceUrl,
+                hoodieSize: mission3HoodieSize,
+                confirmDistance200: mission3ConfirmDistance,
+                confirmRights: mission3ConfirmRights,
+              }
       const nowISO = new Date().toISOString()
       const key = buildProgressKey(token)
       const existing = (await env.ARACHNID_KV.get(key, 'json')) as ProgressRecord | null
@@ -252,7 +270,6 @@ export default {
           token,
           first,
           last,
-          handle,
           codename,
           nowISO,
         })
@@ -262,6 +279,7 @@ export default {
         [missionId]: {
           status: 'LOCKED',
           lastSubmittedAt: nowISO,
+          data: missionData,
         },
       }
       record.submissionCount = (record.submissionCount || 0) + 1

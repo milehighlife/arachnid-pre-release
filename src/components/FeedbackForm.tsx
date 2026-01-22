@@ -6,7 +6,6 @@ type FeedbackFormProps = {
   first: string
   last: string
   fullName: string
-  handle: string
   codename: string
   token: string
   progress: ProgressPayload | null
@@ -35,6 +34,16 @@ export type MissionProgressStatus = 'NOT_STARTED' | 'LOCKED'
 export type MissionProgress = {
   status: MissionProgressStatus
   lastSubmittedAt?: string
+  data?: {
+    feel?: string
+    flight?: string
+    videoUrl?: string
+    shirtSize?: string
+    confirmDistance200?: boolean
+    confirmRights?: boolean
+    aceUrl?: string
+    hoodieSize?: string
+  }
 }
 
 export type ProgressPayload = {
@@ -150,7 +159,6 @@ function FeedbackForm({
   first,
   last,
   fullName,
-  handle,
   codename,
   token,
   progress,
@@ -271,7 +279,62 @@ function FeedbackForm({
 
       return changed ? next : prev
     })
-  }, [progress])
+
+    const m1Data = progress.missions.m1?.data
+    if (m1Data?.feel && !missionTouched.m1 && !mission1Feel) {
+      setMission1Feel(m1Data.feel)
+    }
+
+    const m2Data = progress.missions.m2?.data
+    if (!missionTouched.m2 && m2Data) {
+      if (m2Data.flight && !mission2Flight) {
+        setMission2Flight(m2Data.flight)
+      }
+      if (m2Data.videoUrl && !mission2VideoUrl) {
+        setMission2VideoUrl(m2Data.videoUrl)
+      }
+      if (m2Data.shirtSize && !mission2ShirtSize) {
+        setMission2ShirtSize(m2Data.shirtSize)
+      }
+      if (typeof m2Data.confirmDistance200 === 'boolean' && !mission2ConfirmDistance) {
+        setMission2ConfirmDistance(m2Data.confirmDistance200)
+      }
+      if (typeof m2Data.confirmRights === 'boolean' && !mission2ConfirmRights) {
+        setMission2ConfirmRights(m2Data.confirmRights)
+      }
+    }
+
+    const m3Data = progress.missions.m3?.data
+    if (!missionTouched.m3 && m3Data) {
+      if (m3Data.aceUrl && !mission3AceUrl) {
+        setMission3AceUrl(m3Data.aceUrl)
+      }
+      if (m3Data.hoodieSize && !mission3HoodieSize) {
+        setMission3HoodieSize(m3Data.hoodieSize)
+      }
+      if (typeof m3Data.confirmDistance200 === 'boolean' && !mission3ConfirmDistance) {
+        setMission3ConfirmDistance(m3Data.confirmDistance200)
+      }
+      if (typeof m3Data.confirmRights === 'boolean' && !mission3ConfirmRights) {
+        setMission3ConfirmRights(m3Data.confirmRights)
+      }
+    }
+  }, [
+    progress,
+    missionTouched.m1,
+    missionTouched.m2,
+    missionTouched.m3,
+    mission1Feel,
+    mission2Flight,
+    mission2VideoUrl,
+    mission2ShirtSize,
+    mission2ConfirmDistance,
+    mission2ConfirmRights,
+    mission3AceUrl,
+    mission3HoodieSize,
+    mission3ConfirmDistance,
+    mission3ConfirmRights,
+  ])
 
   const mission1Active = mission1Feel.trim().length > 0
   const mission2Active =
@@ -455,7 +518,6 @@ function FeedbackForm({
       first,
       last,
       fullName,
-      handle,
       codename,
       userAgent: typeof navigator === 'undefined' ? 'unknown' : navigator.userAgent,
       timestampISO: new Date().toISOString(),
