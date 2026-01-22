@@ -17,11 +17,11 @@ npm run dev
 
 ## Feedback endpoint
 
-`/api/feedback` is implemented as a Worker in `worker/src/index.ts`.
+`/api/feedback` is implemented as a Worker in `worker/src/index.ts` and stores progress in KV.
 
 KV setup:
 - Create a KV namespace in the Cloudflare dashboard (Workers → KV).
-- Copy the namespace ID into `worker/wrangler.toml` at `ARACHNID_KV` (`TODO_PROD_KV_ID`).
+- Copy the namespace ID into `worker/wrangler.toml` at `ARACHNID_KV`.
 
 Worker deploy:
 - `cd worker`

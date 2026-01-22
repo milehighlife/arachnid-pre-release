@@ -1,7 +1,4 @@
-import { EmailMessage } from 'cloudflare:email'
-
 type Env = {
-  EMAIL: SendEmail
   ARACHNID_KV: KVNamespace
 }
 
@@ -68,11 +65,6 @@ const jsonResponse = (payload: Record<string, unknown>, status = 200) =>
   })
 
 const sanitizeHandle = (value: string) => value.replace(/^@+/, '').trim()
-
-const getName = (first: string, last: string) => {
-  const firstName = first || 'tester'
-  return first && last ? `${first} ${last}` : firstName
-}
 
 const isHttpUrl = (value: string) => value.startsWith('http')
 const parseMissionId = (value: string): MissionId | null =>
@@ -196,12 +188,6 @@ export default {
 
     const first = typeof payload.first === 'string' ? payload.first.trim() : ''
     const last = typeof payload.last === 'string' ? payload.last.trim() : ''
-    const computedName = getName(first, last)
-    const fullName =
-      typeof payload.fullName === 'string' && payload.fullName.trim()
-        ? payload.fullName.trim()
-        : computedName
-
     const handleRaw = typeof payload.handle === 'string' ? payload.handle.trim() : ''
     const handle = sanitizeHandle(handleRaw)
     const codename = handle ? `@${handle}` : `@${first || 'tester'}`
@@ -256,71 +242,7 @@ export default {
       }
     }
 
-    const userAgent =
-      typeof payload.userAgent === 'string' && payload.userAgent.trim()
-        ? payload.userAgent
-        : 'unknown'
-    const timestampISO =
-      typeof payload.timestampISO === 'string' && payload.timestampISO.trim()
-        ? payload.timestampISO
-        : new Date().toISOString()
-    const pageUrl = typeof payload.pageUrl === 'string' ? payload.pageUrl.trim() : ''
-
-    const to = 'jeff@innovadiscs.com'
-    const from = 'feedback@innovadiscs.com'
-    const missionNumber = missionId === 'm1' ? '1' : missionId === 'm2' ? '2' : '3'
-    const subject = `Arachnid Mission ${missionNumber} Submission: ${fullName} (${codename})`
-
-    const missionHeader =
-      missionId === 'm1'
-        ? 'Mission 1 — Tell Us How the Disc Feels'
-        : missionId === 'm2'
-          ? 'Mission 2 — Share How the Arachnid Flew'
-          : 'Mission 3 — Sharpshooter: Get an Arachnid Ace on Video'
-
-    const missionDetails =
-      missionId === 'm1'
-        ? [`Feel: ${mission1Feel || 'n/a'}`]
-        : missionId === 'm2'
-          ? [
-              `Flight: ${mission2Flight || 'n/a'}`,
-              `Video URL: ${mission2VideoUrl || 'n/a'}`,
-              `Shirt Size: ${mission2ShirtSize || 'n/a'}`,
-              `Confirm Distance 200ft: ${mission2ConfirmDistance ? 'Yes' : 'No'}`,
-              `Confirm Rights: ${mission2ConfirmRights ? 'Yes' : 'No'}`,
-              `Award Eligible: ${mission2ConfirmDistance && mission2ConfirmRights ? 'Yes' : 'No'}`,
-            ]
-          : [
-              `Ace URL: ${mission3AceUrl || 'n/a'}`,
-              `Hoodie Size: ${mission3HoodieSize || 'n/a'}`,
-              `Confirm Distance 200ft: ${mission3ConfirmDistance ? 'Yes' : 'No'}`,
-              `Confirm Rights: ${mission3ConfirmRights ? 'Yes' : 'No'}`,
-              `Award Eligible: ${mission3ConfirmDistance && mission3ConfirmRights ? 'Yes' : 'No'}`,
-            ]
-
-    const body = [
-      `From: ${from}`,
-      `To: ${to}`,
-      `Subject: ${subject}`,
-      'Content-Type: text/plain; charset="UTF-8"',
-      '',
-      `Name: ${fullName}`,
-      `Codename: ${codename}`,
-      `Handle: ${handle ? `@${handle}` : 'n/a'}`,
-      '',
-      `Timestamp: ${timestampISO}`,
-      `User Agent: ${userAgent}`,
-      `Page URL: ${pageUrl || 'n/a'}`,
-      '',
-      `Mission ID: ${missionId}`,
-      missionHeader,
-      ...missionDetails,
-    ].join('\n')
-
     try {
-      const email = new EmailMessage(from, to, body)
-      await env.EMAIL.send(email)
-
       const nowISO = new Date().toISOString()
       const key = buildProgressKey(token)
       const existing = (await env.ARACHNID_KV.get(key, 'json')) as ProgressRecord | null
@@ -357,7 +279,7 @@ export default {
         },
       })
     } catch {
-      return jsonResponse({ ok: false, error: 'Failed to send email' }, 500)
+      return jsonResponse({ ok: false, error: 'Failed to save progress' }, 500)
     }
   },
 } satisfies ExportedHandler<Env>
