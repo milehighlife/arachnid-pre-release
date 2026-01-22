@@ -9,6 +9,9 @@ type IntroGateProps = {
 
 type PlayerInstance = {
   playVideo?: () => void
+  mute?: () => void
+  unMute?: () => void
+  isMuted?: () => boolean
   destroy?: () => void
 }
 
@@ -70,15 +73,13 @@ const loadYouTubeApi = () => {
 
 function IntroGate({ token, codename, onAccepted }: IntroGateProps) {
   const playerRef = useRef<PlayerInstance | null>(null)
-  const startedRef = useRef(false)
-  const [showTapToStart, setShowTapToStart] = useState(false)
   const [videoEnded, setVideoEnded] = useState(false)
   const [accepting, setAccepting] = useState(false)
   const [acceptError, setAcceptError] = useState('')
+  const [soundEnabled, setSoundEnabled] = useState(false)
 
   useEffect(() => {
     let active = true
-    let startTimeout: number | undefined
 
     loadYouTubeApi()
       .then(() => {
@@ -98,18 +99,7 @@ function IntroGate({ token, codename, onAccepted }: IntroGateProps) {
             fs: 0,
           },
           events: {
-            onReady: () => {
-              startTimeout = window.setTimeout(() => {
-                if (!startedRef.current) {
-                  setShowTapToStart(true)
-                }
-              }, 1200)
-            },
             onStateChange: (event: { data: number }) => {
-              if (event.data === window.YT?.PlayerState?.PLAYING) {
-                startedRef.current = true
-                setShowTapToStart(false)
-              }
               if (event.data === window.YT?.PlayerState?.ENDED) {
                 setVideoEnded(true)
               }
@@ -118,22 +108,20 @@ function IntroGate({ token, codename, onAccepted }: IntroGateProps) {
         })
       })
       .catch(() => {
-        setShowTapToStart(true)
+        setVideoEnded(true)
       })
 
     return () => {
       active = false
-      if (startTimeout) {
-        window.clearTimeout(startTimeout)
-      }
       playerRef.current?.destroy?.()
       playerRef.current = null
     }
   }, [])
 
   const handleStart = () => {
+    playerRef.current?.unMute?.()
+    setSoundEnabled(true)
     playerRef.current?.playVideo?.()
-    setShowTapToStart(false)
   }
 
   const handleAccept = async () => {
@@ -180,9 +168,9 @@ function IntroGate({ token, codename, onAccepted }: IntroGateProps) {
           <span className='mono'>LIVE</span>
         </div>
       </div>
-      {showTapToStart && !videoEnded && (
+      {!videoEnded && !soundEnabled && (
         <button className='intro-start' type='button' onClick={handleStart}>
-          Tap to Start Briefing
+          Open Message
         </button>
       )}
       <div className={`intro-accept${videoEnded ? ' is-visible' : ''}`}>
