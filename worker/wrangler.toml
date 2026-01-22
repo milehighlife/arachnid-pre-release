@@ -1,0 +1,6 @@
+name = "arachnid-feedback"
+main = "src/index.ts"
+compatibility_date = "2025-01-01"
+
+[[send_email]]
+name = "EMAIL"
