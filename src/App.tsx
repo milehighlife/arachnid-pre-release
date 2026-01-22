@@ -48,11 +48,11 @@ function App() {
   const personalization = useMemo(getPersonalization, [])
   const [briefingSeen, setBriefingSeen] = useLocalStorageFlag('arachnid_briefing_seen')
   const [showBriefing, setShowBriefing] = useState(false)
-  const [docked, setDocked] = useState(false)
+  const [showHeader, setShowHeader] = useState(false)
   const [headerHeight, setHeaderHeight] = useState(0)
   const [progress, setProgress] = useState<ProgressPayload | null>(null)
   const headerRef = useRef<HTMLDivElement | null>(null)
-  const sentinelRef = useRef<HTMLDivElement | null>(null)
+  const missionEndRef = useRef<HTMLDivElement | null>(null)
   const timeLabel = useClock()
 
   useEffect(() => {
@@ -77,6 +77,11 @@ function App() {
   }, [])
 
   useEffect(() => {
+    if (!showHeader) {
+      setHeaderHeight(0)
+      return
+    }
+
     const node = headerRef.current
     if (!node || typeof window === 'undefined') {
       return
@@ -95,10 +100,10 @@ function App() {
     const observer = new ResizeObserver(() => updateHeight())
     observer.observe(node)
     return () => observer.disconnect()
-  }, [])
+  }, [showHeader])
 
   useEffect(() => {
-    const node = sentinelRef.current
+    const node = missionEndRef.current
     if (!node || typeof window === 'undefined' || !('IntersectionObserver' in window)) {
       return
     }
@@ -109,7 +114,8 @@ function App() {
         if (!entry) {
           return
         }
-        setDocked(!entry.isIntersecting)
+        const isPastMissions = entry.boundingClientRect.top < 0 && !entry.isIntersecting
+        setShowHeader(isPastMissions)
       },
       { threshold: 0 },
     )
@@ -190,19 +196,29 @@ function App() {
         )}
       </AnimatePresence>
       <Hero firstName={personalization.firstName} />
-      <div ref={sentinelRef} className='mission-header-sentinel' aria-hidden='true' />
-      <MissionHeader
-        ref={headerRef}
-        codename={personalization.codename}
-        timeString={timeLabel}
-        docked={docked}
-      />
+      <AnimatePresence>
+        {showHeader && (
+          <motion.div
+            initial={{ opacity: 0, y: -6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.22, ease: 'easeOut' }}
+          >
+            <MissionHeader
+              ref={headerRef}
+              codename={personalization.codename}
+              timeString={timeLabel}
+              docked
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
       {!personalization.token && (
         <div className='token-banner'>
           <div className='container'>Missing token. Progress won’t save.</div>
         </div>
       )}
-      <main className='main' style={{ paddingTop: docked ? headerHeight : 0 }}>
+      <main className='main' style={{ paddingTop: showHeader ? headerHeight : 0 }}>
         <Missions
           first={personalization.first}
           last={personalization.last}
@@ -212,6 +228,7 @@ function App() {
           onProgressUpdate={setProgress}
           codename={personalization.codename}
         />
+        <div ref={missionEndRef} className='mission-header-sentinel' aria-hidden='true' />
       </main>
       <Footer />
     </div>

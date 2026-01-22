@@ -164,18 +164,6 @@ button {
   padding: 96px 0 72px;
 }
 
-.hero-image-wrap {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 16px;
-}
-
-.hero-page-image {
-  width: 100%;
-  max-width: 720px;
-  height: auto;
-}
-
 .hero-grid {
   display: grid;
   gap: 20px;
