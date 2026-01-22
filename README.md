@@ -1,6 +1,6 @@
 # Pre-Release Arachnid Mission Briefing
 
-Single-page landing page for Arachnid pre-release testers. The page collects a three-mission log and emails submissions via Cloudflare Email Routing.
+Single-page landing page for Arachnid pre-release testers. The page collects a three-mission log and stores progress in Cloudflare KV.
 
 ## Local development
 
@@ -25,13 +25,12 @@ KV setup:
 
 Worker deploy:
 - `cd worker`
-- `npx wrangler login`
 - `npx wrangler deploy`
 
 Test:
 - `/api/status?token=TK_test&first=Test&last=User`
 
-Email Routing notes:
-- Enable Email Routing on the Cloudflare account.
-- Add a send_email binding named `EMAIL` for the Worker.
-- Verify the destination address `jeff@innovadiscs.com`.
+Intro gate:
+- Uses YouTube videoId `VWOT_vkPdKI`.
+- Token users persist intro acceptance via KV.
+- Non-token visitors see the intro every visit.

@@ -7,12 +7,14 @@ import Footer from './components/Footer'
 import useLocalStorageFlag from './hooks/useLocalStorageFlag'
 import MissionHeader from './components/MissionHeader'
 import useClock from './hooks/useClock'
+import IntroGate from './components/IntroGate'
 import type { ProgressPayload } from './components/FeedbackForm'
 
 type Personalization = {
   first: string
   last: string
   token: string
+  handle: string
   firstName: string
   fullName: string
   codename: string
@@ -26,6 +28,7 @@ const getPersonalization = (): Personalization => {
       first: '',
       last: '',
       token: '',
+      handle: '',
       firstName: 'tester',
       fullName: 'tester',
       codename: '@tester',
@@ -36,12 +39,18 @@ const getPersonalization = (): Personalization => {
   const first = (params.get('first') || '').trim()
   const last = (params.get('last') || '').trim()
   const token = (params.get('token') || '').trim()
+  const handle = (params.get('handle') || '').trim()
   const tokenTag = sanitizeToken(token)
+  const handleTag = sanitizeToken(handle)
   const firstName = first || 'tester'
   const fullName = first && last ? `${first} ${last}` : firstName
-  const codename = tokenTag ? `@${tokenTag}` : `@${firstName}`
+  const codename = handleTag
+    ? `@${handleTag}`
+    : tokenTag
+      ? `@${tokenTag}`
+      : `@${firstName}`
 
-  return { first, last, token, firstName, fullName, codename }
+  return { first, last, token, handle, firstName, fullName, codename }
 }
 
 function App() {
@@ -51,6 +60,8 @@ function App() {
   const [showHeader, setShowHeader] = useState(false)
   const [headerHeight, setHeaderHeight] = useState(0)
   const [progress, setProgress] = useState<ProgressPayload | null>(null)
+  const [introAccepted, setIntroAccepted] = useState(false)
+  const [statusLoaded, setStatusLoaded] = useState(!personalization.token)
   const headerRef = useRef<HTMLDivElement | null>(null)
   const missionEndRef = useRef<HTMLDivElement | null>(null)
   const timeLabel = useClock()
@@ -131,10 +142,13 @@ function App() {
     const token = personalization.token
     if (!token) {
       setProgress(null)
+      setIntroAccepted(false)
+      setStatusLoaded(true)
       return
     }
 
     let active = true
+    setStatusLoaded(false)
     const params = new URLSearchParams()
     params.set('token', token)
     if (personalization.first) {
@@ -142,6 +156,9 @@ function App() {
     }
     if (personalization.last) {
       params.set('last', personalization.last)
+    }
+    if (personalization.handle) {
+      params.set('handle', personalization.handle)
     }
     fetch(`/api/status?${params.toString()}`)
       .then((response) => response.json())
@@ -151,11 +168,18 @@ function App() {
         }
         if (data?.ok && data.progress) {
           setProgress({ ...data.progress, token })
+          setIntroAccepted(Boolean(data.progress.introAccepted))
+          setStatusLoaded(true)
+          return
         }
+        setIntroAccepted(false)
+        setStatusLoaded(true)
       })
       .catch(() => {
         if (active) {
           setProgress(null)
+          setIntroAccepted(false)
+          setStatusLoaded(true)
         }
       })
 
@@ -167,6 +191,31 @@ function App() {
   const handleSkipBriefing = () => {
     setBriefingSeen(true)
     setShowBriefing(false)
+  }
+
+  const handleIntroAccepted = () => {
+    setIntroAccepted(true)
+    setProgress((current) =>
+      current ? { ...current, introAccepted: true, introAcceptedAt: new Date().toISOString() } : current,
+    )
+  }
+
+  if (personalization.token && !statusLoaded) {
+    return (
+      <div className='intro-loading'>
+        <div className='intro-loading-text'>Establishing secure channel…</div>
+      </div>
+    )
+  }
+
+  if (!introAccepted) {
+    return (
+      <IntroGate
+        token={personalization.token || undefined}
+        codename={personalization.codename}
+        onAccepted={handleIntroAccepted}
+      />
+    )
   }
 
   return (
