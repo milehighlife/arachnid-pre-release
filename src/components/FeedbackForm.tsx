@@ -463,7 +463,7 @@ function FeedbackForm({ first, last, fullName, handle, codename, onStatusChange 
           title='Tell Us How the Disc Feels'
           description='Your first impression matters.'
           award='Optional mission to help refine the final feel.'
-          requirements='Optional, but encouraged. 10-2000 characters if provided.'
+          requirements={'Optional, but encouraged. 10-2000 characters if provided.\nRequired to continue to Mission 2'}
           status={missionStatus.m1}
         >
           <div className='field'>
@@ -513,7 +513,9 @@ function FeedbackForm({ first, last, fullName, handle, codename, onStatusChange 
           title='Share How the Arachnid Flew'
           description='Show us how it flies in the wild.'
           award='Award: Maintain Tester Team Status and receive an Arachnid Tester T-shirt in your size.'
-          requirements='Requirements: Hole must be over 200ft. Video must be public. Innova has rights to reshare video on social platforms.'
+          requirements={
+            'Requirements: Hole must be over 200ft. Video must be public. Innova has rights to reshare video on social platforms.\nIf an ace, also fulfills Mission 3 requirements — two for one.'
+          }
           status={missionStatus.m2}
         >
           <div className='field'>

@@ -13,9 +13,11 @@ function Hero({ firstName }: HeroProps) {
           <div className='hero-eyebrow'>Mission Briefing</div>
           <p className='hero-greeting'>Hey, {firstName}</p>
           <h1 className='hero-title'>Pre-Release Arachnid</h1>
-          <p className='hero-subhead'>Fast, stable mid-range. Built for real-world testing.</p>
+          <p className='hero-subhead'>
+            Low-profile, high-glide, stable mid-range weapon. Secondary role: sidearm approach.
+          </p>
           <div className='flight-row'>
-            <span className='flight-label'>Flight</span>
+            <span className='flight-label'>Flight Numbers</span>
             <span className='flight-values'>5 | 6 | -1 | 1</span>
           </div>
           <p className='hero-line'>Pre-release made for you, the tester.</p>
@@ -37,10 +39,11 @@ function Hero({ firstName }: HeroProps) {
               src={arachnidLogo}
               alt='Arachnid pre-release disc'
               className='disc-image'
-              animate={{ rotate: 360, y: [0, -8, 0] }}
+              animate={{ rotate: 360, y: [0, -8, 0], scale: [1, 1.03, 1] }}
               transition={{
                 rotate: { duration: 80, repeat: Infinity, ease: 'linear' },
                 y: { duration: 8, repeat: Infinity, repeatType: 'mirror', ease: 'easeInOut' },
+                scale: { duration: 4, repeat: Infinity, ease: 'easeInOut' },
               }}
             />
             <span className='disc-scan' aria-hidden='true' />
