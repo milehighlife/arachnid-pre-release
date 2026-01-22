@@ -31,7 +31,7 @@ function Hero({ firstName }: HeroProps) {
             </motion.a>
           </div>
         </div>
-        <div className='hero-media'>
+        <div className='hero-visual'>
           <div className='disc-shell'>
             <motion.img
               src={arachnidLogo}

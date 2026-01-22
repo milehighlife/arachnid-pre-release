@@ -2,7 +2,13 @@ import type { ReactNode } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import useInView from '../hooks/useInView'
 
-export type MissionStatus = 'NOT STARTED' | 'IN PROGRESS' | 'READY' | 'LOCKED'
+export type MissionStatus =
+  | 'NOT STARTED'
+  | 'IN PROGRESS'
+  | 'READY'
+  | 'SENDING'
+  | 'LOCKED'
+  | 'ERROR'
 
 type MissionCardProps = {
   label: string
@@ -20,6 +26,12 @@ const statusTone = (status: MissionStatus) => {
   }
   if (status === 'LOCKED') {
     return 'locked'
+  }
+  if (status === 'SENDING') {
+    return 'sending'
+  }
+  if (status === 'ERROR') {
+    return 'error'
   }
   if (status === 'IN PROGRESS') {
     return 'progress'
@@ -70,7 +82,7 @@ function MissionCard({
           </motion.div>
         </AnimatePresence>
       </div>
-      <h3>{title}</h3>
+      <h3 className='mission-title'>{title}</h3>
       <p className='mission-description'>{description}</p>
       <div className='mission-fields'>{children}</div>
       <div className='mission-award'>

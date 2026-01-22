@@ -260,20 +260,25 @@ button {
   outline-offset: 4px;
 }
 
-.hero-media {
-  background: var(--card-deep);
-  border-radius: 28px;
-  padding: 24px;
-  border: 1px solid var(--border);
+.hero-visual {
   display: grid;
   place-items: center;
-  box-shadow: var(--shadow);
+  padding: 12px 0;
 }
 
 .disc-shell {
   position: relative;
   display: grid;
   place-items: center;
+}
+
+.disc-shell::before {
+  content: '';
+  position: absolute;
+  width: 76%;
+  height: 76%;
+  border-radius: 50%;
+  border: 1px solid rgba(226, 226, 226, 0.12);
 }
 
 .disc-image {
@@ -367,7 +372,7 @@ button {
 .missions-header {
   display: grid;
   gap: 12px;
-  margin: 28px 0 32px;
+  margin: 28px 0 20px;
 }
 
 .section-label {
@@ -403,58 +408,64 @@ button {
   color: var(--muted);
 }
 
+.mission-progress {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 28px;
+  padding: 16px;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: rgba(21, 21, 21, 0.8);
+}
+
+.mission-progress-top {
+  font-size: 0.85rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.mission-progress-bar {
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(226, 226, 226, 0.12);
+  overflow: hidden;
+}
+
+.mission-progress-fill {
+  height: 100%;
+  width: 0;
+  background: var(--accent);
+  transition: width 0.3s ease;
+}
+
+.mission-progress-steps {
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+}
+
+.mission-progress-step {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  display: grid;
+  place-items: center;
+  font-size: 0.75rem;
+  color: var(--muted);
+  transition: border-color 0.3s ease, color 0.3s ease;
+}
+
+.mission-progress-step.is-complete {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
 .mission-form {
   display: grid;
   gap: 28px;
   position: relative;
-}
-
-.mission-layout {
-  display: grid;
-  gap: 20px;
-}
-
-.mission-tracker {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
-}
-
-.mission-step {
-  position: relative;
-  display: grid;
-  gap: 8px;
-  align-items: center;
-  justify-items: center;
-}
-
-.mission-step-dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  border: 1px solid var(--border);
-  transition: transform 0.3s ease, border-color 0.3s ease;
-}
-
-.mission-step-dot.is-complete {
-  border-color: var(--accent);
-  transform: scale(1.15);
-}
-
-.mission-step-text {
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.16em;
-  color: var(--muted);
-}
-
-.mission-step-line {
-  position: absolute;
-  top: 6px;
-  left: calc(100% - 6px);
-  width: calc(100% - 6px);
-  height: 1px;
-  background: var(--border);
 }
 
 .mission-grid {
@@ -480,10 +491,10 @@ button {
 }
 
 .mission-label {
-  font-size: 0.75rem;
-  letter-spacing: 0.2em;
+  font-size: 0.7rem;
+  letter-spacing: 0.24em;
   text-transform: uppercase;
-  color: var(--muted);
+  color: var(--accent);
 }
 
 .mission-chip {
@@ -498,9 +509,15 @@ button {
 }
 
 .mission-chip--ready,
-.mission-chip--locked {
+.mission-chip--locked,
+.mission-chip--error {
   border-color: var(--accent);
   color: var(--accent);
+}
+
+.mission-chip--sending {
+  border-color: rgba(226, 226, 226, 0.3);
+  color: var(--text);
 }
 
 .mission-chip--progress {
@@ -512,9 +529,21 @@ button {
   border-color: var(--border);
 }
 
-.mission-card h3 {
+.mission-title {
   margin: 0;
-  font-size: 1.25rem;
+  font-size: 1.35rem;
+  position: relative;
+  padding-bottom: 10px;
+}
+
+.mission-title::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 56px;
+  height: 2px;
+  background: var(--accent);
 }
 
 .mission-description {
@@ -570,46 +599,13 @@ button {
   font-size: 0.85rem;
 }
 
-.mission-award,
-.mission-requirements {
-  background: var(--card-deep);
-  padding: 14px 16px;
-  border-radius: 16px;
-  border: 1px solid var(--border);
-}
-
-.mission-award {
-  border-left: 2px solid var(--accent);
-}
-
-.mission-award-label,
-.mission-req-label {
-  text-transform: uppercase;
-  letter-spacing: 0.16em;
-  font-size: 0.65rem;
-  color: var(--muted);
-}
-
-.mission-award p,
-.mission-requirements p {
-  margin: 6px 0 0;
-  color: var(--muted);
-}
-
-.mission-confirmations {
+.mission-toggles {
   display: grid;
-  gap: 16px;
-  padding: 18px;
-  border-radius: 16px;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 14px;
   border: 1px solid var(--border);
   background: var(--card-deep);
-}
-
-.mission-confirmations-title {
-  text-transform: uppercase;
-  letter-spacing: 0.2em;
-  font-size: 0.7rem;
-  color: var(--muted);
 }
 
 .toggle-field {
@@ -679,9 +675,54 @@ button {
   transform: translateX(18px);
 }
 
-.submit-area {
+.mission-actions {
   display: grid;
-  gap: 12px;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.mission-edit {
+  border: none;
+  color: var(--muted);
+  font-size: 0.85rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.mission-edit:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.mission-status-message {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.mission-award,
+.mission-requirements {
+  background: var(--card-deep);
+  padding: 14px 16px;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+}
+
+.mission-award {
+  border-left: 2px solid var(--accent);
+}
+
+.mission-award-label,
+.mission-req-label {
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.65rem;
+  color: var(--muted);
+}
+
+.mission-award p,
+.mission-requirements p {
+  margin: 6px 0 0;
+  color: var(--muted);
 }
 
 .submit {
@@ -704,45 +745,6 @@ button {
 .submit:disabled {
   cursor: not-allowed;
   opacity: 0.7;
-}
-
-.submit-success {
-  display: grid;
-  gap: 6px;
-}
-
-.submit-success strong {
-  font-size: 1rem;
-}
-
-.mission-stamp-wrap {
-  position: absolute;
-  top: -24px;
-  right: 12px;
-  z-index: 3;
-}
-
-.mission-stamp {
-  border: 2px solid var(--accent);
-  padding: 14px 18px;
-  border-radius: 8px;
-  color: var(--accent);
-  text-transform: uppercase;
-  letter-spacing: 0.2em;
-  display: grid;
-  gap: 6px;
-  background: transparent;
-  font-size: 0.75rem;
-  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.4);
-}
-
-.mission-stamp-title {
-  font-size: 1rem;
-}
-
-.mission-stamp-sub {
-  font-size: 0.65rem;
-  letter-spacing: 0.12em;
 }
 
 .honeypot {
@@ -774,36 +776,8 @@ button {
     grid-template-columns: 1.1fr 0.9fr;
   }
 
-  .mission-layout {
-    grid-template-columns: auto 1fr;
-    align-items: start;
-  }
-
-  .mission-tracker {
-    grid-template-columns: 1fr;
-    gap: 24px;
-    padding-top: 8px;
-  }
-
-  .mission-step {
-    justify-items: start;
-  }
-
-  .mission-step-line {
-    position: absolute;
-    top: 18px;
-    left: 6px;
-    width: 1px;
-    height: 32px;
-  }
-
   .mission-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .mission-stamp-wrap {
-    top: -28px;
-    right: 40px;
   }
 
   .footer-inner {
@@ -824,13 +798,7 @@ button {
     justify-content: center;
   }
 
-  .mission-step-line {
-    display: none;
-  }
-
-  .mission-stamp-wrap {
-    left: 50%;
-    right: auto;
-    transform: translateX(-50%);
+  .mission-progress {
+    padding: 14px;
   }
 }

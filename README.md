@@ -1,6 +1,6 @@
-# Pre-Release Arachnid Landing
+# Pre-Release Arachnid Mission Briefing
 
-A single-page React landing page for the Pre-Release Arachnid program, built with Vite + React + SWC.
+Single-page landing page for Arachnid pre-release testers. The page collects a three-mission log and emails submissions via Cloudflare Email Routing.
 
 ## Local development
 
@@ -13,24 +13,18 @@ npm run dev
 
 - Deploy by Git push.
 - Build command: `npm run build`
-- Build output: `dist/client`
+- Build output: `dist`
 
-## Environment variables
+## Feedback endpoint
 
-Copy `.env.example` to `.env` and set the Worker URL used by the feedback form.
+`/api/feedback` is implemented as a Worker in `worker/src/index.ts`.
 
-```sh
-VITE_WORKER_URL=https://<your-worker-subdomain>/api/feedback
-```
+Worker deploy:
+- `cd worker`
+- `npx wrangler login`
+- `npx wrangler deploy`
 
-## Worker deploy
-
-```sh
-cd worker
-npx wrangler login
-npx wrangler deploy
-```
-
-Notes:
-- Email Routing must be enabled on the Cloudflare account.
-- The destination address (jeff@innovadiscs.com) must be verified.
+Email Routing notes:
+- Enable Email Routing on the Cloudflare account.
+- Add a send_email binding named `EMAIL` for the Worker.
+- Verify the destination address `jeff@innovadiscs.com`.

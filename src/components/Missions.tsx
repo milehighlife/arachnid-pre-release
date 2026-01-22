@@ -1,5 +1,12 @@
-import FeedbackForm from './FeedbackForm'
+import { useCallback, useMemo, useState } from 'react'
+import FeedbackForm, { type MissionStatusMap } from './FeedbackForm'
 import useClock from '../hooks/useClock'
+
+const defaultStatus: MissionStatusMap = {
+  m1: 'NOT STARTED',
+  m2: 'NOT STARTED',
+  m3: 'NOT STARTED',
+}
 
 type MissionsProps = {
   first: string
@@ -11,6 +18,18 @@ type MissionsProps = {
 
 function Missions({ first, last, fullName, handle, codename }: MissionsProps) {
   const timeLabel = useClock()
+  const [statusMap, setStatusMap] = useState<MissionStatusMap>(defaultStatus)
+
+  const handleStatusChange = useCallback((nextStatus: MissionStatusMap) => {
+    setStatusMap(nextStatus)
+  }, [])
+
+  const lockedCount = useMemo(() => {
+    return ['m1', 'm2', 'm3'].filter((key) => statusMap[key as keyof MissionStatusMap] === 'LOCKED')
+      .length
+  }, [statusMap])
+
+  const progressPercent = Math.round((lockedCount / 3) * 100)
 
   return (
     <section id='missions' className='missions'>
@@ -35,12 +54,37 @@ function Missions({ first, last, fullName, handle, codename }: MissionsProps) {
           </p>
           <p className='missions-awards'>Awards will be issued to {fullName} after verification.</p>
         </div>
+
+        <div className='mission-progress'>
+          <div className='mission-progress-top'>
+            <span>Mission Progress: {lockedCount}/3</span>
+          </div>
+          <div className='mission-progress-bar'>
+            <div className='mission-progress-fill' style={{ width: `${progressPercent}%` }} />
+          </div>
+          <div className='mission-progress-steps'>
+            {[1, 2, 3].map((step) => {
+              const key = `m${step}` as keyof MissionStatusMap
+              const isComplete = statusMap[key] === 'LOCKED'
+              return (
+                <div
+                  key={step}
+                  className={`mission-progress-step${isComplete ? ' is-complete' : ''}`}
+                >
+                  {step}
+                </div>
+              )
+            })}
+          </div>
+        </div>
+
         <FeedbackForm
           first={first}
           last={last}
           fullName={fullName}
           handle={handle}
           codename={codename}
+          onStatusChange={handleStatusChange}
         />
       </div>
     </section>

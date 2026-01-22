@@ -4,8 +4,8 @@ function Footer() {
   return (
     <footer className='footer'>
       <div className='container footer-inner'>
-        <span>© {year} Pre-Release Arachnid. All rights reserved.</span>
-        <span>Crafted for confident field testing.</span>
+        <span>© {year} Pre-Release Arachnid Mission Control.</span>
+        <span>Transmission channel secured for testers.</span>
       </div>
     </footer>
   )
