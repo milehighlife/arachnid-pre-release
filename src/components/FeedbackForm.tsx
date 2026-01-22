@@ -482,7 +482,7 @@ function FeedbackForm({
       return 'Uploading…'
     }
     if (stage === 'sent') {
-      return 'Sent'
+      return 'TRANSMISSION COMPLETE'
     }
     return label
   }
@@ -524,6 +524,7 @@ function FeedbackForm({
             )}
           </div>
           <div className='mission-actions'>
+            <span className='submit-label mono'>UPLOAD EVIDENCE</span>
             <button
               type='button'
               className='submit'
@@ -541,7 +542,12 @@ function FeedbackForm({
               <span className='mission-status-message'>Locked. Transmission received, {codename}.</span>
             )}
             {showMissionError('m1') && missionStatus.m1 === 'ERROR' && (
-              <span className='mission-status-message'>Transmission failed.</span>
+              <span className='mission-status-message'>
+                TRANSMISSION FAILED
+                <span className='mission-status-hint'>
+                  Retry in a moment. If it persists, refresh the page.
+                </span>
+              </span>
             )}
             {tokenMissing && (
               <span className='mission-status-message'>Add token to submit.</span>
@@ -666,6 +672,7 @@ function FeedbackForm({
             </div>
           </div>
           <div className='mission-actions'>
+            <span className='submit-label mono'>UPLOAD EVIDENCE</span>
             <button
               type='button'
               className='submit'
@@ -683,7 +690,12 @@ function FeedbackForm({
               <span className='mission-status-message'>Locked. Transmission received, {codename}.</span>
             )}
             {showMissionError('m2') && missionStatus.m2 === 'ERROR' && (
-              <span className='mission-status-message'>Transmission failed.</span>
+              <span className='mission-status-message'>
+                TRANSMISSION FAILED
+                <span className='mission-status-hint'>
+                  Retry in a moment. If it persists, refresh the page.
+                </span>
+              </span>
             )}
             {tokenMissing && (
               <span className='mission-status-message'>Add token to submit.</span>
@@ -792,6 +804,7 @@ function FeedbackForm({
             </div>
           </div>
           <div className='mission-actions'>
+            <span className='submit-label mono'>UPLOAD EVIDENCE</span>
             <button
               type='button'
               className='submit'
@@ -809,7 +822,12 @@ function FeedbackForm({
               <span className='mission-status-message'>Locked. Transmission received, {codename}.</span>
             )}
             {showMissionError('m3') && missionStatus.m3 === 'ERROR' && (
-              <span className='mission-status-message'>Transmission failed.</span>
+              <span className='mission-status-message'>
+                TRANSMISSION FAILED
+                <span className='mission-status-hint'>
+                  Retry in a moment. If it persists, refresh the page.
+                </span>
+              </span>
             )}
             {tokenMissing && (
               <span className='mission-status-message'>Add token to submit.</span>

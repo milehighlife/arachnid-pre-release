@@ -39,6 +39,13 @@ const statusTone = (status: MissionStatus) => {
   return 'idle'
 }
 
+const statusLabel = (status: MissionStatus) => {
+  if (status === 'ERROR') {
+    return 'TRANSMISSION FAILED'
+  }
+  return status
+}
+
 function MissionCard({
   label,
   title,
@@ -50,14 +57,15 @@ function MissionCard({
 }: MissionCardProps) {
   const { ref, inView } = useInView<HTMLElement>({ threshold: 0.2 })
   const tone = statusTone(status)
+  const isLocked = status === 'LOCKED'
 
   return (
     <motion.article
       ref={ref}
-      className='mission-card'
-      initial={{ opacity: 0, y: 20 }}
-      animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-      transition={{ duration: 0.5, ease: 'easeOut' }}
+      className={`mission-card${inView ? ' is-inview' : ''}${isLocked ? ' is-locked' : ''}`}
+      initial={{ opacity: 0, y: 10 }}
+      animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
+      transition={{ duration: 0.26, ease: 'easeOut' }}
     >
       <div className='mission-card-header'>
         <div className='mission-label'>{label}</div>
@@ -77,13 +85,26 @@ function MissionCard({
               exit={{ opacity: 0, y: -4 }}
               transition={{ duration: 0.18 }}
             >
-              {status}
+              {statusLabel(status)}
             </motion.span>
           </motion.div>
         </AnimatePresence>
       </div>
+      {status === 'LOCKED' && (
+        <motion.div
+          className='filed-stamp'
+          initial={{ opacity: 0, scale: 1.2 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.24, ease: 'easeOut' }}
+        >
+          <span>FILED</span>
+          <span className='filed-sub'>EVIDENCE RECEIVED</span>
+        </motion.div>
+      )}
       <h3 className='mission-title'>{title}</h3>
-      <p className='mission-description'>{description}</p>
+      <p className='mission-description'>
+        <span className='redaction-line'>{description}</span>
+      </p>
       <div className='mission-fields'>{children}</div>
       <div className='mission-award'>
         <span className='mission-award-label'>Award</span>

@@ -25,6 +25,15 @@ function Hero({ firstName }: HeroProps) {
           </div>
         </div>
         <div className='hero-copy'>
+          <motion.div
+            className='confidential-stamp'
+            initial={{ opacity: 0, scale: 1.2 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.24, ease: 'easeOut' }}
+          >
+            <span>CONFIDENTIAL</span>
+            <span className='confidential-sub'>TEST BATCH ACCESS</span>
+          </motion.div>
           <div className='hero-eyebrow'>Mission Briefing</div>
           <p className='hero-greeting'>Hey, {firstName}</p>
           <h1 className='hero-title'>Pre-Release Arachnid</h1>

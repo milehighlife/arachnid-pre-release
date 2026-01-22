@@ -29,11 +29,12 @@ function Missions({ first, last, fullName, codename, token, progress, onProgress
       .length
   }, [statusMap])
 
-  const progressPercent = Math.round((lockedCount / 3) * 100)
+  const progressPercent = lockedCount === 3 ? 100 : lockedCount * 33
 
   return (
     <section id='missions' className='missions'>
       <div className='container'>
+        <div className='system-label mono'>SECURE CHANNEL: ACTIVE</div>
         <div className='missions-header'>
           <div className='section-label'>Mission Log — {codename}</div>
           <h2>Your Missions</h2>
@@ -51,21 +52,39 @@ function Missions({ first, last, fullName, codename, token, progress, onProgress
           </div>
           <div className='mission-progress-bar'>
             <div className='mission-progress-fill' style={{ width: `${progressPercent}%` }} />
+            <div className='mission-progress-steps'>
+              {[1, 2, 3].map((step) => {
+                const key = `m${step}` as keyof MissionStatusMap
+                const isComplete = statusMap[key] === 'LOCKED'
+                const position = step === 1 ? 33 : step === 2 ? 66 : 100
+                return (
+                  <div
+                    key={step}
+                    className={`mission-progress-step${isComplete ? ' is-complete' : ''}${
+                      step === 3 ? ' is-end' : ''
+                    }`}
+                    style={{ left: `${position}%` }}
+                  >
+                    {isComplete ? (
+                      <svg viewBox='0 0 16 16' aria-hidden='true'>
+                        <path
+                          d='M3.2 8.6 6.4 11.6 12.8 4.8'
+                          fill='none'
+                          stroke='currentColor'
+                          strokeWidth='2'
+                          strokeLinecap='round'
+                          strokeLinejoin='round'
+                        />
+                      </svg>
+                    ) : (
+                      step
+                    )}
+                  </div>
+                )
+              })}
+            </div>
           </div>
-          <div className='mission-progress-steps'>
-            {[1, 2, 3].map((step) => {
-              const key = `m${step}` as keyof MissionStatusMap
-              const isComplete = statusMap[key] === 'LOCKED'
-              return (
-                <div
-                  key={step}
-                  className={`mission-progress-step${isComplete ? ' is-complete' : ''}`}
-                >
-                  {step}
-                </div>
-              )
-            })}
-          </div>
+          <div className='progress-label mono'>DATA ENCRYPTED AT REST</div>
         </div>
 
         <FeedbackForm
