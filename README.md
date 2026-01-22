@@ -19,10 +19,17 @@ npm run dev
 
 `/api/feedback` is implemented as a Worker in `worker/src/index.ts`.
 
+KV setup:
+- Create a KV namespace in the Cloudflare dashboard (Workers → KV).
+- Copy the namespace ID into `worker/wrangler.toml` at `ARACHNID_KV` (`TODO_PROD_KV_ID`).
+
 Worker deploy:
 - `cd worker`
 - `npx wrangler login`
 - `npx wrangler deploy`
+
+Test:
+- `/api/status?token=TK_test&first=Test&last=User&handle=tester`
 
 Email Routing notes:
 - Enable Email Routing on the Cloudflare account.

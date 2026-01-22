@@ -8,10 +8,13 @@ type FeedbackFormProps = {
   fullName: string
   handle: string
   codename: string
+  token: string
+  progress: ProgressPayload | null
+  onProgressUpdate: (progress: ProgressPayload) => void
   onStatusChange?: (statusMap: MissionStatusMap) => void
 }
 
-type MissionId = 'm1' | 'm2' | 'm3'
+export type MissionId = 'm1' | 'm2' | 'm3'
 
 type SubmitStage = 'idle' | 'encrypting' | 'uploading' | 'sent'
 
@@ -26,6 +29,21 @@ type MissionStringMap = Record<MissionId, string>
 type MissionTouchedMap = Record<MissionId, boolean>
 
 type MissionSentMap = Record<MissionId, string>
+
+export type MissionProgressStatus = 'NOT_STARTED' | 'LOCKED'
+
+export type MissionProgress = {
+  status: MissionProgressStatus
+  lastSubmittedAt?: string
+}
+
+export type ProgressPayload = {
+  token?: string
+  codename?: string
+  missions: Record<MissionId, MissionProgress>
+  updatedAt?: string
+  lastSeenAt?: string
+}
 
 const statusValues: MissionStatus[] = [
   'NOT STARTED',
@@ -117,16 +135,6 @@ const readSentMap = () => {
   }
 }
 
-const createToken = () => {
-  if (typeof crypto !== 'undefined' && 'getRandomValues' in crypto) {
-    const bytes = new Uint8Array(16)
-    crypto.getRandomValues(bytes)
-    return Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join('')
-  }
-
-  return `${Math.random().toString(36).slice(2)}${Math.random().toString(36).slice(2)}`
-}
-
 const isHttpUrl = (value: string) => value.startsWith('http')
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
@@ -138,8 +146,18 @@ const deriveMissionStatus = (active: boolean, ready: boolean): MissionStatus => 
   return ready ? 'READY' : 'IN PROGRESS'
 }
 
-function FeedbackForm({ first, last, fullName, handle, codename, onStatusChange }: FeedbackFormProps) {
-  const token = useMemo(() => createToken().slice(0, 32), [])
+function FeedbackForm({
+  first,
+  last,
+  fullName,
+  handle,
+  codename,
+  token,
+  progress,
+  onProgressUpdate,
+  onStatusChange,
+}: FeedbackFormProps) {
+  const tokenValue = useMemo(() => token.trim(), [token])
   const feedbackUrl = import.meta.env.VITE_WORKER_URL || '/api/feedback'
   const timeoutsRef = useRef<number[]>([])
   const [missionStatus, setMissionStatus] = useState<MissionStatusMap>(readStatusMap)
@@ -160,6 +178,7 @@ function FeedbackForm({ first, last, fullName, handle, codename, onStatusChange 
   const [mission3ConfirmRights, setMission3ConfirmRights] = useState(false)
   const [company, setCompany] = useState('')
   const [hasAttempted, setHasAttempted] = useState<MissionTouchedMap>(defaultTouched)
+  const tokenMissing = !tokenValue
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -209,6 +228,50 @@ function FeedbackForm({ first, last, fullName, handle, codename, onStatusChange 
       timeoutsRef.current = []
     }
   }, [])
+
+  useEffect(() => {
+    if (!progress?.missions) {
+      return
+    }
+
+    setMissionStatus((prev) => {
+      const next = { ...prev }
+      let changed = false
+
+      ;(['m1', 'm2', 'm3'] as MissionId[]).forEach((id) => {
+        const progressStatus = progress.missions[id]?.status
+        if (!progressStatus) {
+          return
+        }
+        if (progressStatus === 'LOCKED' && prev[id] !== 'LOCKED') {
+          next[id] = 'LOCKED'
+          changed = true
+          return
+        }
+        if (progressStatus === 'NOT_STARTED' && prev[id] === 'LOCKED') {
+          next[id] = 'NOT STARTED'
+          changed = true
+        }
+      })
+
+      return changed ? next : prev
+    })
+
+    setLastSent((prev) => {
+      const next = { ...prev }
+      let changed = false
+
+      ;(['m1', 'm2', 'm3'] as MissionId[]).forEach((id) => {
+        const lastSubmittedAt = progress.missions[id]?.lastSubmittedAt
+        if (lastSubmittedAt && lastSubmittedAt !== prev[id]) {
+          next[id] = lastSubmittedAt
+          changed = true
+        }
+      })
+
+      return changed ? next : prev
+    })
+  }, [progress])
 
   const mission1Active = mission1Feel.trim().length > 0
   const mission2Active =
@@ -344,6 +407,10 @@ function FeedbackForm({ first, last, fullName, handle, codename, onStatusChange 
       return
     }
 
+    if (tokenMissing) {
+      return
+    }
+
     setHasAttempted((prev) => ({ ...prev, [missionId]: true }))
     const nextErrors = validateMission(missionId)
 
@@ -384,6 +451,7 @@ function FeedbackForm({ first, last, fullName, handle, codename, onStatusChange 
             }
 
     const payload = {
+      token: tokenValue,
       first,
       last,
       fullName,
@@ -404,13 +472,13 @@ function FeedbackForm({ first, last, fullName, handle, codename, onStatusChange 
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-Feedback-Token': token.padEnd(16, '0'),
+          'X-Feedback-Token': tokenValue.padEnd(16, '0'),
         },
         body: JSON.stringify(payload),
       })
 
       const data = (await response.json().catch(() => null)) as
-        | { ok: boolean; error?: string }
+        | { ok: boolean; error?: string; progress?: ProgressPayload }
         | null
 
       const elapsed = Date.now() - startTime
@@ -427,7 +495,17 @@ function FeedbackForm({ first, last, fullName, handle, codename, onStatusChange 
 
       setMissionStages((prev) => ({ ...prev, [missionId]: 'sent' }))
       setMissionStatus((prev) => ({ ...prev, [missionId]: 'LOCKED' }))
-      setLastSent((prev) => ({ ...prev, [missionId]: new Date().toISOString() }))
+
+      const submittedAt = data?.progress?.missions?.[missionId]?.lastSubmittedAt
+      const nextTimestamp = submittedAt || new Date().toISOString()
+      setLastSent((prev) => ({ ...prev, [missionId]: nextTimestamp }))
+
+      if (data?.progress?.missions) {
+        onProgressUpdate({
+          ...data.progress,
+          token: data.progress.token || tokenValue,
+        })
+      }
     } catch {
       setMissionStatus((prev) => ({ ...prev, [missionId]: 'ERROR' }))
       setMissionStages((prev) => ({ ...prev, [missionId]: 'idle' }))
@@ -489,7 +567,7 @@ function FeedbackForm({ first, last, fullName, handle, codename, onStatusChange 
             <button
               type='button'
               className='submit'
-              disabled={!mission1Ready || isMissionDisabled('m1')}
+              disabled={!mission1Ready || isMissionDisabled('m1') || tokenMissing}
               onClick={() => submitMission('m1')}
             >
               {getSubmitLabel('m1', 'Submit Mission 1')}
@@ -504,6 +582,9 @@ function FeedbackForm({ first, last, fullName, handle, codename, onStatusChange 
             )}
             {showMissionError('m1') && missionStatus.m1 === 'ERROR' && (
               <span className='mission-status-message'>Transmission failed.</span>
+            )}
+            {tokenMissing && (
+              <span className='mission-status-message'>Add token to submit.</span>
             )}
           </div>
         </MissionCard>
@@ -628,7 +709,7 @@ function FeedbackForm({ first, last, fullName, handle, codename, onStatusChange 
             <button
               type='button'
               className='submit'
-              disabled={!mission2Ready || isMissionDisabled('m2')}
+              disabled={!mission2Ready || isMissionDisabled('m2') || tokenMissing}
               onClick={() => submitMission('m2')}
             >
               {getSubmitLabel('m2', 'Submit Mission 2')}
@@ -643,6 +724,9 @@ function FeedbackForm({ first, last, fullName, handle, codename, onStatusChange 
             )}
             {showMissionError('m2') && missionStatus.m2 === 'ERROR' && (
               <span className='mission-status-message'>Transmission failed.</span>
+            )}
+            {tokenMissing && (
+              <span className='mission-status-message'>Add token to submit.</span>
             )}
           </div>
         </MissionCard>
@@ -751,7 +835,7 @@ function FeedbackForm({ first, last, fullName, handle, codename, onStatusChange 
             <button
               type='button'
               className='submit'
-              disabled={!mission3Ready || isMissionDisabled('m3')}
+              disabled={!mission3Ready || isMissionDisabled('m3') || tokenMissing}
               onClick={() => submitMission('m3')}
             >
               {getSubmitLabel('m3', 'Submit Mission 3')}
@@ -766,6 +850,9 @@ function FeedbackForm({ first, last, fullName, handle, codename, onStatusChange 
             )}
             {showMissionError('m3') && missionStatus.m3 === 'ERROR' && (
               <span className='mission-status-message'>Transmission failed.</span>
+            )}
+            {tokenMissing && (
+              <span className='mission-status-message'>Add token to submit.</span>
             )}
           </div>
         </MissionCard>

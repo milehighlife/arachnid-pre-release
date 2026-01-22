@@ -7,11 +7,13 @@ import Footer from './components/Footer'
 import useLocalStorageFlag from './hooks/useLocalStorageFlag'
 import MissionHeader from './components/MissionHeader'
 import useClock from './hooks/useClock'
+import type { ProgressPayload } from './components/FeedbackForm'
 
 type Personalization = {
   first: string
   last: string
   handle: string
+  token: string
   firstName: string
   fullName: string
   codename: string
@@ -25,6 +27,7 @@ const getPersonalization = (): Personalization => {
       first: '',
       last: '',
       handle: '',
+      token: '',
       firstName: 'tester',
       fullName: 'tester',
       codename: '@tester',
@@ -36,11 +39,12 @@ const getPersonalization = (): Personalization => {
   const last = (params.get('last') || '').trim()
   const handleRaw = sanitizeHandle(params.get('handle') || '')
   const handle = handleRaw
+  const token = (params.get('token') || '').trim()
   const firstName = first || 'tester'
   const fullName = first && last ? `${first} ${last}` : firstName
   const codename = handle ? `@${handle}` : `@${firstName}`
 
-  return { first, last, handle, firstName, fullName, codename }
+  return { first, last, handle, token, firstName, fullName, codename }
 }
 
 function App() {
@@ -49,6 +53,7 @@ function App() {
   const [showBriefing, setShowBriefing] = useState(false)
   const [docked, setDocked] = useState(false)
   const [headerHeight, setHeaderHeight] = useState(0)
+  const [progress, setProgress] = useState<ProgressPayload | null>(null)
   const headerRef = useRef<HTMLDivElement | null>(null)
   const sentinelRef = useRef<HTMLDivElement | null>(null)
   const timeLabel = useClock()
@@ -115,6 +120,47 @@ function App() {
     }
   }, [])
 
+  useEffect(() => {
+    const token = personalization.token
+    if (!token) {
+      setProgress(null)
+      return
+    }
+
+    let active = true
+    const params = new URLSearchParams()
+    params.set('token', token)
+    if (personalization.first) {
+      params.set('first', personalization.first)
+    }
+    if (personalization.last) {
+      params.set('last', personalization.last)
+    }
+    if (personalization.handle) {
+      params.set('handle', personalization.handle)
+    }
+
+    fetch(`/api/status?${params.toString()}`)
+      .then((response) => response.json())
+      .then((data) => {
+        if (!active) {
+          return
+        }
+        if (data?.ok && data.progress) {
+          setProgress({ ...data.progress, token })
+        }
+      })
+      .catch(() => {
+        if (active) {
+          setProgress(null)
+        }
+      })
+
+    return () => {
+      active = false
+    }
+  }, [personalization.first, personalization.handle, personalization.last, personalization.token])
+
   const handleSkipBriefing = () => {
     setBriefingSeen(true)
     setShowBriefing(false)
@@ -154,12 +200,20 @@ function App() {
         timeString={timeLabel}
         docked={docked}
       />
+      {!personalization.token && (
+        <div className='token-banner'>
+          <div className='container'>Missing token. Progress won’t save.</div>
+        </div>
+      )}
       <main className='main' style={{ paddingTop: docked ? headerHeight : 0 }}>
         <Missions
           first={personalization.first}
           last={personalization.last}
           fullName={personalization.fullName}
           handle={personalization.handle}
+          token={personalization.token}
+          progress={progress}
+          onProgressUpdate={setProgress}
           codename={personalization.codename}
         />
       </main>

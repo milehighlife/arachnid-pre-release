@@ -344,6 +344,17 @@ button {
   opacity: 1;
 }
 
+.token-banner {
+  background: rgba(226, 226, 226, 0.06);
+  border-bottom: 1px solid var(--border);
+}
+
+.token-banner .container {
+  padding: 8px 0;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
 @supports ((-webkit-backdrop-filter: blur(10px)) or (backdrop-filter: blur(10px))) {
   .mission-header.is-docked {
     -webkit-backdrop-filter: blur(10px);

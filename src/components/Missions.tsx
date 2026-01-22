@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from 'react'
-import FeedbackForm, { type MissionStatusMap } from './FeedbackForm'
+import FeedbackForm, { type MissionStatusMap, type ProgressPayload } from './FeedbackForm'
 
 const defaultStatus: MissionStatusMap = {
   m1: 'NOT STARTED',
@@ -13,9 +13,12 @@ type MissionsProps = {
   fullName: string
   handle: string
   codename: string
+  token: string
+  progress: ProgressPayload | null
+  onProgressUpdate: (progress: ProgressPayload) => void
 }
 
-function Missions({ first, last, fullName, handle, codename }: MissionsProps) {
+function Missions({ first, last, fullName, handle, codename, token, progress, onProgressUpdate }: MissionsProps) {
   const [statusMap, setStatusMap] = useState<MissionStatusMap>(defaultStatus)
 
   const handleStatusChange = useCallback((nextStatus: MissionStatusMap) => {
@@ -72,6 +75,9 @@ function Missions({ first, last, fullName, handle, codename }: MissionsProps) {
           fullName={fullName}
           handle={handle}
           codename={codename}
+          token={token}
+          progress={progress}
+          onProgressUpdate={onProgressUpdate}
           onStatusChange={handleStatusChange}
         />
       </div>
