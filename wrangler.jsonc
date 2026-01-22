@@ -7,6 +7,7 @@
 	"name": "shy-rice-298c",
 	"main": "worker/index.ts",
 	"compatibility_date": "2025-09-27",
+	"pages_build_output_dir": "dist/client",
 	"assets": {
 		"not_found_handling": "single-page-application"
 	},

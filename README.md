@@ -13,7 +13,7 @@ npm run dev
 
 - Deploy by Git push.
 - Build command: `npm run build`
-- Build output: `dist`
+- Build output: `dist/client`
 
 ## Environment variables
 
