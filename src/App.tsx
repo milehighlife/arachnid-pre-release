@@ -1,10 +1,12 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import './styles.css'
 import Hero from './components/Hero'
 import Missions from './components/Missions'
 import Footer from './components/Footer'
 import useLocalStorageFlag from './hooks/useLocalStorageFlag'
+import MissionHeader from './components/MissionHeader'
+import useClock from './hooks/useClock'
 
 type Personalization = {
   first: string
@@ -45,6 +47,11 @@ function App() {
   const personalization = useMemo(getPersonalization, [])
   const [briefingSeen, setBriefingSeen] = useLocalStorageFlag('arachnid_briefing_seen')
   const [showBriefing, setShowBriefing] = useState(false)
+  const [docked, setDocked] = useState(false)
+  const [headerHeight, setHeaderHeight] = useState(0)
+  const headerRef = useRef<HTMLDivElement | null>(null)
+  const sentinelRef = useRef<HTMLDivElement | null>(null)
+  const timeLabel = useClock()
 
   useEffect(() => {
     if (briefingSeen) {
@@ -62,6 +69,51 @@ function App() {
       window.clearTimeout(timer)
     }
   }, [briefingSeen, setBriefingSeen])
+
+  useEffect(() => {
+    const node = headerRef.current
+    if (!node || typeof window === 'undefined') {
+      return
+    }
+
+    const updateHeight = () => {
+      setHeaderHeight(node.getBoundingClientRect().height)
+    }
+
+    updateHeight()
+
+    if (!('ResizeObserver' in window)) {
+      return
+    }
+
+    const observer = new ResizeObserver(() => updateHeight())
+    observer.observe(node)
+    return () => observer.disconnect()
+  }, [])
+
+  useEffect(() => {
+    const node = sentinelRef.current
+    if (!node || typeof window === 'undefined' || !('IntersectionObserver' in window)) {
+      return
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0]
+        if (!entry) {
+          return
+        }
+        setDocked(!entry.isIntersecting)
+      },
+      { threshold: 0 },
+    )
+
+    observer.observe(node)
+
+    return () => {
+      observer.disconnect()
+    }
+  }, [])
 
   const handleSkipBriefing = () => {
     setBriefingSeen(true)
@@ -95,13 +147,22 @@ function App() {
         )}
       </AnimatePresence>
       <Hero firstName={personalization.firstName} />
-      <Missions
-        first={personalization.first}
-        last={personalization.last}
-        fullName={personalization.fullName}
-        handle={personalization.handle}
+      <div ref={sentinelRef} className='mission-header-sentinel' aria-hidden='true' />
+      <MissionHeader
+        ref={headerRef}
         codename={personalization.codename}
+        timeString={timeLabel}
+        docked={docked}
       />
+      <main className='main' style={{ paddingTop: docked ? headerHeight : 0 }}>
+        <Missions
+          first={personalization.first}
+          last={personalization.last}
+          fullName={personalization.fullName}
+          handle={personalization.handle}
+          codename={personalization.codename}
+        />
+      </main>
       <Footer />
     </div>
   )

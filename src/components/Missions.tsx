@@ -1,6 +1,5 @@
 import { useCallback, useMemo, useState } from 'react'
 import FeedbackForm, { type MissionStatusMap } from './FeedbackForm'
-import useClock from '../hooks/useClock'
 
 const defaultStatus: MissionStatusMap = {
   m1: 'NOT STARTED',
@@ -17,7 +16,6 @@ type MissionsProps = {
 }
 
 function Missions({ first, last, fullName, handle, codename }: MissionsProps) {
-  const timeLabel = useClock()
   const [statusMap, setStatusMap] = useState<MissionStatusMap>(defaultStatus)
 
   const handleStatusChange = useCallback((nextStatus: MissionStatusMap) => {
@@ -33,16 +31,6 @@ function Missions({ first, last, fullName, handle, codename }: MissionsProps) {
 
   return (
     <section id='missions' className='missions'>
-      <div className='mission-log-bar'>
-        <div className='container mission-log-inner'>
-          <div className='mission-log-left mono'>
-            <span>Mission Log — {codename}</span>
-            <span className='clearance-tag'>CLEARANCE: TESTER</span>
-          </div>
-          <div className='mission-log-center mono'>ARACHNID FILE</div>
-          <div className='mission-log-right mono'>{timeLabel}</div>
-        </div>
-      </div>
       <div className='container'>
         <div className='missions-header'>
           <div className='section-label'>Mission Log — {codename}</div>
