@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import arachnidLogo from '../assets/arachnid-logo.png'
+import pageImage from '../assets/page-image.png'
 
 type HeroProps = {
   firstName: string
@@ -8,6 +9,16 @@ type HeroProps = {
 function Hero({ firstName }: HeroProps) {
   return (
     <section className='hero'>
+      <div className='container hero-image-wrap'>
+        <motion.img
+          src={pageImage}
+          alt='Arachnid confidential mission briefing'
+          className='hero-page-image'
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.24, ease: 'easeOut' }}
+        />
+      </div>
       <div className='container hero-grid'>
         <div className='hero-visual'>
           <div className='disc-shell'>

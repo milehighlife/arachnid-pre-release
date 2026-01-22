@@ -73,6 +73,10 @@ function App() {
   }, [briefingSeen, setBriefingSeen])
 
   useEffect(() => {
+    document.title = 'Confidential: Arachnid Agents Only'
+  }, [])
+
+  useEffect(() => {
     const node = headerRef.current
     if (!node || typeof window === 'undefined') {
       return
