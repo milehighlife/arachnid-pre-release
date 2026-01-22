@@ -25,7 +25,7 @@ declare global {
   }
 }
 
-const VIDEO_ID = 'VWOT_vkPdKI'
+const VIDEO_ID = 'ZrBpV_Jlhg4'
 
 let youTubeApiPromise: Promise<void> | null = null
 
