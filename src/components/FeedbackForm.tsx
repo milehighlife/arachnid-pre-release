@@ -27,8 +27,6 @@ type MissionStringMap = Record<MissionId, string>
 
 type MissionTouchedMap = Record<MissionId, boolean>
 
-type MissionSentMap = Record<MissionId, string>
-
 export type MissionProgressStatus = 'NOT_STARTED' | 'LOCKED'
 
 export type MissionProgress = {
@@ -54,15 +52,6 @@ export type ProgressPayload = {
   lastSeenAt?: string
 }
 
-const statusValues: MissionStatus[] = [
-  'NOT STARTED',
-  'IN PROGRESS',
-  'READY',
-  'SENDING',
-  'LOCKED',
-  'ERROR',
-]
-
 const defaultStatus: MissionStatusMap = {
   m1: 'NOT STARTED',
   m2: 'NOT STARTED',
@@ -85,63 +74,6 @@ const defaultTouched: MissionTouchedMap = {
   m1: false,
   m2: false,
   m3: false,
-}
-
-const defaultSent: MissionSentMap = {
-  m1: '',
-  m2: '',
-  m3: '',
-}
-
-const toStorageStatus = (status: MissionStatus) => status.replace(/ /g, '_')
-
-const fromStorageStatus = (value: string): MissionStatus | null => {
-  const normalized = value.replace(/_/g, ' ')
-  return statusValues.includes(normalized as MissionStatus) ? (normalized as MissionStatus) : null
-}
-
-const readStatusMap = () => {
-  if (typeof window === 'undefined') {
-    return defaultStatus
-  }
-
-  const raw = window.localStorage.getItem('arachnid_mission_status_v1')
-  if (!raw) {
-    return defaultStatus
-  }
-
-  try {
-    const parsed = JSON.parse(raw) as Partial<Record<MissionId, string>>
-    return {
-      m1: fromStorageStatus(parsed.m1 ?? '') || 'NOT STARTED',
-      m2: fromStorageStatus(parsed.m2 ?? '') || 'NOT STARTED',
-      m3: fromStorageStatus(parsed.m3 ?? '') || 'NOT STARTED',
-    }
-  } catch {
-    return defaultStatus
-  }
-}
-
-const readSentMap = () => {
-  if (typeof window === 'undefined') {
-    return defaultSent
-  }
-
-  const raw = window.localStorage.getItem('arachnid_mission_last_sent_v1')
-  if (!raw) {
-    return defaultSent
-  }
-
-  try {
-    const parsed = JSON.parse(raw) as Partial<MissionSentMap>
-    return {
-      m1: typeof parsed.m1 === 'string' ? parsed.m1 : '',
-      m2: typeof parsed.m2 === 'string' ? parsed.m2 : '',
-      m3: typeof parsed.m3 === 'string' ? parsed.m3 : '',
-    }
-  } catch {
-    return defaultSent
-  }
 }
 
 const isHttpUrl = (value: string) => value.startsWith('http')
@@ -168,11 +100,10 @@ function FeedbackForm({
   const tokenValue = useMemo(() => token.trim(), [token])
   const feedbackUrl = import.meta.env.VITE_WORKER_URL || '/api/feedback'
   const timeoutsRef = useRef<number[]>([])
-  const [missionStatus, setMissionStatus] = useState<MissionStatusMap>(readStatusMap)
+  const [missionStatus, setMissionStatus] = useState<MissionStatusMap>(defaultStatus)
   const [missionStages, setMissionStages] = useState<MissionStageMap>(defaultStages)
   const [missionErrors, setMissionErrors] = useState<MissionStringMap>(defaultStrings)
   const [missionTouched, setMissionTouched] = useState<MissionTouchedMap>(defaultTouched)
-  const [lastSent, setLastSent] = useState<MissionSentMap>(readSentMap)
 
   const [mission1Feel, setMission1Feel] = useState('')
   const [mission2Flight, setMission2Flight] = useState('')
@@ -189,22 +120,8 @@ function FeedbackForm({
   const tokenMissing = !tokenValue
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const storageStatus = {
-        m1: toStorageStatus(missionStatus.m1),
-        m2: toStorageStatus(missionStatus.m2),
-        m3: toStorageStatus(missionStatus.m3),
-      }
-      window.localStorage.setItem('arachnid_mission_status_v1', JSON.stringify(storageStatus))
-    }
     onStatusChange?.(missionStatus)
   }, [missionStatus, onStatusChange])
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      window.localStorage.setItem('arachnid_mission_last_sent_v1', JSON.stringify(lastSent))
-    }
-  }, [lastSent])
 
   useEffect(() => {
     setMissionStages((prev) => {
@@ -258,21 +175,6 @@ function FeedbackForm({
         }
         if (progressStatus === 'NOT_STARTED' && prev[id] === 'LOCKED') {
           next[id] = 'NOT STARTED'
-          changed = true
-        }
-      })
-
-      return changed ? next : prev
-    })
-
-    setLastSent((prev) => {
-      const next = { ...prev }
-      let changed = false
-
-      ;(['m1', 'm2', 'm3'] as MissionId[]).forEach((id) => {
-        const lastSubmittedAt = progress.missions[id]?.lastSubmittedAt
-        if (lastSubmittedAt && lastSubmittedAt !== prev[id]) {
-          next[id] = lastSubmittedAt
           changed = true
         }
       })
@@ -557,10 +459,6 @@ function FeedbackForm({
 
       setMissionStages((prev) => ({ ...prev, [missionId]: 'sent' }))
       setMissionStatus((prev) => ({ ...prev, [missionId]: 'LOCKED' }))
-
-      const submittedAt = data?.progress?.missions?.[missionId]?.lastSubmittedAt
-      const nextTimestamp = submittedAt || new Date().toISOString()
-      setLastSent((prev) => ({ ...prev, [missionId]: nextTimestamp }))
 
       if (data?.progress?.missions) {
         onProgressUpdate({
