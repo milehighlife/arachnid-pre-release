@@ -91,7 +91,7 @@ function MissionCard({
       </div>
       <div className='mission-requirements'>
         <span className='mission-req-label'>Requirements</span>
-        <p>{requirements}</p>
+        <p className='requirementsText'>{requirements}</p>
       </div>
     </motion.article>
   )

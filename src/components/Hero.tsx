@@ -9,6 +9,22 @@ function Hero({ firstName }: HeroProps) {
   return (
     <section className='hero'>
       <div className='container hero-grid'>
+        <div className='hero-visual'>
+          <div className='disc-shell'>
+            <motion.img
+              src={arachnidLogo}
+              alt='Arachnid pre-release disc'
+              className='disc-image'
+              animate={{ rotate: 360, y: [0, -8, 0], scale: [1, 1.03, 1] }}
+              transition={{
+                rotate: { duration: 80, repeat: Infinity, ease: 'linear' },
+                y: { duration: 8, repeat: Infinity, repeatType: 'mirror', ease: 'easeInOut' },
+                scale: { duration: 4, repeat: Infinity, ease: 'easeInOut' },
+              }}
+            />
+            <span className='disc-scan' aria-hidden='true' />
+          </div>
+        </div>
         <div className='hero-copy'>
           <div className='hero-eyebrow'>Mission Briefing</div>
           <p className='hero-greeting'>Hey, {firstName}</p>
@@ -31,22 +47,6 @@ function Hero({ firstName }: HeroProps) {
             >
               Start Missions
             </motion.a>
-          </div>
-        </div>
-        <div className='hero-visual'>
-          <div className='disc-shell'>
-            <motion.img
-              src={arachnidLogo}
-              alt='Arachnid pre-release disc'
-              className='disc-image'
-              animate={{ rotate: 360, y: [0, -8, 0], scale: [1, 1.03, 1] }}
-              transition={{
-                rotate: { duration: 80, repeat: Infinity, ease: 'linear' },
-                y: { duration: 8, repeat: Infinity, repeatType: 'mirror', ease: 'easeInOut' },
-                scale: { duration: 4, repeat: Infinity, ease: 'easeInOut' },
-              }}
-            />
-            <span className='disc-scan' aria-hidden='true' />
           </div>
         </div>
       </div>
