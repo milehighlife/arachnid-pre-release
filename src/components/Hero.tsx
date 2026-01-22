@@ -15,9 +15,8 @@ function Hero({ firstName }: HeroProps) {
               src={arachnidLogo}
               alt='Arachnid pre-release disc'
               className='disc-image'
-              animate={{ rotate: 360, y: [0, -8, 0], scale: [1, 1.03, 1] }}
+              animate={{ y: [0, -8, 0], scale: [1, 1.03, 1] }}
               transition={{
-                rotate: { duration: 80, repeat: Infinity, ease: 'linear' },
                 y: { duration: 8, repeat: Infinity, repeatType: 'mirror', ease: 'easeInOut' },
                 scale: { duration: 4, repeat: Infinity, ease: 'easeInOut' },
               }}
