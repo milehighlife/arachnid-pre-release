@@ -311,6 +311,7 @@ export default {
           introViewed: record.introViewed,
           introViewedAt: record.introViewedAt,
           introAccepted: record.introAccepted,
+          introAcceptedAt: record.introAcceptedAt,
           submissionCount: record.submissionCount,
           missions: record.missions,
         })),

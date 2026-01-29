@@ -26,6 +26,7 @@ type AgentRecord = {
   introViewed?: boolean
   introViewedAt?: string | null
   introAccepted: boolean
+  introAcceptedAt?: string | null
   submissionCount: number
   missions: {
     m1?: MissionProgress
@@ -36,11 +37,23 @@ type AgentRecord = {
 
 const formatComplete = (value?: boolean) => (value ? 'Complete' : 'Incomplete')
 
+const formatTimestamp = (value?: string | null) => {
+  if (!value) {
+    return '—'
+  }
+  try {
+    return new Date(value).toLocaleString()
+  } catch {
+    return value
+  }
+}
+
 const renderMission1 = (mission?: MissionProgress) => {
   if (!mission || mission.status !== 'LOCKED') {
     return 'Incomplete'
   }
-  return mission.data?.feel?.trim() || 'Complete'
+  const details = mission.data?.feel?.trim() || 'Complete'
+  return `${details} • ${formatTimestamp(mission.lastSubmittedAt)}`
 }
 
 const renderMission2 = (mission?: MissionProgress) => {
@@ -53,6 +66,7 @@ const renderMission2 = (mission?: MissionProgress) => {
     data.shirtSize || 'No size',
     `200ft: ${formatComplete(data.confirmDistance200)}`,
     `Public: ${formatComplete(data.confirmRights)}`,
+    formatTimestamp(mission.lastSubmittedAt),
   ].join(' | ')
 }
 
@@ -66,6 +80,7 @@ const renderMission3 = (mission?: MissionProgress) => {
     data.hoodieSize || 'No size',
     `200ft: ${formatComplete(data.confirmDistance200)}`,
     `Public: ${formatComplete(data.confirmRights)}`,
+    formatTimestamp(mission.lastSubmittedAt),
   ].join(' | ')
 }
 
@@ -178,8 +193,14 @@ function AdminApp() {
                       {agent.last || '—'}, {agent.first || '—'}
                     </td>
                     <td>{agent.token}</td>
-                    <td>{formatComplete(agent.introViewed ?? agent.introAccepted)}</td>
-                    <td>{formatComplete(agent.introAccepted)}</td>
+                    <td>
+                      {formatComplete(agent.introViewed ?? agent.introAccepted)} •{' '}
+                      {formatTimestamp(agent.introViewedAt)}
+                    </td>
+                    <td>
+                      {formatComplete(agent.introAccepted)} •{' '}
+                      {formatTimestamp(agent.introAcceptedAt)}
+                    </td>
                     <td>{renderMission1(agent.missions?.m1)}</td>
                     <td>{renderMission2(agent.missions?.m2)}</td>
                     <td>{renderMission3(agent.missions?.m3)}</td>
