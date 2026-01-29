@@ -54,7 +54,7 @@ function Missions({ first, last, fullName, codename, token, progress, onProgress
           <h2>{statusLabel === 'Tier One' ? 'Missions Completed' : 'Your Missions'}</h2>
           <p className='missions-copy'>
             {statusLabel === 'Tier One'
-              ? 'Congratulations! You are an elite-level operator and have accomplished a challenging mission set. Your insights into the Arachnid are first class. Thank you for your contribution!'
+              ? 'Congratulations! You are an elite-level operator and have accomplished a challenging mission set. Your insights into the Arachnid are first class. Display your Arachnid Patch proudly as a decorated field agent. Thank you for your contribution!'
               : `Agent ${tokenLabel} your missions are live. Unlocked rewards will be issued upon verification. Allow 2-3 weeks for fulfillment.`}
           </p>
         </div>
