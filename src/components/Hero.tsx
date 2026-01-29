@@ -5,9 +5,10 @@ type HeroProps = {
   firstName: string
   agentToken: string
   agentStatus: string
+  showCta: boolean
 }
 
-function Hero({ firstName, agentToken, agentStatus }: HeroProps) {
+function Hero({ firstName, agentToken, agentStatus, showCta }: HeroProps) {
   return (
     <section className='hero'>
       <motion.div
@@ -61,16 +62,18 @@ function Hero({ firstName, agentToken, agentStatus }: HeroProps) {
             Cypher Access: Tap your mission patch to return to this page and submit intel.
           </p>
           <p className='hero-goodluck'>Good luck!</p>
-          <div className='hero-actions'>
-            <motion.a
-              className='cta'
-              href='#missions'
-              whileHover={{ y: -2 }}
-              whileTap={{ y: 0 }}
-            >
-              Start Missions
-            </motion.a>
-          </div>
+          {showCta && (
+            <div className='hero-actions'>
+              <motion.a
+                className='cta'
+                href='#missions'
+                whileHover={{ y: -2 }}
+                whileTap={{ y: 0 }}
+              >
+                Start Missions
+              </motion.a>
+            </div>
+          )}
         </div>
       </div>
     </section>

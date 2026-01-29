@@ -86,6 +86,7 @@ function App() {
   const timeLabel = useClock()
   const agentToken = sanitizeToken(personalization.token) || personalization.firstName
   const agentStatus = getAgentStatus(progress)
+  const mission1Locked = progress?.missions?.m1?.status === 'LOCKED'
 
   useEffect(() => {
     if (briefingSeen) {
@@ -303,6 +304,7 @@ function App() {
         firstName={personalization.firstName}
         agentToken={agentToken}
         agentStatus={agentStatus}
+        showCta={!mission1Locked}
       />
       <AnimatePresence>
         {showHeader && (
