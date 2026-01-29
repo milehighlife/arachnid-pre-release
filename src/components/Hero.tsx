@@ -44,6 +44,7 @@ function Hero({ firstName }: HeroProps) {
             <li>Forehand lasers</li>
             <li>Flight Numbers: 5, 6, -1, 1</li>
             <li>Pre-release variant</li>
+            <li>Production release this March/April</li>
           </ul>
           <p className='hero-intro'>
             Mission Package: Use your skills for Arachnid field testing missions. Publish and
