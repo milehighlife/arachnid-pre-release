@@ -1,5 +1,6 @@
 type Env = {
   ARACHNID_KV: KVNamespace
+  ADMIN_TOKEN?: string
 }
 
 type MissionId = 'm1' | 'm2' | 'm3'
@@ -212,6 +213,48 @@ export default {
         ok: true,
         introAccepted: false,
         introAcceptedAt: null,
+      })
+    }
+
+    if (url.pathname === '/api/admin/agents') {
+      if (request.method !== 'GET') {
+        return jsonResponse({ ok: false, error: 'Method not allowed' }, 405)
+      }
+
+      if (!env.ADMIN_TOKEN) {
+        return jsonResponse({ ok: false, error: 'Admin token not configured' }, 500)
+      }
+
+      const headerToken = (request.headers.get('X-Admin-Token') || '').trim()
+      if (!headerToken || headerToken !== env.ADMIN_TOKEN) {
+        return jsonResponse({ ok: false, error: 'Unauthorized' }, 401)
+      }
+
+      const agents: ProgressRecord[] = []
+      let cursor: string | undefined
+
+      do {
+        const list = await env.ARACHNID_KV.list({ prefix: 'arachnid:progress:', cursor })
+        cursor = list.cursor
+        for (const key of list.keys) {
+          const record = (await env.ARACHNID_KV.get(key.name, 'json')) as ProgressRecord | null
+          if (record) {
+            agents.push(record)
+          }
+        }
+      } while (cursor)
+
+      return jsonResponse({
+        ok: true,
+        agents: agents.map((record) => ({
+          token: record.token,
+          first: record.first,
+          last: record.last,
+          codename: record.codename,
+          introAccepted: record.introAccepted,
+          submissionCount: record.submissionCount,
+          missions: record.missions,
+        })),
       })
     }
 

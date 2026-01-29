@@ -9,3 +9,6 @@ routes = [
 kv_namespaces = [
   { binding = "ARACHNID_KV", id = "f78521e41f184d16969bb4b0a70fa859" }
 ]
+
+[vars]
+ADMIN_TOKEN = "milehighwombat"

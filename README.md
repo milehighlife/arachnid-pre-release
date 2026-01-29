@@ -35,6 +35,10 @@ Test:
 - `/api/status?token=TK_test&first=Test&last=User`
 
 Intro gate:
-- Uses YouTube videoId `VWOT_vkPdKI`.
+- Default YouTube videoId: `ZrBpV_Jlhg4` (token-specific overrides supported).
 - Token users persist intro acceptance via KV.
 - Non-token visitors see the intro every visit.
+
+Admin console:
+- Visit `/admin` for agent stats.
+- Requires header `X-Admin-Token` matching `ADMIN_TOKEN` in `worker/wrangler.toml`.
