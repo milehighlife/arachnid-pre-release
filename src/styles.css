@@ -1361,12 +1361,14 @@ button {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 12px;
+  align-items: start;
 }
 
 .admin-mission-cell {
   display: grid;
   gap: 6px;
   min-width: 0;
+  align-content: start;
 }
 
 .admin-mission-label {
