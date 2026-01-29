@@ -29,6 +29,19 @@ function Missions({ first, last, fullName, codename, token, progress, onProgress
       .length
   }, [statusMap])
 
+  const statusLabel = useMemo(() => {
+    if (statusMap.m3 === 'LOCKED') {
+      return 'Tier One'
+    }
+    if (statusMap.m2 === 'LOCKED') {
+      return 'Operator'
+    }
+    if (statusMap.m1 === 'LOCKED') {
+      return 'Qualified'
+    }
+    return 'Candidate'
+  }, [statusMap])
+
   const progressPercent = lockedCount === 3 ? 100 : lockedCount * 33
 
   return (
@@ -46,7 +59,9 @@ function Missions({ first, last, fullName, codename, token, progress, onProgress
 
         <div className='mission-progress'>
           <div className='mission-progress-top'>
-            <span>Mission Progress: {lockedCount}/3</span>
+            <span>
+              Mission Progress: {statusLabel} ({lockedCount}/3)
+            </span>
           </div>
           <div className='mission-progress-bar'>
             <div className='mission-progress-fill' style={{ width: `${progressPercent}%` }} />
