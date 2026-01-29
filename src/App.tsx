@@ -54,6 +54,23 @@ const getPersonalization = (): Personalization => {
   return { first, last, token, handle, firstName, fullName, codename }
 }
 
+const getAgentStatus = (progress: ProgressPayload | null) => {
+  const m1Locked = progress?.missions?.m1?.status === 'LOCKED'
+  const m2Locked = progress?.missions?.m2?.status === 'LOCKED'
+  const m3Locked = progress?.missions?.m3?.status === 'LOCKED'
+
+  if (m3Locked) {
+    return 'Tier One'
+  }
+  if (m2Locked) {
+    return 'Operator'
+  }
+  if (m1Locked) {
+    return 'Qualified'
+  }
+  return 'Candidate'
+}
+
 function App() {
   const personalization = useMemo(getPersonalization, [])
   const [briefingSeen, setBriefingSeen] = useLocalStorageFlag('arachnid_briefing_seen')
@@ -67,6 +84,8 @@ function App() {
   const headerRef = useRef<HTMLDivElement | null>(null)
   const missionEndRef = useRef<HTMLDivElement | null>(null)
   const timeLabel = useClock()
+  const agentToken = sanitizeToken(personalization.token) || personalization.firstName
+  const agentStatus = getAgentStatus(progress)
 
   useEffect(() => {
     if (briefingSeen) {
@@ -280,7 +299,11 @@ function App() {
           </motion.div>
         )}
       </AnimatePresence>
-      <Hero firstName={personalization.firstName} />
+      <Hero
+        firstName={personalization.firstName}
+        agentToken={agentToken}
+        agentStatus={agentStatus}
+      />
       <AnimatePresence>
         {showHeader && (
           <motion.div

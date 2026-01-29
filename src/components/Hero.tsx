@@ -3,9 +3,11 @@ import arachnidLogo from '../assets/arachnid-logo.png'
 
 type HeroProps = {
   firstName: string
+  agentToken: string
+  agentStatus: string
 }
 
-function Hero({ firstName }: HeroProps) {
+function Hero({ firstName, agentToken, agentStatus }: HeroProps) {
   return (
     <section className='hero'>
       <motion.div
@@ -36,7 +38,9 @@ function Hero({ firstName }: HeroProps) {
         </div>
         <div className='hero-copy'>
           <div className='hero-eyebrow'>Mission Briefing</div>
-          <p className='hero-greeting'>Hey, {firstName}</p>
+          <p className='hero-greeting hero-status'>
+            Agent: {agentToken || firstName}, Status: {agentStatus}
+          </p>
           <h1 className='hero-title'>Pre-Release Arachnid</h1>
           <p className='hero-subheading'>MISSION INTEL:</p>
           <ul className='hero-bullets'>
