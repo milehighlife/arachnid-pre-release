@@ -15,7 +15,7 @@ function Hero({ firstName }: HeroProps) {
         transition={{ duration: 0.24, ease: 'easeOut' }}
       >
         <div className='container confidential-banner-inner'>
-          <span>CONFIDENTIAL — ENCRYPTED CHANNEL — MISSION ACCESS</span>
+          <span>CONFIDENTIAL • ENCRYPTED</span>
         </div>
       </motion.div>
       <div className='container hero-grid'>
