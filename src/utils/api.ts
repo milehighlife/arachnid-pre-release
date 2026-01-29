@@ -6,7 +6,11 @@ export const getApiUrl = (path: string) => {
     }
   }
 
-  const workerUrl = import.meta.env.VITE_WORKER_URL
+  const workerUrl =
+    import.meta.env.VITE_WORKER_URL ||
+    (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+      ? 'https://arachnidagent.com/api/feedback'
+      : '')
   if (!workerUrl) {
     return path
   }

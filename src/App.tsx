@@ -63,6 +63,7 @@ function App() {
   const [progress, setProgress] = useState<ProgressPayload | null>(null)
   const [introAccepted, setIntroAccepted] = useState(false)
   const [statusLoaded, setStatusLoaded] = useState(!personalization.token)
+  const [introDismissed, setIntroDismissed] = useState(!personalization.token)
   const headerRef = useRef<HTMLDivElement | null>(null)
   const missionEndRef = useRef<HTMLDivElement | null>(null)
   const timeLabel = useClock()
@@ -144,6 +145,7 @@ function App() {
     if (!token) {
       setProgress(null)
       setIntroAccepted(false)
+      setIntroDismissed(false)
       setStatusLoaded(true)
       return
     }
@@ -170,16 +172,21 @@ function App() {
         if (data?.ok && data.progress) {
           setProgress({ ...data.progress, token })
           setIntroAccepted(Boolean(data.progress.introAccepted))
+          if (data.progress.introAccepted) {
+            setIntroDismissed(true)
+          }
           setStatusLoaded(true)
           return
         }
         setIntroAccepted(false)
+        setIntroDismissed(false)
         setStatusLoaded(true)
       })
       .catch(() => {
         if (active) {
           setProgress(null)
           setIntroAccepted(false)
+          setIntroDismissed(false)
           setStatusLoaded(true)
         }
       })
@@ -196,9 +203,35 @@ function App() {
 
   const handleIntroAccepted = () => {
     setIntroAccepted(true)
+    setIntroDismissed(true)
     setProgress((current) =>
-      current ? { ...current, introAccepted: true, introAcceptedAt: new Date().toISOString() } : current,
+      current
+        ? { ...current, introAccepted: true, introAcceptedAt: new Date().toISOString() }
+        : current,
     )
+  }
+
+  const handleIntroReset = async () => {
+    if (!personalization.token) {
+      return
+    }
+    try {
+      const response = await fetch(getApiUrl('/api/intro-reset'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: personalization.token }),
+      })
+      const data = (await response.json()) as { ok?: boolean }
+      if (!response.ok || !data?.ok) {
+        return
+      }
+      setIntroAccepted(false)
+      setProgress((current) =>
+        current ? { ...current, introAccepted: false, introAcceptedAt: null } : current,
+      )
+    } catch {
+      return
+    }
   }
 
   if (personalization.token && !statusLoaded) {
@@ -209,7 +242,9 @@ function App() {
     )
   }
 
-  if (!introAccepted) {
+  const showIntro = !introDismissed && (!personalization.token || !introAccepted)
+
+  if (showIntro) {
     return (
       <IntroGate
         token={personalization.token || undefined}
@@ -280,7 +315,11 @@ function App() {
         />
         <div ref={missionEndRef} className='mission-header-sentinel' aria-hidden='true' />
       </main>
-      <Footer />
+      <Footer
+        introAccepted={introAccepted}
+        canReset={Boolean(personalization.token)}
+        onResetIntro={handleIntroReset}
+      />
     </div>
   )
 }

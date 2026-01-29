@@ -167,6 +167,54 @@ export default {
       })
     }
 
+    if (url.pathname === '/api/intro-reset') {
+      if (request.method !== 'POST') {
+        return jsonResponse({ ok: false, error: 'Method not allowed' }, 405)
+      }
+
+      let payload: { token?: string }
+      try {
+        payload = (await request.json()) as { token?: string }
+      } catch {
+        return jsonResponse({ ok: false, error: 'Invalid JSON payload' }, 400)
+      }
+
+      const token = typeof payload.token === 'string' ? payload.token.trim() : ''
+      if (!token) {
+        return jsonResponse({ ok: false, error: 'Missing token' }, 400)
+      }
+
+      const nowISO = new Date().toISOString()
+      const key = buildProgressKey(token)
+      const existing = (await env.ARACHNID_KV.get(key, 'json')) as ProgressRecord | null
+      const tokenTag = sanitizeToken(token)
+      const codename = tokenTag ? `@${tokenTag}` : '@tester'
+
+      const record =
+        existing ??
+        buildProgressRecord({
+          token,
+          first: '',
+          last: '',
+          codename,
+          nowISO,
+        })
+
+      record.introAccepted = false
+      record.introAcceptedAt = null
+      record.updatedAt = nowISO
+      record.lastSeenAt = nowISO
+      record.codename = record.codename || codename
+
+      await env.ARACHNID_KV.put(key, JSON.stringify(record))
+
+      return jsonResponse({
+        ok: true,
+        introAccepted: false,
+        introAcceptedAt: null,
+      })
+    }
+
     if (url.pathname === '/api/status') {
       if (request.method !== 'GET') {
         return jsonResponse({ ok: false, error: 'Method not allowed' }, 405)

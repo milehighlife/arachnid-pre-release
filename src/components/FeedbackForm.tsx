@@ -501,18 +501,20 @@ function FeedbackForm({
       <div className='mission-grid'>
         <MissionCard
           label='Mission 1'
-          title='Tell Us How the Disc Feels'
+          title='Shape Assessment'
           description='Your first impression matters.'
-          award='Optional mission to help refine the final feel.'
-          requirements='Optional, but encouraged. 10-2000 characters if provided. Required to continue to Mission 2.'
+          requirements='Submission required to maintain Agent status.'
           status={missionStatus.m1}
         >
           <div className='field'>
-            <label htmlFor='mission1_feel'>Describe the shape and feel of the disc in hand.</label>
+            <label htmlFor='mission1_feel'>
+              Describe the Arachnid’s form, fit, and geometry, then assess expected pre-flight
+              behavior—how you think it will fly. Text-only submission.
+            </label>
             <textarea
               id='mission1_feel'
               name='mission1_feel'
-              placeholder='Grip, dome, and plastic feel...'
+              placeholder='Grip, shape, feel...'
               value={mission1Feel}
               onChange={(event) => {
                 setMission1Feel(event.target.value)
@@ -527,7 +529,6 @@ function FeedbackForm({
             )}
           </div>
           <div className='mission-actions'>
-            <span className='submit-label mono'>UPLOAD EVIDENCE</span>
             <button
               type='button'
               className='submit'
@@ -560,14 +561,18 @@ function FeedbackForm({
 
         <MissionCard
           label='Mission 2'
-          title='Share How the Arachnid Flew'
+          title='Flight Test'
           description='Show us how it flies in the wild.'
           award='Award: Maintain Tester Team Status and receive an Arachnid Tester T-shirt in your size.'
           requirements='Requirements: Hole must be over 200ft. Video must be public. Innova has rights to reshare video on social platforms. If an ace, also fulfills Mission 3 requirements — two for one.'
           status={missionStatus.m2}
         >
           <div className='field'>
-            <label htmlFor='mission2_flight'>Describe how it flew.</label>
+            <label htmlFor='mission2_flight'>
+              Conduct a controlled test flight, document observed performance in detail, record
+              clear flight video based on requirements. Publish to agent social channel and collab
+              with @innovadiscs and @innovawombat. Award: Level 1 Agent uniform (t-shirt).
+            </label>
             <textarea
               id='mission2_flight'
               name='mission2_flight'
@@ -708,8 +713,8 @@ function FeedbackForm({
 
         <MissionCard
           label='Mission 3'
-          title='Sharpshooter: Get an Arachnid Ace on Video'
-          description='Elite accomplishment.'
+          title='Sharpshooter'
+          description='For elite agents only. Score an ace over 200ft. Capture and publish video. Collab with @innovadiscs and @innovawombat. Award: Level 2 Agent uniform (hoodie) and two (2) first-run Arachnids.'
           award='Award: Limited Arachnid Tester Hoodie customized with your full name, plus two first-run Arachnids.'
           requirements='Requirements: Hole must be over 200ft. Video must be public. Innova has the rights to share video on social platforms.'
           status={missionStatus.m3}

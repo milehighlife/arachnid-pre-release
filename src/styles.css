@@ -323,6 +323,26 @@ button {
   padding: 96px 0 72px;
 }
 
+.confidential-banner {
+  width: 100%;
+  border-top: 1px solid rgba(255, 0, 0, 0.6);
+  border-bottom: 1px solid rgba(255, 0, 0, 0.6);
+  color: rgba(255, 0, 0, 0.85);
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  font-size: 0.7rem;
+  margin-bottom: 18px;
+}
+
+.confidential-banner-inner {
+  padding: 10px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
 .hero-grid {
   display: grid;
   gap: 20px;
@@ -332,21 +352,6 @@ button {
 .hero-copy {
   display: grid;
   gap: 14px;
-}
-
-.confidential-stamp {
-  justify-self: start;
-  display: inline-flex;
-  flex-direction: column;
-  gap: 2px;
-  padding: 8px 12px;
-  border: 1px solid rgba(255, 0, 0, 0.75);
-  color: rgba(255, 0, 0, 0.8);
-  border-radius: 10px;
-  font-size: 0.7rem;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  transform: rotate(-8deg);
 }
 
 .confidential-sub {
@@ -374,41 +379,38 @@ button {
   letter-spacing: -0.03em;
 }
 
-.hero-subhead {
+.hero-subheading {
+  margin: 0;
+  color: var(--accent);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+}
+
+.hero-bullets {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--muted);
+  display: grid;
+  gap: 6px;
+  font-size: 0.98rem;
+}
+
+.hero-bullets li {
+  line-height: 1.4;
+}
+
+.hero-intro {
   margin: 0;
   color: var(--muted);
-  font-size: 1.05rem;
-  max-width: 520px;
+  max-width: 560px;
+  line-height: 1.5;
 }
 
-.flight-row {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  color: var(--muted);
-  font-size: 0.95rem;
-}
-
-.flight-label {
-  text-transform: uppercase;
-  letter-spacing: 0.18em;
-  font-size: 0.7rem;
-}
-
-.flight-values {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: var(--accent);
-}
-
-.hero-line {
+.hero-goodluck {
   margin: 0;
   color: var(--text);
-}
-
-.hero-friendly {
-  margin: 0;
-  color: var(--muted);
+  font-weight: 600;
 }
 
 .hero-actions {
@@ -1206,6 +1208,47 @@ button {
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+
+.footer-channel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.footer-key {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  border: 1px solid currentColor;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  padding: 0;
+}
+
+.footer-key svg {
+  width: 18px;
+  height: 18px;
+}
+
+.footer-key.is-red {
+  color: var(--accent);
+}
+
+.footer-key.is-green {
+  color: #22c55e;
+}
+
+.footer-key:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.footer-key:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: 4px;
 }
 
 @media (min-width: 960px) {

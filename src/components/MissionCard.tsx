@@ -14,7 +14,7 @@ type MissionCardProps = {
   label: string
   title: string
   description: string
-  award: string
+  award?: string
   requirements: string
   status: MissionStatus
   children: ReactNode
@@ -106,10 +106,12 @@ function MissionCard({
         <span className='redaction-line'>{description}</span>
       </p>
       <div className='mission-fields'>{children}</div>
-      <div className='mission-award'>
-        <span className='mission-award-label'>Award</span>
-        <p>{award}</p>
-      </div>
+      {award ? (
+        <div className='mission-award'>
+          <span className='mission-award-label'>Award</span>
+          <p>{award}</p>
+        </div>
+      ) : null}
       <div className='mission-requirements'>
         <span className='mission-req-label'>Requirements</span>
         <p className='requirementsText'>{requirements}</p>

@@ -38,12 +38,10 @@ function Missions({ first, last, fullName, codename, token, progress, onProgress
         <div className='missions-header'>
           <div className='section-label'>Mission Log — {codename}</div>
           <h2>Your Missions</h2>
-          <p className='missions-intro'>Codename {codename}, your missions are live.</p>
           <p className='missions-copy'>
-            Codename {codename}, complete missions to maintain Tester Team Status and unlock
-            rewards.
+            Codename {codename} your missions are live. Complete Missions 1 & 2 to maintain Tester
+            Agent status. Unlocked rewards will be issued upon verification.
           </p>
-          <p className='missions-awards'>Awards will be issued to {fullName} after verification.</p>
         </div>
 
         <div className='mission-progress'>

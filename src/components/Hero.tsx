@@ -8,6 +8,16 @@ type HeroProps = {
 function Hero({ firstName }: HeroProps) {
   return (
     <section className='hero'>
+      <motion.div
+        className='confidential-banner'
+        initial={{ opacity: 0, y: -6 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.24, ease: 'easeOut' }}
+      >
+        <div className='container confidential-banner-inner'>
+          <span>CONFIDENTIAL — ENCRYPTED CHANNEL — MISSION ACCESS</span>
+        </div>
+      </motion.div>
       <div className='container hero-grid'>
         <div className='hero-visual'>
           <div className='disc-shell'>
@@ -25,27 +35,25 @@ function Hero({ firstName }: HeroProps) {
           </div>
         </div>
         <div className='hero-copy'>
-          <motion.div
-            className='confidential-stamp'
-            initial={{ opacity: 0, scale: 1.2 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.24, ease: 'easeOut' }}
-          >
-            <span>CONFIDENTIAL</span>
-            <span className='confidential-sub'>TEST BATCH ACCESS</span>
-          </motion.div>
           <div className='hero-eyebrow'>Mission Briefing</div>
           <p className='hero-greeting'>Hey, {firstName}</p>
           <h1 className='hero-title'>Pre-Release Arachnid</h1>
-          <p className='hero-subhead'>
-            Low-profile, high-glide, stable mid-range weapon. Secondary role: sidearm approach.
+          <p className='hero-subheading'>MISSION INTEL:</p>
+          <ul className='hero-bullets'>
+            <li>Low-profile, high-glide, stable mid-range</li>
+            <li>Forehand lasers</li>
+            <li>Flight Numbers: 5, 6, -1, 1</li>
+            <li>Pre-release variant</li>
+          </ul>
+          <p className='hero-intro'>
+            Mission Package: Use your skills for Arachnid field testing missions. Publish and
+            collab your findings. Maintain agent status, level up with agent Arachnid gear. Your
+            mission briefings are below.
           </p>
-          <div className='flight-row'>
-            <span className='flight-label'>Flight Numbers</span>
-            <span className='flight-values'>5 | 6 | -1 | 1</span>
-          </div>
-          <p className='hero-line'>Pre-release made for you, the tester.</p>
-          <p className='hero-friendly'>Stay sharp, {firstName}. Log every flight detail.</p>
+          <p className='hero-intro'>
+            Cypher Access: Tap your mission patch to return to this page and submit intel.
+          </p>
+          <p className='hero-goodluck'>Good luck!</p>
           <div className='hero-actions'>
             <motion.a
               className='cta'
