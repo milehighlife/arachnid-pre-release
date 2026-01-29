@@ -31,6 +31,7 @@ type AgentRecord = {
   visitCount?: number
   lastSeenAt?: string | null
   updatedAt?: string | null
+  updateAction?: string
   missions: {
     m1?: MissionProgress
     m2?: MissionProgress
@@ -194,6 +195,8 @@ function AdminApp() {
                 <th>Accepted Missions</th>
                 <th>Visits</th>
                 <th>Last Seen</th>
+                <th>Last Update</th>
+                <th>Update Action</th>
                 <th>Mission 1</th>
                 <th>Mission 2</th>
                 <th>Mission 3</th>
@@ -223,6 +226,8 @@ function AdminApp() {
                     </td>
                     <td>{agent.visitCount ?? 0}</td>
                     <td>{formatTimestamp(agent.lastSeenAt)}</td>
+                    <td>{formatTimestamp(agent.updatedAt)}</td>
+                    <td>{agent.updateAction || 'Viewed page'}</td>
                     <td>{renderMission1(agent.missions?.m1, agent.updatedAt)}</td>
                     <td>{renderMission2(agent.missions?.m2, agent.updatedAt)}</td>
                     <td>{renderMission3(agent.missions?.m3, agent.updatedAt)}</td>

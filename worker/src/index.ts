@@ -33,6 +33,7 @@ type ProgressRecord = {
   missions: Record<MissionId, MissionProgress>
   submissionCount: number
   visitCount: number
+  updateAction: string
   createdAt: string
   updatedAt: string
   lastSeenAt: string
@@ -113,6 +114,7 @@ const buildProgressRecord = ({
   missions: defaultMissions(),
   submissionCount: 0,
   visitCount: 0,
+  updateAction: 'Created',
   createdAt: nowISO,
   updatedAt: nowISO,
   lastSeenAt: nowISO,
@@ -163,6 +165,7 @@ export default {
       record.introAcceptedAt = nowISO
       record.introViewed = true
       record.introViewedAt = record.introViewedAt || nowISO
+      record.updateAction = 'Intro accepted'
       record.updatedAt = nowISO
       record.lastSeenAt = nowISO
       record.codename = record.codename || codename
@@ -211,6 +214,7 @@ export default {
 
       record.introViewed = true
       record.introViewedAt = record.introViewedAt || nowISO
+      record.updateAction = 'Intro viewed'
       record.updatedAt = nowISO
       record.lastSeenAt = nowISO
       record.codename = record.codename || codename
@@ -261,6 +265,7 @@ export default {
       record.introAcceptedAt = null
       record.introViewed = false
       record.introViewedAt = null
+      record.updateAction = 'Intro reset'
       record.updatedAt = nowISO
       record.lastSeenAt = nowISO
       record.codename = record.codename || codename
@@ -318,6 +323,7 @@ export default {
           visitCount: record.visitCount || 0,
           lastSeenAt: record.lastSeenAt,
           updatedAt: record.updatedAt,
+          updateAction: record.updateAction || 'Viewed page',
           missions: record.missions,
         })),
       })
@@ -355,6 +361,7 @@ export default {
             lastSeenAt: nowISO,
             updatedAt: nowISO,
             visitCount: (existing.visitCount || 0) + 1,
+            updateAction: 'Viewed page',
           }
         : buildProgressRecord({
             token: tokenParam,
@@ -377,6 +384,7 @@ export default {
             : Boolean(baseRecord.introAcceptedAt),
         introAcceptedAt: baseRecord.introAcceptedAt ?? null,
         visitCount: typeof baseRecord.visitCount === 'number' ? baseRecord.visitCount : 1,
+        updateAction: baseRecord.updateAction || 'Viewed page',
       }
 
       await env.ARACHNID_KV.put(key, JSON.stringify(record))
@@ -391,6 +399,7 @@ export default {
           introViewedAt: record.introViewedAt,
           introAccepted: record.introAccepted,
           introAcceptedAt: record.introAcceptedAt,
+          updateAction: record.updateAction,
           updatedAt: record.updatedAt,
           lastSeenAt: record.lastSeenAt,
         },
@@ -526,6 +535,7 @@ export default {
         },
       }
       record.submissionCount = (record.submissionCount || 0) + 1
+      record.updateAction = `Mission ${missionId.slice(1)} sent`
       record.updatedAt = nowISO
       record.lastSeenAt = nowISO
 
