@@ -50,10 +50,11 @@ function Missions({ first, last, fullName, codename, token, progress, onProgress
         <div className='system-label mono'>SECURE CHANNEL: ACTIVE</div>
         <div className='missions-header'>
           <div className='section-label'>Mission Log — {codename}</div>
-          <h2>Your Missions</h2>
+          <h2>{statusLabel === 'Tier One' ? 'Missions Completed' : 'Your Missions'}</h2>
           <p className='missions-copy'>
-            Codename {codename} your missions are live. Complete Missions 1 & 2 to maintain Tester
-            Agent status. Unlocked rewards will be issued upon verification.
+            {statusLabel === 'Tier One'
+              ? 'Congratulations! You are an elite-level operator and have accomplished a challenging mission set. Your insights into the Arachnid are first class. Thank you for your contribution!'
+              : `Codename ${codename} your missions are live. Complete Missions 1 & 2 to maintain Tester Agent status. Unlocked rewards will be issued upon verification.`}
           </p>
         </div>
 
