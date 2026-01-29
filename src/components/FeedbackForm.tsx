@@ -541,7 +541,7 @@ function FeedbackForm({
           <div className='mission-actions'>
             <button
               type='button'
-              className='submit'
+              className={`submit${missionStatus.m1 === 'LOCKED' ? ' is-locked' : ''}`}
               disabled={!mission1Ready || isMissionDisabled('m1') || tokenMissing}
               onClick={() => submitMission('m1')}
             >
@@ -702,7 +702,7 @@ function FeedbackForm({
             <span className='submit-label mono'>UPLOAD EVIDENCE</span>
             <button
               type='button'
-              className='submit'
+              className={`submit${missionStatus.m2 === 'LOCKED' ? ' is-locked' : ''}`}
               disabled={!mission2Ready || isMissionDisabled('m2') || tokenMissing}
               onClick={() => submitMission('m2')}
             >
@@ -842,7 +842,7 @@ function FeedbackForm({
             <span className='submit-label mono'>UPLOAD EVIDENCE</span>
             <button
               type='button'
-              className='submit'
+              className={`submit${missionStatus.m3 === 'LOCKED' ? ' is-locked' : ''}`}
               disabled={!mission3Ready || isMissionDisabled('m3') || tokenMissing}
               onClick={() => submitMission('m3')}
             >
