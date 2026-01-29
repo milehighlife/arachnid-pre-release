@@ -613,7 +613,6 @@ function FeedbackForm({
               <li>Innova has rights to share on social platforms</li>
               <li>Collab with @innovadiscs, @innovawombat</li>
               <li>Tag all media #innovaarachnid</li>
-              <li>An ace qualifies for Mission 3 Award (2-for-1)</li>
             </ul>
           }
           status={missionStatus.m2}
