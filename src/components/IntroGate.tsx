@@ -28,7 +28,59 @@ declare global {
   }
 }
 
-const VIDEO_ID = 'ZrBpV_Jlhg4'
+const DEFAULT_VIDEO_ID = 'ZrBpV_Jlhg4'
+
+const VIDEO_MAP: Record<string, string> = {
+  mylesofdiscs: 'nqcDirOGs8c',
+  'jose.discgolf': 'oIJFW7YNyZw',
+  'jonathanb.mauldin': '2IRufI7HTS4',
+  anotherrounddg: 'x6QtHQR02QU',
+  nathansajk: 'R-eUoBq9n70',
+  ghydle: 'g1TAHA_WRWg',
+  discgolfdudez: 'X-C-XDSlV0I',
+  lasasso_jessica: '3cWf486Kp3o',
+  thinktextures: '5LVfGDDsV2s',
+  jaredselby: 'prLgVtpfpoY',
+  toddconner81: 'Y-ze-JUIsas',
+  anotherroundsaltlake: 'QzVpZWmzYw0',
+  dyesbyredd: '36kgaSq9wI8',
+  'jonte.dg': 'o-4ZDfMrbrQ',
+  jerrymenzie47: 'YQ9phb2QuDE',
+  mandos_disc_golf: '3JfNJLV7foE',
+  kmac_disc: 'Rz5dWJolPGY',
+  kona_disc: 'Z1aG1Sbfq4Q',
+  'disc.pink': 'azilEQzExEs',
+  jberwanger_discgolf: 'RcopyrRh7vA',
+  markylavalley: 'HPVLcZqI4sA',
+  thedisczone: 'pmnhGirzv44',
+  forehand_dan: 'yzPypPYOAZc',
+  queencitydisc: 'jRQrWWDMJQQ',
+  eva_lutsenkodg: 'hrBBZxSD27A',
+  mj_discgolf: '2UUzotsa-s8',
+  understablemindsdg: 'm_tUbqzHVN4',
+  chasekdillon: 'VgzWvLxRRXE',
+  mikaelasantek: 'EEy9EYHHlR8',
+  'kimberly.disc.aholic': 'AC3k1RSvDKA',
+  bearbitedisc: 'dVEpWCtfD34',
+  limitlesselizabeth: 'xiTwW5lLxJU',
+  ditsydiscgirl: 'TyhjxD5JDZc',
+  k_cay_music_and_discgolf: 'wyvtJc5hqjc',
+  karaleediscgolf: 'itkN2Cd0xeM',
+  riley_d23: '9jM09Pp8BDI',
+  'the.duvie': 'SA91wnSnS7g',
+  harostotle: 'ypshz7wE_xo',
+  benji_z_disc_golf: 'uAYtgJE3zt8',
+  csullivangolf: 'QCo7tJyx7D0',
+  frisbeenate: '4wi-4POyLZU',
+  silverfoxpdga25617: 'twuMquoPruU',
+  scott_oxspring: '7P1F5CWJ65Q',
+  anotherroundatx: '04dFa0VMC6U',
+}
+
+const resolveVideoId = (token?: string | null) => {
+  const key = (token || '').replace(/^@+/, '').trim().toLowerCase()
+  return VIDEO_MAP[key] || DEFAULT_VIDEO_ID
+}
 
 let youTubeApiPromise: Promise<void> | null = null
 
@@ -77,6 +129,7 @@ function IntroGate({ token, codename, onAccepted }: IntroGateProps) {
   const [accepting, setAccepting] = useState(false)
   const [acceptError, setAcceptError] = useState('')
   const [soundEnabled, setSoundEnabled] = useState(false)
+  const videoId = resolveVideoId(token)
 
   useEffect(() => {
     let active = true
@@ -88,7 +141,7 @@ function IntroGate({ token, codename, onAccepted }: IntroGateProps) {
         }
 
         playerRef.current = new window.YT.Player('introPlayer', {
-          videoId: VIDEO_ID,
+          videoId,
           playerVars: {
             autoplay: 1,
             mute: 1,
