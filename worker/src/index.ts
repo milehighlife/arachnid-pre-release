@@ -235,7 +235,8 @@ export default {
 
       do {
         const list = await env.ARACHNID_KV.list({ prefix: 'arachnid:progress:', cursor })
-        cursor = list.cursor
+        const nextCursor = 'cursor' in list ? list.cursor : undefined
+        cursor = list.list_complete ? undefined : nextCursor
         for (const key of list.keys) {
           const record = (await env.ARACHNID_KV.get(key.name, 'json')) as ProgressRecord | null
           if (record) {
