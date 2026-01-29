@@ -1360,6 +1360,7 @@ button {
 .admin-mission-cell {
   display: grid;
   gap: 6px;
+  min-width: 0;
 }
 
 .admin-mission-label {
@@ -1372,6 +1373,8 @@ button {
 .admin-mission-value {
   color: var(--text);
   font-size: 0.85rem;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .admin-empty {
