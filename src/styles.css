@@ -1168,6 +1168,18 @@ button {
   font-size: 0.9rem;
 }
 
+.requirements-list {
+  margin: 6px 0 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 6px;
+}
+
+.requirements-list li {
+  line-height: 1.45;
+  color: var(--muted);
+}
+
 .submit {
   justify-self: start;
   padding: 12px 24px;

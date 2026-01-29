@@ -15,7 +15,7 @@ type MissionCardProps = {
   title: string
   description: string
   award?: string
-  requirements: string
+  requirements: ReactNode
   status: MissionStatus
   children: ReactNode
 }
@@ -114,7 +114,11 @@ function MissionCard({
       ) : null}
       <div className='mission-requirements'>
         <span className='mission-req-label'>Requirements</span>
-        <p className='requirementsText'>{requirements}</p>
+        {typeof requirements === 'string' ? (
+          <p className='requirementsText'>{requirements}</p>
+        ) : (
+          <div className='requirementsText'>{requirements}</div>
+        )}
       </div>
     </motion.article>
   )

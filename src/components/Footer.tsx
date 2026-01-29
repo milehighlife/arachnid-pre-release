@@ -23,12 +23,32 @@ function Footer({ introAccepted, canReset, onResetIntro }: FooterProps) {
           >
             <svg viewBox='0 0 24 24' aria-hidden='true'>
               <path
-                d='M7.5 14a4.5 4.5 0 1 1 4.24-6H21v3h-2v2h-2v2h-2v2h-3.26A4.5 4.5 0 0 1 7.5 14Z'
+                d='M6 11a6 6 0 0 1 12 0'
                 fill='none'
                 stroke='currentColor'
                 strokeWidth='1.6'
                 strokeLinecap='round'
-                strokeLinejoin='round'
+              />
+              <path
+                d='M9 11a3 3 0 0 1 6 0'
+                fill='none'
+                stroke='currentColor'
+                strokeWidth='1.6'
+                strokeLinecap='round'
+              />
+              <path
+                d='M6 14v2a4 4 0 0 0 8 0v-2'
+                fill='none'
+                stroke='currentColor'
+                strokeWidth='1.6'
+                strokeLinecap='round'
+              />
+              <path
+                d='M14 14v1a2 2 0 0 0 4 0v-1'
+                fill='none'
+                stroke='currentColor'
+                strokeWidth='1.6'
+                strokeLinecap='round'
               />
             </svg>
           </button>

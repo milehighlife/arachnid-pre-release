@@ -45,6 +45,8 @@ function Hero({ firstName }: HeroProps) {
             <li>Flight Numbers: 5, 6, -1, 1</li>
             <li>Pre-release variant</li>
             <li>Production release this March/April</li>
+            <li>Collab with @innovadiscs, @innovawombat</li>
+            <li>Tag all media #innovaarachnid</li>
           </ul>
           <p className='hero-intro'>
             Mission Package: Use your skills for Arachnid field testing missions. Publish and

@@ -564,7 +564,16 @@ function FeedbackForm({
           title='Flight Test'
           description='Show us how it flies in the wild.'
           award='Award: Maintain Tester Team Status and receive an Arachnid Tester T-shirt in your size.'
-          requirements='Requirements: Hole must be over 200ft. Video must be public. Innova has rights to reshare video on social platforms. If an ace, also fulfills Mission 3 requirements — two for one.'
+          requirements={
+            <ul className='requirements-list'>
+              <li>Hole must be greater than 200ft</li>
+              <li>Published video must be public</li>
+              <li>Innova has rights to share on social platforms</li>
+              <li>Collab with @innovadiscs, @innovawombat</li>
+              <li>Tag all media #innovaarachnid</li>
+              <li>An ace qualifies for Mission 3 Award (2-for-1)</li>
+            </ul>
+          }
           status={missionStatus.m2}
         >
           <div className='field'>
@@ -716,7 +725,15 @@ function FeedbackForm({
           title='Sharpshooter'
           description='For elite agents only. Score an ace over 200ft. Capture and publish video. Collab with @innovadiscs and @innovawombat. Award: Level 2 Agent uniform (hoodie) and two (2) first-run Arachnids.'
           award='Award: Limited Arachnid Tester Hoodie customized with your full name, plus two first-run Arachnids.'
-          requirements='Requirements: Hole must be over 200ft. Video must be public. Innova has the rights to share video on social platforms.'
+          requirements={
+            <ul className='requirements-list'>
+              <li>Hole must be over 200ft</li>
+              <li>Published video must be public</li>
+              <li>Innova has rights to share on social platforms</li>
+              <li>Collab with @innovadiscs, @innovawombat</li>
+              <li>Tag #innovaarachnid</li>
+            </ul>
+          }
           status={missionStatus.m3}
         >
           <div className='field'>
