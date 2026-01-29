@@ -32,6 +32,7 @@ type ProgressRecord = {
   introAcceptedAt: string | null
   missions: Record<MissionId, MissionProgress>
   submissionCount: number
+  visitCount: number
   createdAt: string
   updatedAt: string
   lastSeenAt: string
@@ -111,6 +112,7 @@ const buildProgressRecord = ({
   introAcceptedAt: null,
   missions: defaultMissions(),
   submissionCount: 0,
+  visitCount: 0,
   createdAt: nowISO,
   updatedAt: nowISO,
   lastSeenAt: nowISO,
@@ -313,6 +315,8 @@ export default {
           introAccepted: record.introAccepted || Boolean(record.introAcceptedAt),
           introAcceptedAt: record.introAcceptedAt,
           submissionCount: record.submissionCount,
+          visitCount: record.visitCount || 0,
+          lastSeenAt: record.lastSeenAt,
           missions: record.missions,
         })),
       })
@@ -349,6 +353,7 @@ export default {
             codename,
             lastSeenAt: nowISO,
             updatedAt: nowISO,
+            visitCount: (existing.visitCount || 0) + 1,
           }
         : buildProgressRecord({
             token: tokenParam,
@@ -370,6 +375,7 @@ export default {
             ? baseRecord.introAccepted
             : Boolean(baseRecord.introAcceptedAt),
         introAcceptedAt: baseRecord.introAcceptedAt ?? null,
+        visitCount: typeof baseRecord.visitCount === 'number' ? baseRecord.visitCount : 1,
       }
 
       await env.ARACHNID_KV.put(key, JSON.stringify(record))

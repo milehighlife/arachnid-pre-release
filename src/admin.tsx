@@ -28,6 +28,8 @@ type AgentRecord = {
   introAccepted: boolean
   introAcceptedAt?: string | null
   submissionCount: number
+  visitCount?: number
+  lastSeenAt?: string | null
   missions: {
     m1?: MissionProgress
     m2?: MissionProgress
@@ -104,7 +106,8 @@ function AdminApp() {
   }, [tokenInput])
 
   const sortedAgents = useMemo(() => {
-    return [...agents].sort((a, b) => a.last.localeCompare(b.last))
+    const toTime = (value?: string | null) => (value ? new Date(value).getTime() : 0)
+    return [...agents].sort((a, b) => toTime(b.lastSeenAt) - toTime(a.lastSeenAt))
   }, [agents])
 
   const handleLoad = async () => {
@@ -174,6 +177,8 @@ function AdminApp() {
                 <th>Agent Token</th>
                 <th>Viewed Intro Video</th>
                 <th>Accepted Missions</th>
+                <th>Visits</th>
+                <th>Last Seen</th>
                 <th>Mission 1</th>
                 <th>Mission 2</th>
                 <th>Mission 3</th>
@@ -201,6 +206,8 @@ function AdminApp() {
                       {formatComplete(agent.introAccepted || Boolean(agent.introAcceptedAt))} •{' '}
                       {formatTimestamp(agent.introAcceptedAt)}
                     </td>
+                    <td>{agent.visitCount ?? 0}</td>
+                    <td>{formatTimestamp(agent.lastSeenAt)}</td>
                     <td>{renderMission1(agent.missions?.m1)}</td>
                     <td>{renderMission2(agent.missions?.m2)}</td>
                     <td>{renderMission3(agent.missions?.m3)}</td>
