@@ -834,6 +834,7 @@ button {
 .mission-grid {
   display: grid;
   gap: 24px;
+  align-items: start;
 }
 
 .mission-card {
@@ -845,6 +846,7 @@ button {
   display: grid;
   gap: 16px;
   position: relative;
+  align-content: start;
 }
 
 .mission-card-header {
