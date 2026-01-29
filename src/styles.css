@@ -1347,6 +1347,33 @@ button {
   font-size: 0.7rem;
 }
 
+.admin-row-missions td {
+  background: rgba(226, 226, 226, 0.02);
+}
+
+.admin-mission-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.admin-mission-cell {
+  display: grid;
+  gap: 6px;
+}
+
+.admin-mission-label {
+  font-size: 0.65rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.admin-mission-value {
+  color: var(--text);
+  font-size: 0.85rem;
+}
+
 .admin-empty {
   padding: 24px;
   text-align: center;

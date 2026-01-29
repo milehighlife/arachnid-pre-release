@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { Fragment, useEffect, useMemo, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import './styles.css'
 import { getApiUrl } from './utils/api'
@@ -193,13 +193,9 @@ function AdminApp() {
                 <th>Agent Token</th>
                 <th>Viewed Intro Video</th>
                 <th>Accepted Missions</th>
-                <th>Visits</th>
                 <th>Last Seen</th>
                 <th>Last Update</th>
                 <th>Update Action</th>
-                <th>Mission 1</th>
-                <th>Mission 2</th>
-                <th>Mission 3</th>
               </tr>
             </thead>
             <tbody>
@@ -211,27 +207,49 @@ function AdminApp() {
                 </tr>
               ) : (
                 sortedAgents.map((agent) => (
-                  <tr key={agent.token}>
-                    <td>
-                      {agent.last || '—'}, {agent.first || '—'}
-                    </td>
-                    <td>{agent.token}</td>
-                    <td>
-                      {formatComplete(agent.introViewed ?? agent.introAccepted)} •{' '}
-                      {formatTimestamp(agent.introViewedAt)}
-                    </td>
-                    <td>
-                      {formatComplete(agent.introAccepted || Boolean(agent.introAcceptedAt))} •{' '}
-                      {formatTimestamp(agent.introAcceptedAt)}
-                    </td>
-                    <td>{agent.visitCount ?? 0}</td>
-                    <td>{formatTimestamp(agent.lastSeenAt)}</td>
-                    <td>{formatTimestamp(agent.updatedAt)}</td>
-                    <td>{agent.updateAction || 'Viewed page'}</td>
-                    <td>{renderMission1(agent.missions?.m1, agent.updatedAt)}</td>
-                    <td>{renderMission2(agent.missions?.m2, agent.updatedAt)}</td>
-                    <td>{renderMission3(agent.missions?.m3, agent.updatedAt)}</td>
-                  </tr>
+                  <Fragment key={agent.token}>
+                    <tr className='admin-row-main'>
+                      <td>
+                        {agent.last || '—'}, {agent.first || '—'}
+                      </td>
+                      <td>{agent.token}</td>
+                      <td>
+                        {formatComplete(agent.introViewed ?? agent.introAccepted)} •{' '}
+                        {formatTimestamp(agent.introViewedAt)}
+                      </td>
+                      <td>
+                        {formatComplete(agent.introAccepted || Boolean(agent.introAcceptedAt))} •{' '}
+                        {formatTimestamp(agent.introAcceptedAt)}
+                      </td>
+                      <td>{formatTimestamp(agent.lastSeenAt)}</td>
+                      <td>{formatTimestamp(agent.updatedAt)}</td>
+                      <td>{agent.updateAction || 'Viewed page'}</td>
+                    </tr>
+                    <tr className='admin-row-missions'>
+                      <td colSpan={7}>
+                        <div className='admin-mission-row'>
+                          <div className='admin-mission-cell'>
+                            <span className='admin-mission-label'>Mission 1</span>
+                            <div className='admin-mission-value'>
+                              {renderMission1(agent.missions?.m1, agent.updatedAt)}
+                            </div>
+                          </div>
+                          <div className='admin-mission-cell'>
+                            <span className='admin-mission-label'>Mission 2</span>
+                            <div className='admin-mission-value'>
+                              {renderMission2(agent.missions?.m2, agent.updatedAt)}
+                            </div>
+                          </div>
+                          <div className='admin-mission-cell'>
+                            <span className='admin-mission-label'>Mission 3</span>
+                            <div className='admin-mission-value'>
+                              {renderMission3(agent.missions?.m3, agent.updatedAt)}
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  </Fragment>
                 ))
               )}
             </tbody>
