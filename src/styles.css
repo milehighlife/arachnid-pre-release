@@ -1159,6 +1159,10 @@ button {
   border-left: 2px solid var(--accent);
 }
 
+.mission-card.is-locked .mission-award {
+  border-left-color: var(--success);
+}
+
 .mission-award-label,
 .mission-req-label {
   text-transform: uppercase;
