@@ -11,7 +11,9 @@ type MissionProgress = {
   lastSubmittedAt?: string
   data?: {
     feel?: string
+    feelRating?: number
     flight?: string
+    flightRating?: number
     videoUrl?: string
     shirtSize?: string
     confirmDistance200?: boolean
@@ -51,7 +53,9 @@ type FeedbackPayload = {
   }
   mission?: {
     feel?: string
+    feelRating?: number
     flight?: string
+    flightRating?: number
     videoUrl?: string
     shirtSize?: string
     confirmDistance200?: boolean
@@ -305,8 +309,8 @@ export default {
           const record = (await env.ARACHNID_KV.get(key.name, 'json')) as ProgressRecord | null
           if (record) {
             agents.push(record)
-          }
-        }
+  }
+}
       } while (cursor)
 
       return jsonResponse({
@@ -454,6 +458,14 @@ export default {
     const mission2Flight = typeof mission.flight === 'string' ? mission.flight.trim() : ''
     const mission2VideoUrl = typeof mission.videoUrl === 'string' ? mission.videoUrl.trim() : ''
     const mission2ShirtSize = typeof mission.shirtSize === 'string' ? mission.shirtSize.trim() : ''
+    const mission1FeelRating =
+      typeof mission.feelRating === 'number'
+        ? Math.min(5, Math.max(1, Math.round(mission.feelRating)))
+        : undefined
+    const mission2FlightRating =
+      typeof mission.flightRating === 'number'
+        ? Math.min(5, Math.max(1, Math.round(mission.flightRating)))
+        : undefined
     const mission2ConfirmDistance = Boolean(mission.confirmDistance200)
     const mission2ConfirmRights = Boolean(mission.confirmRights)
     const mission3AceUrl = typeof mission.aceUrl === 'string' ? mission.aceUrl.trim() : ''
@@ -498,10 +510,11 @@ export default {
     try {
       const missionData =
         missionId === 'm1'
-          ? { feel: mission1Feel }
+          ? { feel: mission1Feel, feelRating: mission1FeelRating }
           : missionId === 'm2'
             ? {
                 flight: mission2Flight,
+                flightRating: mission2FlightRating,
                 videoUrl: mission2VideoUrl,
                 shirtSize: mission2ShirtSize,
                 confirmDistance200: mission2ConfirmDistance,

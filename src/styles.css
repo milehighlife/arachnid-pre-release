@@ -967,6 +967,20 @@ button {
   gap: 8px;
 }
 
+.field-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.range-value {
+  font-size: 0.75rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
 .field label {
   font-weight: 500;
 }
@@ -985,6 +999,10 @@ button {
 .field textarea {
   min-height: 120px;
   resize: vertical;
+}
+
+.field input[type='range'] {
+  accent-color: var(--success);
 }
 
 .field input:focus-visible,

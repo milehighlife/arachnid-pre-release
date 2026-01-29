@@ -35,7 +35,9 @@ export type MissionProgress = {
   lastSubmittedAt?: string
   data?: {
     feel?: string
+    feelRating?: number
     flight?: string
+    flightRating?: number
     videoUrl?: string
     shirtSize?: string
     confirmDistance200?: boolean
@@ -112,7 +114,9 @@ function FeedbackForm({
   const [missionTouched, setMissionTouched] = useState<MissionTouchedMap>(defaultTouched)
 
   const [mission1Feel, setMission1Feel] = useState('')
+  const [mission1FeelRating, setMission1FeelRating] = useState(3)
   const [mission2Flight, setMission2Flight] = useState('')
+  const [mission2FlightRating, setMission2FlightRating] = useState(3)
   const [mission2VideoUrl, setMission2VideoUrl] = useState('')
   const [mission2ShirtSize, setMission2ShirtSize] = useState('')
   const [mission2ConfirmDistance, setMission2ConfirmDistance] = useState(false)
@@ -192,11 +196,17 @@ function FeedbackForm({
     if (m1Data?.feel && !missionTouched.m1 && !mission1Feel) {
       setMission1Feel(m1Data.feel)
     }
+    if (typeof m1Data?.feelRating === 'number') {
+      setMission1FeelRating(m1Data.feelRating)
+    }
 
     const m2Data = progress.missions.m2?.data
     if (!missionTouched.m2 && m2Data) {
       if (m2Data.flight && !mission2Flight) {
         setMission2Flight(m2Data.flight)
+      }
+      if (typeof m2Data.flightRating === 'number') {
+        setMission2FlightRating(m2Data.flightRating)
       }
       if (m2Data.videoUrl && !mission2VideoUrl) {
         setMission2VideoUrl(m2Data.videoUrl)
@@ -407,10 +417,12 @@ function FeedbackForm({
       missionId === 'm1'
         ? {
             feel: mission1Feel.trim(),
+            feelRating: mission1FeelRating,
           }
         : missionId === 'm2'
           ? {
               flight: mission2Flight.trim(),
+              flightRating: mission2FlightRating,
               videoUrl: mission2VideoUrl.trim(),
               shirtSize: mission2ShirtSize.trim(),
               confirmDistance200: mission2ConfirmDistance,
@@ -538,6 +550,26 @@ function FeedbackForm({
               <span className='field-message'>{missionErrors.m1}</span>
             )}
           </div>
+          <div className='field'>
+            <div className='field-row'>
+              <label htmlFor='mission1_feel_rating'>Feel rating</label>
+              <span className='range-value'>{mission1FeelRating}</span>
+            </div>
+            <input
+              id='mission1_feel_rating'
+              name='mission1_feel_rating'
+              type='range'
+              min={1}
+              max={5}
+              step={1}
+              value={mission1FeelRating}
+              onChange={(event) => {
+                setMission1FeelRating(Number(event.target.value))
+                updateMissionTouched('m1')
+              }}
+              disabled={isMissionDisabled('m1')}
+            />
+          </div>
           <div className='mission-actions'>
             <button
               type='button'
@@ -604,6 +636,26 @@ function FeedbackForm({
               disabled={isMissionDisabled('m2')}
               aria-invalid={hasAttempted.m2 && Boolean(missionErrors.m2)}
               className={hasAttempted.m2 && missionErrors.m2 ? 'field-error' : undefined}
+            />
+          </div>
+          <div className='field'>
+            <div className='field-row'>
+              <label htmlFor='mission2_flight_rating'>Flight rating</label>
+              <span className='range-value'>{mission2FlightRating}</span>
+            </div>
+            <input
+              id='mission2_flight_rating'
+              name='mission2_flight_rating'
+              type='range'
+              min={1}
+              max={5}
+              step={1}
+              value={mission2FlightRating}
+              onChange={(event) => {
+                setMission2FlightRating(Number(event.target.value))
+                updateMissionTouched('m2')
+              }}
+              disabled={isMissionDisabled('m2')}
             />
           </div>
           <div className='field'>
