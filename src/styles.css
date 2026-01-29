@@ -1044,6 +1044,11 @@ button {
   color: var(--accent);
 }
 
+.mission-card.is-locked .toggle-state.is-active {
+  border-color: var(--success);
+  color: var(--success);
+}
+
 .toggle-switch {
   display: inline-flex;
   align-items: center;
