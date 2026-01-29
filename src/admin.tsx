@@ -30,6 +30,7 @@ type AgentRecord = {
   submissionCount: number
   visitCount?: number
   lastSeenAt?: string | null
+  updatedAt?: string | null
   missions: {
     m1?: MissionProgress
     m2?: MissionProgress
@@ -50,40 +51,54 @@ const formatTimestamp = (value?: string | null) => {
   }
 }
 
-const renderMission1 = (mission?: MissionProgress) => {
+const renderMission1 = (mission?: MissionProgress, fallbackTime?: string | null) => {
   if (!mission || mission.status !== 'LOCKED') {
     return 'Incomplete'
   }
   const details = mission.data?.feel?.trim() || 'Complete'
-  return `${details} • ${formatTimestamp(mission.lastSubmittedAt)}`
+  const time = formatTimestamp(mission.lastSubmittedAt || fallbackTime || null)
+  return (
+    <div>
+      <div>{details}</div>
+      <div className='admin-meta'>{time}</div>
+    </div>
+  )
 }
 
-const renderMission2 = (mission?: MissionProgress) => {
+const renderMission2 = (mission?: MissionProgress, fallbackTime?: string | null) => {
   if (!mission || mission.status !== 'LOCKED') {
     return 'Incomplete'
   }
   const data = mission.data || {}
-  return [
-    data.videoUrl || 'No URL',
-    data.shirtSize || 'No size',
-    `200ft: ${formatComplete(data.confirmDistance200)}`,
-    `Public: ${formatComplete(data.confirmRights)}`,
-    formatTimestamp(mission.lastSubmittedAt),
-  ].join(' | ')
+  const time = formatTimestamp(mission.lastSubmittedAt || fallbackTime || null)
+  return (
+    <div>
+      <div>
+        {(data.videoUrl || 'No URL')} | {(data.shirtSize || 'No size')} | 200ft:{' '}
+        {formatComplete(data.confirmDistance200)} | Public:{' '}
+        {formatComplete(data.confirmRights)}
+      </div>
+      <div className='admin-meta'>{time}</div>
+    </div>
+  )
 }
 
-const renderMission3 = (mission?: MissionProgress) => {
+const renderMission3 = (mission?: MissionProgress, fallbackTime?: string | null) => {
   if (!mission || mission.status !== 'LOCKED') {
     return 'Incomplete'
   }
   const data = mission.data || {}
-  return [
-    data.aceUrl || 'No URL',
-    data.hoodieSize || 'No size',
-    `200ft: ${formatComplete(data.confirmDistance200)}`,
-    `Public: ${formatComplete(data.confirmRights)}`,
-    formatTimestamp(mission.lastSubmittedAt),
-  ].join(' | ')
+  const time = formatTimestamp(mission.lastSubmittedAt || fallbackTime || null)
+  return (
+    <div>
+      <div>
+        {(data.aceUrl || 'No URL')} | {(data.hoodieSize || 'No size')} | 200ft:{' '}
+        {formatComplete(data.confirmDistance200)} | Public:{' '}
+        {formatComplete(data.confirmRights)}
+      </div>
+      <div className='admin-meta'>{time}</div>
+    </div>
+  )
 }
 
 function AdminApp() {
@@ -208,9 +223,9 @@ function AdminApp() {
                     </td>
                     <td>{agent.visitCount ?? 0}</td>
                     <td>{formatTimestamp(agent.lastSeenAt)}</td>
-                    <td>{renderMission1(agent.missions?.m1)}</td>
-                    <td>{renderMission2(agent.missions?.m2)}</td>
-                    <td>{renderMission3(agent.missions?.m3)}</td>
+                    <td>{renderMission1(agent.missions?.m1, agent.updatedAt)}</td>
+                    <td>{renderMission2(agent.missions?.m2, agent.updatedAt)}</td>
+                    <td>{renderMission3(agent.missions?.m3, agent.updatedAt)}</td>
                   </tr>
                 ))
               )}

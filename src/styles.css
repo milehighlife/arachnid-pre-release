@@ -1352,6 +1352,12 @@ button {
   color: var(--muted);
 }
 
+.admin-meta {
+  margin-top: 6px;
+  font-size: 0.7rem;
+  color: var(--muted);
+}
+
 @media (min-width: 960px) {
   .hero {
     padding: 120px 0 90px;

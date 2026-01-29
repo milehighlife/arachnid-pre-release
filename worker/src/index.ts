@@ -317,6 +317,7 @@ export default {
           submissionCount: record.submissionCount,
           visitCount: record.visitCount || 0,
           lastSeenAt: record.lastSeenAt,
+          updatedAt: record.updatedAt,
           missions: record.missions,
         })),
       })
