@@ -19,6 +19,7 @@ type MissionsProps = {
 
 function Missions({ first, last, fullName, codename, token, progress, onProgressUpdate }: MissionsProps) {
   const [statusMap, setStatusMap] = useState<MissionStatusMap>(defaultStatus)
+  const tokenLabel = token.trim().replace(/^@+/, '') || 'tester'
 
   const handleStatusChange = useCallback((nextStatus: MissionStatusMap) => {
     setStatusMap(nextStatus)
@@ -54,7 +55,7 @@ function Missions({ first, last, fullName, codename, token, progress, onProgress
           <p className='missions-copy'>
             {statusLabel === 'Tier One'
               ? 'Congratulations! You are an elite-level operator and have accomplished a challenging mission set. Your insights into the Arachnid are first class. Thank you for your contribution!'
-              : `Codename ${codename} your missions are live. Complete Missions 1 & 2 to maintain Tester Agent status. Unlocked rewards will be issued upon verification.`}
+              : `Agent ${tokenLabel} your missions are live. Unlocked rewards will be issued upon verification. Allow 2-3 weeks for fulfillment.`}
           </p>
         </div>
 
