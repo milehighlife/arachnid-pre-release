@@ -34,7 +34,7 @@ type AgentRecord = {
   }
 }
 
-const formatBool = (value?: boolean) => (value ? 'Yes' : 'No')
+const formatComplete = (value?: boolean) => (value ? 'Complete' : 'Incomplete')
 
 const renderMission1 = (mission?: MissionProgress) => {
   if (!mission || mission.status !== 'LOCKED') {
@@ -51,8 +51,8 @@ const renderMission2 = (mission?: MissionProgress) => {
   return [
     data.videoUrl || 'No URL',
     data.shirtSize || 'No size',
-    `200ft: ${formatBool(data.confirmDistance200)}`,
-    `Public: ${formatBool(data.confirmRights)}`,
+    `200ft: ${formatComplete(data.confirmDistance200)}`,
+    `Public: ${formatComplete(data.confirmRights)}`,
   ].join(' | ')
 }
 
@@ -64,8 +64,8 @@ const renderMission3 = (mission?: MissionProgress) => {
   return [
     data.aceUrl || 'No URL',
     data.hoodieSize || 'No size',
-    `200ft: ${formatBool(data.confirmDistance200)}`,
-    `Public: ${formatBool(data.confirmRights)}`,
+    `200ft: ${formatComplete(data.confirmDistance200)}`,
+    `Public: ${formatComplete(data.confirmRights)}`,
   ].join(' | ')
 }
 
@@ -178,8 +178,8 @@ function AdminApp() {
                       {agent.last || '—'}, {agent.first || '—'}
                     </td>
                     <td>{agent.token}</td>
-                    <td>{formatBool(agent.introViewed ?? agent.introAccepted)}</td>
-                    <td>{formatBool(agent.submissionCount > 0)}</td>
+                    <td>{formatComplete(agent.introViewed ?? agent.introAccepted)}</td>
+                    <td>{formatComplete(agent.introAccepted)}</td>
                     <td>{renderMission1(agent.missions?.m1)}</td>
                     <td>{renderMission2(agent.missions?.m2)}</td>
                     <td>{renderMission3(agent.missions?.m3)}</td>
