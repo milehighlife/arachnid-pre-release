@@ -193,6 +193,7 @@ function AdminApp() {
                 <th>Agent Token</th>
                 <th>Viewed Intro Video</th>
                 <th>Accepted Missions</th>
+                <th>Visits</th>
                 <th>Last Seen</th>
                 <th>Last Update</th>
                 <th>Update Action</th>
@@ -201,7 +202,7 @@ function AdminApp() {
             <tbody>
               {sortedAgents.length === 0 && !loading ? (
                 <tr>
-                  <td colSpan={7} className='admin-empty'>
+                  <td colSpan={8} className='admin-empty'>
                     No agent data available.
                   </td>
                 </tr>
@@ -221,12 +222,13 @@ function AdminApp() {
                         {formatComplete(agent.introAccepted || Boolean(agent.introAcceptedAt))} •{' '}
                         {formatTimestamp(agent.introAcceptedAt)}
                       </td>
+                      <td>{agent.visitCount ?? 0}</td>
                       <td>{formatTimestamp(agent.lastSeenAt)}</td>
                       <td>{formatTimestamp(agent.updatedAt)}</td>
                       <td>{agent.updateAction || 'Viewed page'}</td>
                     </tr>
                     <tr className='admin-row-missions'>
-                      <td colSpan={7}>
+                      <td colSpan={8}>
                         <div className='admin-mission-row'>
                           <div className='admin-mission-cell'>
                             <span className='admin-mission-label'>Mission 1</span>
