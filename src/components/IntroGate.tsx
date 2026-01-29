@@ -131,6 +131,7 @@ function IntroGate({ token, codename, onAccepted }: IntroGateProps) {
   const [acceptError, setAcceptError] = useState('')
   const [soundEnabled, setSoundEnabled] = useState(false)
   const videoId = resolveVideoId(token)
+  const hasReportedView = useRef(false)
 
   useEffect(() => {
     let active = true
@@ -208,6 +209,18 @@ function IntroGate({ token, codename, onAccepted }: IntroGateProps) {
 
     onAccepted()
   }
+
+  useEffect(() => {
+    if (!videoEnded || !token || hasReportedView.current) {
+      return
+    }
+    hasReportedView.current = true
+    fetch(getApiUrl('/api/intro-viewed'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token }),
+    }).catch(() => undefined)
+  }, [token, videoEnded])
 
   return (
     <div className='intro-gate'>

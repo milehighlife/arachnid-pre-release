@@ -49,6 +49,8 @@ export type ProgressPayload = {
   token?: string
   codename?: string
   missions: Record<MissionId, MissionProgress>
+  introViewed?: boolean
+  introViewedAt?: string | null
   introAccepted?: boolean
   introAcceptedAt?: string | null
   updatedAt?: string

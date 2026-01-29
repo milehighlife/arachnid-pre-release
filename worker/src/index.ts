@@ -26,6 +26,8 @@ type ProgressRecord = {
   first: string
   last: string
   codename: string
+  introViewed: boolean
+  introViewedAt: string | null
   introAccepted: boolean
   introAcceptedAt: string | null
   missions: Record<MissionId, MissionProgress>
@@ -103,6 +105,8 @@ const buildProgressRecord = ({
   first,
   last,
   codename,
+  introViewed: false,
+  introViewedAt: null,
   introAccepted: false,
   introAcceptedAt: null,
   missions: defaultMissions(),
@@ -155,6 +159,8 @@ export default {
 
       record.introAccepted = true
       record.introAcceptedAt = nowISO
+      record.introViewed = true
+      record.introViewedAt = record.introViewedAt || nowISO
       record.updatedAt = nowISO
       record.lastSeenAt = nowISO
       record.codename = record.codename || codename
@@ -165,6 +171,54 @@ export default {
         ok: true,
         introAccepted: true,
         introAcceptedAt: nowISO,
+      })
+    }
+
+    if (url.pathname === '/api/intro-viewed') {
+      if (request.method !== 'POST') {
+        return jsonResponse({ ok: false, error: 'Method not allowed' }, 405)
+      }
+
+      let payload: { token?: string }
+      try {
+        payload = (await request.json()) as { token?: string }
+      } catch {
+        return jsonResponse({ ok: false, error: 'Invalid JSON payload' }, 400)
+      }
+
+      const token = typeof payload.token === 'string' ? payload.token.trim() : ''
+      if (!token) {
+        return jsonResponse({ ok: false, error: 'Missing token' }, 400)
+      }
+
+      const nowISO = new Date().toISOString()
+      const key = buildProgressKey(token)
+      const existing = (await env.ARACHNID_KV.get(key, 'json')) as ProgressRecord | null
+      const tokenTag = sanitizeToken(token)
+      const codename = tokenTag ? `@${tokenTag}` : '@tester'
+
+      const record =
+        existing ??
+        buildProgressRecord({
+          token,
+          first: '',
+          last: '',
+          codename,
+          nowISO,
+        })
+
+      record.introViewed = true
+      record.introViewedAt = record.introViewedAt || nowISO
+      record.updatedAt = nowISO
+      record.lastSeenAt = nowISO
+      record.codename = record.codename || codename
+
+      await env.ARACHNID_KV.put(key, JSON.stringify(record))
+
+      return jsonResponse({
+        ok: true,
+        introViewed: true,
+        introViewedAt: record.introViewedAt,
       })
     }
 
@@ -203,6 +257,8 @@ export default {
 
       record.introAccepted = false
       record.introAcceptedAt = null
+      record.introViewed = false
+      record.introViewedAt = null
       record.updatedAt = nowISO
       record.lastSeenAt = nowISO
       record.codename = record.codename || codename
@@ -252,6 +308,8 @@ export default {
           first: record.first,
           last: record.last,
           codename: record.codename,
+          introViewed: record.introViewed,
+          introViewedAt: record.introViewedAt,
           introAccepted: record.introAccepted,
           submissionCount: record.submissionCount,
           missions: record.missions,
@@ -301,6 +359,9 @@ export default {
 
       const record: ProgressRecord = {
         ...baseRecord,
+        introViewed:
+          typeof baseRecord.introViewed === 'boolean' ? baseRecord.introViewed : false,
+        introViewedAt: baseRecord.introViewedAt ?? null,
         introAccepted:
           typeof baseRecord.introAccepted === 'boolean' ? baseRecord.introAccepted : false,
         introAcceptedAt: baseRecord.introAcceptedAt ?? null,
@@ -314,6 +375,8 @@ export default {
           token: record.token,
           codename: record.codename,
           missions: record.missions,
+          introViewed: record.introViewed,
+          introViewedAt: record.introViewedAt,
           introAccepted: record.introAccepted,
           introAcceptedAt: record.introAcceptedAt,
           updatedAt: record.updatedAt,
@@ -436,6 +499,10 @@ export default {
       if (typeof record.introAccepted !== 'boolean') {
         record.introAccepted = false
         record.introAcceptedAt = null
+      }
+      if (typeof record.introViewed !== 'boolean') {
+        record.introViewed = false
+        record.introViewedAt = null
       }
 
       record.missions = {

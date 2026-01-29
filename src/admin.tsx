@@ -23,6 +23,8 @@ type AgentRecord = {
   first: string
   last: string
   codename: string
+  introViewed?: boolean
+  introViewedAt?: string | null
   introAccepted: boolean
   submissionCount: number
   missions: {
@@ -176,7 +178,7 @@ function AdminApp() {
                       {agent.last || '—'}, {agent.first || '—'}
                     </td>
                     <td>{agent.token}</td>
-                    <td>{formatBool(agent.introAccepted)}</td>
+                    <td>{formatBool(agent.introViewed ?? agent.introAccepted)}</td>
                     <td>{formatBool(agent.submissionCount > 0)}</td>
                     <td>{renderMission1(agent.missions?.m1)}</td>
                     <td>{renderMission2(agent.missions?.m2)}</td>
