@@ -308,9 +308,9 @@ export default {
           first: record.first,
           last: record.last,
           codename: record.codename,
-          introViewed: record.introViewed,
+          introViewed: record.introViewed || Boolean(record.introViewedAt),
           introViewedAt: record.introViewedAt,
-          introAccepted: record.introAccepted,
+          introAccepted: record.introAccepted || Boolean(record.introAcceptedAt),
           introAcceptedAt: record.introAcceptedAt,
           submissionCount: record.submissionCount,
           missions: record.missions,
@@ -361,10 +361,14 @@ export default {
       const record: ProgressRecord = {
         ...baseRecord,
         introViewed:
-          typeof baseRecord.introViewed === 'boolean' ? baseRecord.introViewed : false,
+          typeof baseRecord.introViewed === 'boolean'
+            ? baseRecord.introViewed
+            : Boolean(baseRecord.introViewedAt),
         introViewedAt: baseRecord.introViewedAt ?? null,
         introAccepted:
-          typeof baseRecord.introAccepted === 'boolean' ? baseRecord.introAccepted : false,
+          typeof baseRecord.introAccepted === 'boolean'
+            ? baseRecord.introAccepted
+            : Boolean(baseRecord.introAcceptedAt),
         introAcceptedAt: baseRecord.introAcceptedAt ?? null,
       }
 

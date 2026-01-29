@@ -198,7 +198,7 @@ function AdminApp() {
                       {formatTimestamp(agent.introViewedAt)}
                     </td>
                     <td>
-                      {formatComplete(agent.introAccepted)} •{' '}
+                      {formatComplete(agent.introAccepted || Boolean(agent.introAcceptedAt))} •{' '}
                       {formatTimestamp(agent.introAcceptedAt)}
                     </td>
                     <td>{renderMission1(agent.missions?.m1)}</td>
