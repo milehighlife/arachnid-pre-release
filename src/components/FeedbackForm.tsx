@@ -620,10 +620,15 @@ function FeedbackForm({
         >
           <div className='field'>
             <label htmlFor='mission2_flight'>
-              Conduct a controlled test flight, document observed performance in detail, record
-              clear flight video based on requirements. Publish to agent social channel and collab
-              with @innovadiscs and @innovawombat. Award: Level 1 Agent uniform (t-shirt).
+              Flight Test Instructions
             </label>
+            <ul className='requirements-list'>
+              <li>Record a clear flight video</li>
+              <li>Include talking head description or voiceover</li>
+              <li>Publish to your social channel(s)</li>
+              <li>Collab with @innovadiscs, @innovawombat</li>
+              <li>Tag #innovaarachnid</li>
+            </ul>
             <textarea
               id='mission2_flight'
               name='mission2_flight'
