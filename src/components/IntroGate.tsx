@@ -69,6 +69,7 @@ const VIDEO_MAP: Record<string, string> = {
   riley_d23: '9jM09Pp8BDI',
   'the.duvie': 'SA91wnSnS7g',
   harostotle: 'ypshz7wE_xo',
+  innovawombat: 'wlA43ilj2W8',
   benji_z_disc_golf: 'uAYtgJE3zt8',
   csullivangolf: 'QCo7tJyx7D0',
   frisbeenate: '4wi-4POyLZU',
