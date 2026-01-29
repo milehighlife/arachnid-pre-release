@@ -363,13 +363,17 @@ export default {
             visitCount: (existing.visitCount || 0) + 1,
             updateAction: 'Viewed page',
           }
-        : buildProgressRecord({
-            token: tokenParam,
-            first,
-            last,
-            codename,
-            nowISO,
-          })
+        : {
+            ...buildProgressRecord({
+              token: tokenParam,
+              first,
+              last,
+              codename,
+              nowISO,
+            }),
+            visitCount: 1,
+            updateAction: 'Viewed page',
+          }
 
       const record: ProgressRecord = {
         ...baseRecord,
