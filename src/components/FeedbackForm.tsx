@@ -82,6 +82,7 @@ const defaultTouched: MissionTouchedMap = {
 }
 
 const isHttpUrl = (value: string) => value.startsWith('http')
+const countWords = (value: string) => value.trim().split(/\s+/).filter(Boolean).length
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
@@ -256,7 +257,8 @@ function FeedbackForm({
     mission3ConfirmDistance ||
     mission3ConfirmRights
 
-  const mission1Ready = mission1Feel.trim().length >= 10
+  const mission1WordCount = countWords(mission1Feel)
+  const mission1Ready = mission1WordCount >= 25 && mission1Feel.trim().length <= 2000
   const mission2Ready =
     mission2Flight.trim().length >= 10 &&
     isHttpUrl(mission2VideoUrl.trim()) &&
@@ -328,8 +330,9 @@ function FeedbackForm({
 
     if (missionId === 'm1') {
       const length = mission1Feel.trim().length
-      if (length < 10 || length > 2000) {
-        nextErrors.m1 = 'Mission 1 notes must be 10-2000 characters.'
+      const words = countWords(mission1Feel)
+      if (words < 25 || length > 2000) {
+        nextErrors.m1 = 'Mission 1 notes must be at least 25 words (max 2000 characters).'
       }
       return nextErrors
     }
@@ -505,13 +508,18 @@ function FeedbackForm({
           label='Mission 1'
           title='Shape Assessment'
           description='Your first impression matters.'
-          requirements='Submission required to maintain Agent status.'
+          requirements={
+            <ul className='requirements-list'>
+              <li>Submission required to maintain Agent status</li>
+              <li>Minimum 25 words</li>
+            </ul>
+          }
           status={missionStatus.m1}
         >
           <div className='field'>
             <label htmlFor='mission1_feel'>
               Describe the Arachnid’s form, fit, and geometry, then assess expected pre-flight
-              behavior—how you think it will fly. Text-only submission.
+              behavior—how you think it will fly. Text-only submission. Min 25 words.
             </label>
             <textarea
               id='mission1_feel'

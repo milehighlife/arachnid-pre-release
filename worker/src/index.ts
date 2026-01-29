@@ -78,6 +78,7 @@ const jsonResponse = (payload: Record<string, unknown>, status = 200) =>
   })
 
 const sanitizeToken = (value: string) => value.replace(/^@+/, '').trim()
+const countWords = (value: string) => value.trim().split(/\s+/).filter(Boolean).length
 
 const isHttpUrl = (value: string) => value.startsWith('http')
 const parseMissionId = (value: string): MissionId | null =>
@@ -461,8 +462,12 @@ export default {
     const mission3ConfirmRights = Boolean(mission.confirmRights)
 
     if (missionId === 'm1') {
-      if (mission1Feel.length < 10 || mission1Feel.length > 2000) {
-        return jsonResponse({ ok: false, error: 'Mission 1 text must be 10-2000 characters' }, 400)
+      const words = countWords(mission1Feel)
+      if (words < 25 || mission1Feel.length > 2000) {
+        return jsonResponse(
+          { ok: false, error: 'Mission 1 text must be at least 25 words (max 2000 characters)' },
+          400,
+        )
       }
     }
 
