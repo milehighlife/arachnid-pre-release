@@ -1303,6 +1303,11 @@ button {
   cursor: pointer;
 }
 
+.admin-logout {
+  border-color: rgba(226, 226, 226, 0.3);
+  color: var(--text);
+}
+
 .admin-controls button:disabled {
   opacity: 0.6;
   cursor: not-allowed;

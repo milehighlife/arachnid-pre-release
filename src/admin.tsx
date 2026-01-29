@@ -72,10 +72,12 @@ function AdminApp() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [agents, setAgents] = useState<AgentRecord[]>([])
+  const [authed, setAuthed] = useState(false)
 
   useEffect(() => {
     const cached = sessionStorage.getItem('arachnid_admin_token') || ''
     setTokenInput(cached)
+    setAuthed(Boolean(cached))
   }, [])
 
   useEffect(() => {
@@ -97,16 +99,30 @@ function AdminApp() {
       })
       const data = (await response.json()) as { ok?: boolean; agents?: AgentRecord[]; error?: string }
       if (!response.ok || !data.ok) {
-        setError(data?.error || 'Unable to load agent stats.')
+        const isUnauthorized =
+          response.status === 401 || String(data?.error || '').toLowerCase().includes('unauthorized')
+        const message = isUnauthorized ? 'unauthorized access' : data?.error || 'Unable to load agent stats.'
+        setError(message)
+        setAuthed(false)
         setLoading(false)
         return
       }
       setAgents(data.agents || [])
+      setAuthed(true)
       setLoading(false)
     } catch {
       setError('Unable to load agent stats.')
+      setAuthed(false)
       setLoading(false)
     }
+  }
+
+  const handleLogout = () => {
+    sessionStorage.removeItem('arachnid_admin_token')
+    setTokenInput('')
+    setAgents([])
+    setAuthed(false)
+    setError('')
   }
 
   return (
@@ -126,6 +142,11 @@ function AdminApp() {
           <button type='button' onClick={handleLoad} disabled={!tokenInput.trim() || loading}>
             {loading ? 'Loading…' : 'Load Agents'}
           </button>
+          {authed && (
+            <button type='button' className='admin-logout' onClick={handleLogout}>
+              Log out
+            </button>
+          )}
         </div>
         {error && <div className='admin-error'>{error}</div>}
         <div className='admin-table-wrap'>
