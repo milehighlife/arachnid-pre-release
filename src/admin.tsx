@@ -89,9 +89,15 @@ const renderMission2 = (mission?: MissionProgress, fallbackTime?: string | null)
   return (
     <div>
       <div>
-        {(data.videoUrl || 'No URL')} | {(data.shirtSize || 'No size')} | 200ft:{' '}
-        {formatComplete(data.confirmDistance200)} | Public:{' '}
-        {formatComplete(data.confirmRights)}
+        {data.videoUrl ? (
+          <a className='admin-link' href={data.videoUrl} target='_blank' rel='noreferrer'>
+            {data.videoUrl}
+          </a>
+        ) : (
+          'No URL'
+        )}{' '}
+        | {(data.shirtSize || 'No size')} | 200ft: {formatComplete(data.confirmDistance200)} |
+        Public: {formatComplete(data.confirmRights)}
         {rating}
         {note}
       </div>
@@ -109,9 +115,15 @@ const renderMission3 = (mission?: MissionProgress, fallbackTime?: string | null)
   return (
     <div>
       <div>
-        {(data.aceUrl || 'No URL')} | {(data.hoodieSize || 'No size')} | 200ft:{' '}
-        {formatComplete(data.confirmDistance200)} | Public:{' '}
-        {formatComplete(data.confirmRights)}
+        {data.aceUrl ? (
+          <a className='admin-link' href={data.aceUrl} target='_blank' rel='noreferrer'>
+            {data.aceUrl}
+          </a>
+        ) : (
+          'No URL'
+        )}{' '}
+        | {(data.hoodieSize || 'No size')} | 200ft: {formatComplete(data.confirmDistance200)} |
+        Public: {formatComplete(data.confirmRights)}
       </div>
       <div className='admin-meta'>{time}</div>
     </div>

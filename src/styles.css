@@ -1501,6 +1501,12 @@ button {
   color: var(--muted);
 }
 
+.admin-link {
+  color: var(--text);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 @media (min-width: 960px) {
   .hero {
     padding: 120px 0 45px;
