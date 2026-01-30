@@ -583,6 +583,7 @@ function FeedbackForm({
               }}
               disabled={isMissionDisabled('m1')}
             />
+            <span className='field-hint'>1 = off, 5 = perfect fit in hand.</span>
           </div>
           <div className='mission-actions'>
             <button
@@ -676,6 +677,7 @@ function FeedbackForm({
               }}
               disabled={isMissionDisabled('m2')}
             />
+            <span className='field-hint'>1 = poor flight, 5 = ideal flight.</span>
           </div>
           <div className='field'>
             <label htmlFor='mission2_video_url'>Published video URL (public)</label>

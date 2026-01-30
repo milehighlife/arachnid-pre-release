@@ -1053,6 +1053,11 @@ button {
   font-size: 0.85rem;
 }
 
+.field-hint {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
 .mission-toggles {
   display: grid;
   gap: 12px;
