@@ -384,6 +384,8 @@ function FeedbackForm({
         nextErrors.m3 = 'Add a public ace video URL.'
       } else if (!isHttpUrl(mission3AceUrl.trim())) {
         nextErrors.m3 = 'Ace URL must start with http.'
+      } else if (mission2VideoUrl.trim() && mission3AceUrl.trim() === mission2VideoUrl.trim()) {
+        nextErrors.m3 = 'Mission 3 video must be different from Mission 2.'
       }
       if (!mission3HoodieSize.trim()) {
         nextErrors.m3 = 'Select a hoodie size.'
@@ -812,6 +814,7 @@ function FeedbackForm({
               <li>Innova has rights to share on social platforms</li>
               <li>Collab with @innovadiscs, @innovawombat</li>
               <li>Tag #innovaarachnid</li>
+              <li>Cannot be same video as Mission 2</li>
             </ul>
           }
           status={missionStatus.m3}

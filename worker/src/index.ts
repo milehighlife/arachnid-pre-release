@@ -513,6 +513,12 @@ export default {
       if (!isHttpUrl(mission3AceUrl)) {
         return jsonResponse({ ok: false, error: 'Mission 3 video URL must start with http' }, 400)
       }
+      if (mission2VideoUrl && mission3AceUrl === mission2VideoUrl) {
+        return jsonResponse(
+          { ok: false, error: 'Mission 3 video must be different from Mission 2' },
+          400,
+        )
+      }
       if (!mission3ConfirmDistance || !mission3ConfirmRights) {
         return jsonResponse({ ok: false, error: 'Mission 3 confirmations are required' }, 400)
       }
