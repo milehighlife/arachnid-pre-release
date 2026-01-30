@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useMemo, useState } from 'react'
+import { Fragment, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './styles.css'
 import { getApiUrl } from './utils/api'
@@ -56,76 +56,83 @@ const formatTimestamp = (value?: string | null) => {
   }
 }
 
+const renderValue = (value?: string) => (value && value.trim().length > 0 ? value : '—')
+
+const fieldCell = (label: string, value: ReactNode) => (
+  <div className='admin-field-cell'>
+    <span className='admin-field-label'>{label}</span>
+    <span className='admin-field-value'>{value}</span>
+  </div>
+)
+
+const renderLink = (url?: string) =>
+  url ? (
+    <a className='admin-link' href={url} target='_blank' rel='noreferrer'>
+      {url}
+    </a>
+  ) : (
+    '—'
+  )
+
 const renderMission1 = (mission?: MissionProgress, fallbackTime?: string | null) => {
   if (!mission || mission.status !== 'LOCKED') {
-    return 'Incomplete'
+    return fieldCell('Status', 'Incomplete')
   }
-  const details = mission.data?.feel?.trim() || 'Complete'
-  const rating =
-    typeof mission.data?.feelRating === 'number' ? ` • Feel: ${mission.data.feelRating}/5` : ''
-  const note = mission.data?.feelNote?.trim() ? ` • Note: ${mission.data.feelNote}` : ''
   const time = formatTimestamp(mission.lastSubmittedAt || fallbackTime || null)
   return (
-    <div>
-      <div>
-        {details}
-        {rating}
-        {note}
-      </div>
-      <div className='admin-meta'>{time}</div>
+    <div className='admin-field-grid'>
+      {fieldCell('Status', 'Complete')}
+      {fieldCell('Feel Summary', renderValue(mission.data?.feel))}
+      {fieldCell(
+        'Feel Rating',
+        typeof mission.data?.feelRating === 'number'
+          ? `${mission.data.feelRating}/5`
+          : '—',
+      )}
+      {fieldCell('Poor Feel Explanation', renderValue(mission.data?.feelNote))}
+      {fieldCell('Submitted', time)}
     </div>
   )
 }
 
 const renderMission2 = (mission?: MissionProgress, fallbackTime?: string | null) => {
   if (!mission || mission.status !== 'LOCKED') {
-    return 'Incomplete'
+    return fieldCell('Status', 'Incomplete')
   }
   const data = mission.data || {}
   const time = formatTimestamp(mission.lastSubmittedAt || fallbackTime || null)
-  const rating =
-    typeof data.flightRating === 'number' ? ` | Flight: ${data.flightRating}/5` : ''
-  const note = data.flightNote?.trim() ? ` | Note: ${data.flightNote}` : ''
   return (
-    <div>
-      <div>
-        {data.videoUrl ? (
-          <a className='admin-link' href={data.videoUrl} target='_blank' rel='noreferrer'>
-            {data.videoUrl}
-          </a>
-        ) : (
-          'No URL'
-        )}{' '}
-        | {(data.shirtSize || 'No size')} | 200ft: {formatComplete(data.confirmDistance200)} |
-        Public: {formatComplete(data.confirmRights)}
-        {rating}
-        {note}
-      </div>
-      <div className='admin-meta'>{time}</div>
+    <div className='admin-field-grid'>
+      {fieldCell('Status', 'Complete')}
+      {fieldCell('Flight Summary', renderValue(data.flight))}
+      {fieldCell(
+        'Flight Rating',
+        typeof data.flightRating === 'number' ? `${data.flightRating}/5` : '—',
+      )}
+      {fieldCell('Poor Flight Explanation', renderValue(data.flightNote))}
+      {fieldCell('Video URL', renderLink(data.videoUrl))}
+      {fieldCell('Shirt Size', renderValue(data.shirtSize))}
+      {fieldCell('200ft+', formatComplete(data.confirmDistance200))}
+      {fieldCell('Public Video', formatComplete(data.confirmRights))}
+      {fieldCell('Submitted', time)}
     </div>
   )
 }
 
 const renderMission3 = (mission?: MissionProgress, fallbackTime?: string | null) => {
   if (!mission || mission.status !== 'LOCKED') {
-    return 'Incomplete'
+    return fieldCell('Status', 'Incomplete')
   }
   const data = mission.data || {}
   const time = formatTimestamp(mission.lastSubmittedAt || fallbackTime || null)
   return (
-    <div>
-      <div>
-        {data.aceUrl ? (
-          <a className='admin-link' href={data.aceUrl} target='_blank' rel='noreferrer'>
-            {data.aceUrl}
-          </a>
-        ) : (
-          'No URL'
-        )}{' '}
-        | {(data.hoodieSize || 'No size')} | 200ft: {formatComplete(data.confirmDistance200)} |
-        Public: {formatComplete(data.confirmRights)}
-      </div>
-      <div className='admin-meta'>{time}</div>
+    <div className='admin-field-grid'>
+      {fieldCell('Status', 'Complete')}
+      {fieldCell('Ace Video URL', renderLink(data.aceUrl))}
+      {fieldCell('Hoodie Size', renderValue(data.hoodieSize))}
+      {fieldCell('200ft+', formatComplete(data.confirmDistance200))}
+      {fieldCell('Public Video', formatComplete(data.confirmRights))}
+      {fieldCell('Submitted', time)}
     </div>
   )
 }
@@ -188,6 +195,102 @@ function AdminApp() {
     setAgents([])
     setAuthed(false)
     setError('')
+  }
+
+  const handleDownloadCsv = () => {
+    if (!agents.length) {
+      return
+    }
+    const headers = [
+      'Name',
+      'Token',
+      'Updated',
+      'Visits',
+      'Viewed Video',
+      'Viewed Video At',
+      'Accepted Missions',
+      'Accepted Missions At',
+      'Update Action',
+      'Mission 1 Status',
+      'Mission 1 Feel',
+      'Mission 1 Feel Rating',
+      'Mission 1 Poor Feel Explanation',
+      'Mission 1 Submitted At',
+      'Mission 2 Status',
+      'Mission 2 Flight',
+      'Mission 2 Flight Rating',
+      'Mission 2 Poor Flight Explanation',
+      'Mission 2 Video URL',
+      'Mission 2 Shirt Size',
+      'Mission 2 200ft+',
+      'Mission 2 Public Video',
+      'Mission 2 Submitted At',
+      'Mission 3 Status',
+      'Mission 3 Ace URL',
+      'Mission 3 Hoodie Size',
+      'Mission 3 200ft+',
+      'Mission 3 Public Video',
+      'Mission 3 Submitted At',
+    ]
+
+    const escapeValue = (value: string | number | boolean | null | undefined) => {
+      const stringValue = String(value ?? '')
+      if (stringValue.includes('"') || stringValue.includes(',') || stringValue.includes('\n')) {
+        return `"${stringValue.replace(/"/g, '""')}"`
+      }
+      return stringValue
+    }
+
+    const rows = agents.map((agent) => {
+      const m1 = agent.missions?.m1
+      const m2 = agent.missions?.m2
+      const m3 = agent.missions?.m3
+      return [
+        `${agent.last || '—'}, ${agent.first || '—'}`,
+        agent.token,
+        agent.updatedAt || '',
+        agent.visitCount ?? 0,
+        formatComplete(agent.introViewed ?? agent.introAccepted),
+        agent.introViewedAt || '',
+        formatComplete(agent.introAccepted || Boolean(agent.introAcceptedAt)),
+        agent.introAcceptedAt || '',
+        agent.updateAction || '',
+        m1?.status || 'NOT_STARTED',
+        m1?.data?.feel || '',
+        m1?.data?.feelRating ?? '',
+        m1?.data?.feelNote || '',
+        m1?.lastSubmittedAt || '',
+        m2?.status || 'NOT_STARTED',
+        m2?.data?.flight || '',
+        m2?.data?.flightRating ?? '',
+        m2?.data?.flightNote || '',
+        m2?.data?.videoUrl || '',
+        m2?.data?.shirtSize || '',
+        formatComplete(m2?.data?.confirmDistance200),
+        formatComplete(m2?.data?.confirmRights),
+        m2?.lastSubmittedAt || '',
+        m3?.status || 'NOT_STARTED',
+        m3?.data?.aceUrl || '',
+        m3?.data?.hoodieSize || '',
+        formatComplete(m3?.data?.confirmDistance200),
+        formatComplete(m3?.data?.confirmRights),
+        m3?.lastSubmittedAt || '',
+      ]
+    })
+
+    const csv = [headers, ...rows]
+      .map((row) => row.map((value) => escapeValue(value)).join(','))
+      .join('\n')
+
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = 'arachnid-agent-responses.csv'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
   }
 
   const toggleRow = (token: string) => {
@@ -276,44 +379,25 @@ function AdminApp() {
                       <>
                         <tr className='admin-row-missions'>
                           <td colSpan={8}>
-                            <div className='admin-mission-row'>
-                              <div className='admin-mission-cell'>
-                                <span className='admin-mission-label'>Mission 1</span>
-                                <div className='admin-mission-value'>
-                                  {renderMission1(agent.missions?.m1, agent.updatedAt)}
-                                </div>
-                              </div>
-                              <div className='admin-mission-cell'>
-                                <span className='admin-mission-label'>Mission 2</span>
-                                <div className='admin-mission-value'>
-                                  {renderMission2(agent.missions?.m2, agent.updatedAt)}
-                                </div>
-                              </div>
-                              <div className='admin-mission-cell'>
-                                <span className='admin-mission-label'>Mission 3</span>
-                                <div className='admin-mission-value'>
-                                  {renderMission3(agent.missions?.m3, agent.updatedAt)}
-                                </div>
-                              </div>
+                            <div className='admin-mission-block'>
+                              <div className='admin-mission-title'>Mission 1</div>
+                              {renderMission1(agent.missions?.m1, agent.updatedAt)}
                             </div>
                           </td>
                         </tr>
                         <tr className='admin-row-missions'>
                           <td colSpan={8}>
-                            <div className='admin-mission-row admin-notes-row'>
-                              <div className='admin-mission-cell'>
-                                <span className='admin-mission-label'>Poor Feel Explanation</span>
-                                <div className='admin-mission-value'>
-                                  {agent.missions?.m1?.data?.feelNote?.trim() || 'None'}
-                                </div>
-                              </div>
-                              <div className='admin-mission-cell'>
-                                <span className='admin-mission-label'>Poor Flight Explanation</span>
-                                <div className='admin-mission-value'>
-                                  {agent.missions?.m2?.data?.flightNote?.trim() || 'None'}
-                                </div>
-                              </div>
-                              <div className='admin-mission-cell' />
+                            <div className='admin-mission-block'>
+                              <div className='admin-mission-title'>Mission 2</div>
+                              {renderMission2(agent.missions?.m2, agent.updatedAt)}
+                            </div>
+                          </td>
+                        </tr>
+                        <tr className='admin-row-missions'>
+                          <td colSpan={8}>
+                            <div className='admin-mission-block'>
+                              <div className='admin-mission-title'>Mission 3</div>
+                              {renderMission3(agent.missions?.m3, agent.updatedAt)}
                             </div>
                           </td>
                         </tr>
@@ -324,6 +408,13 @@ function AdminApp() {
               )}
             </tbody>
           </table>
+          {agents.length > 0 && (
+            <div className='admin-download'>
+              <button type='button' onClick={handleDownloadCsv}>
+                Download CSV
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>
