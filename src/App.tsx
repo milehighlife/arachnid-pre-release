@@ -347,6 +347,13 @@ function App() {
         />
         <div ref={missionEndRef} className='mission-header-sentinel' aria-hidden='true' />
       </main>
+      <section className='hatch-band' aria-hidden='true'>
+        <div className='hatch-text'>
+          {Array.from({ length: 8 }).map((_, index) => (
+            <span key={index}>THROW YOUR BEST</span>
+          ))}
+        </div>
+      </section>
       <Footer
         introAccepted={introAccepted}
         canReset={Boolean(personalization.token)}
