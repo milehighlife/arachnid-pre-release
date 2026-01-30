@@ -1,10 +1,8 @@
 type Env = {
   ARACHNID_KV: KVNamespace
   ADMIN_TOKEN?: string
-  TWILIO_ACCOUNT_SID?: string
-  TWILIO_AUTH_TOKEN?: string
-  TWILIO_FROM_NUMBER?: string
-  TWILIO_TO_NUMBER?: string
+  TELEGRAM_BOT_TOKEN?: string
+  TELEGRAM_CHAT_ID?: string
 }
 
 type MissionId = 'm1' | 'm2' | 'm3'
@@ -97,7 +95,7 @@ const parseMissionId = (value: string): MissionId | null =>
   value === 'm1' || value === 'm2' || value === 'm3' ? value : null
 const buildProgressKey = (token: string) => `arachnid:progress:${token}`
 
-const sendMissionSms = async (
+const sendMissionTelegram = async (
   env: Env,
   params: {
     missionId: MissionId
@@ -107,30 +105,22 @@ const sendMissionSms = async (
     codename: string
   },
 ) => {
-  const sid = env.TWILIO_ACCOUNT_SID
-  const authToken = env.TWILIO_AUTH_TOKEN
-  const from = env.TWILIO_FROM_NUMBER
-  const to = env.TWILIO_TO_NUMBER
-  if (!sid || !authToken || !from || !to) {
+  const botToken = env.TELEGRAM_BOT_TOKEN
+  const chatId = env.TELEGRAM_CHAT_ID
+  if (!botToken || !chatId) {
     return
   }
 
   const agentName = [params.first, params.last].filter(Boolean).join(' ').trim() || params.token
-  const body = `Arachnid ${params.missionId.toUpperCase()} complete by ${agentName} (${params.codename}).`
-  const form = new URLSearchParams({
-    From: from,
-    To: to,
-    Body: body,
-  })
-
-  const auth = btoa(`${sid}:${authToken}`)
-  await fetch(`https://api.twilio.com/2010-04-01/Accounts/${sid}/Messages.json`, {
+  const text = `Arachnid ${params.missionId.toUpperCase()} complete by ${agentName} (${params.codename}).`
+  await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
     method: 'POST',
-    headers: {
-      Authorization: `Basic ${auth}`,
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    body: form.toString(),
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      chat_id: chatId,
+      text,
+      disable_web_page_preview: true,
+    }),
   })
 }
 
@@ -629,9 +619,9 @@ export default {
       await env.ARACHNID_KV.put(key, JSON.stringify(record))
 
       try {
-        await sendMissionSms(env, { missionId, token, first, last, codename })
+        await sendMissionTelegram(env, { missionId, token, first, last, codename })
       } catch {
-        // SMS failure should not block mission submission.
+        // Notification failure should not block mission submission.
       }
 
       return jsonResponse({
