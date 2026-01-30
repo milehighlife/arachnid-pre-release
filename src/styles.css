@@ -1441,7 +1441,6 @@ button {
   width: 24px;
   height: 24px;
   border-radius: 6px;
-  margin-right: 10px;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
@@ -1451,6 +1450,11 @@ button {
 
 .admin-name {
   vertical-align: middle;
+}
+
+.admin-toggle-cell {
+  width: 44px;
+  text-align: center;
 }
 
 .admin-notes-row {

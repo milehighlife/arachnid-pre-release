@@ -210,6 +210,7 @@ function AdminApp() {
           <table className='admin-table'>
             <thead>
               <tr>
+                <th></th>
                 <th>Agent Last, First</th>
                 <th>Agent Token</th>
                 <th>Viewed Intro Video</th>
@@ -223,7 +224,7 @@ function AdminApp() {
             <tbody>
               {sortedAgents.length === 0 && !loading ? (
                 <tr>
-                  <td colSpan={8} className='admin-empty'>
+                  <td colSpan={9} className='admin-empty'>
                     No agent data available.
                   </td>
                 </tr>
@@ -231,7 +232,7 @@ function AdminApp() {
                 sortedAgents.map((agent) => (
                   <Fragment key={agent.token}>
                     <tr className='admin-row-main'>
-                      <td>
+                      <td className='admin-toggle-cell'>
                         <button
                           type='button'
                           className='admin-toggle'
@@ -241,6 +242,8 @@ function AdminApp() {
                         >
                           {expanded[agent.token] ? '−' : '+'}
                         </button>
+                      </td>
+                      <td>
                         <span className='admin-name'>
                           {agent.last || '—'}, {agent.first || '—'}
                         </span>
@@ -262,7 +265,7 @@ function AdminApp() {
                     {expanded[agent.token] && (
                       <>
                         <tr className='admin-row-missions'>
-                          <td colSpan={8}>
+                          <td colSpan={9}>
                             <div className='admin-mission-row'>
                               <div className='admin-mission-cell'>
                                 <span className='admin-mission-label'>Mission 1</span>
@@ -286,7 +289,7 @@ function AdminApp() {
                           </td>
                         </tr>
                         <tr className='admin-row-missions'>
-                          <td colSpan={8}>
+                          <td colSpan={9}>
                             <div className='admin-mission-row admin-notes-row'>
                               <div className='admin-mission-cell'>
                                 <span className='admin-mission-label'>Poor Feel Explanation</span>
