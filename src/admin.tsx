@@ -211,20 +211,19 @@ function AdminApp() {
             <thead>
               <tr>
                 <th></th>
-                <th>Agent Last, First</th>
-                <th>Agent Token</th>
-                <th>Viewed Intro Video</th>
-                <th>Accepted Missions</th>
+                <th>Name</th>
+                <th>Updated</th>
                 <th>Visits</th>
-                <th>Last Seen</th>
-                <th>Last Update</th>
+                <th>Token</th>
+                <th>Viewed Video</th>
+                <th>Accepted Missions</th>
                 <th>Update Action</th>
               </tr>
             </thead>
             <tbody>
               {sortedAgents.length === 0 && !loading ? (
                 <tr>
-                  <td colSpan={9} className='admin-empty'>
+                  <td colSpan={8} className='admin-empty'>
                     No agent data available.
                   </td>
                 </tr>
@@ -248,6 +247,8 @@ function AdminApp() {
                           {agent.last || '—'}, {agent.first || '—'}
                         </span>
                       </td>
+                      <td>{formatTimestamp(agent.updatedAt)}</td>
+                      <td>{agent.visitCount ?? 0}</td>
                       <td>{agent.token}</td>
                       <td>
                         {formatComplete(agent.introViewed ?? agent.introAccepted)} •{' '}
@@ -257,15 +258,12 @@ function AdminApp() {
                         {formatComplete(agent.introAccepted || Boolean(agent.introAcceptedAt))} •{' '}
                         {formatTimestamp(agent.introAcceptedAt)}
                       </td>
-                      <td>{agent.visitCount ?? 0}</td>
-                      <td>{formatTimestamp(agent.lastSeenAt)}</td>
-                      <td>{formatTimestamp(agent.updatedAt)}</td>
                       <td>{agent.updateAction || 'Viewed page'}</td>
                     </tr>
                     {expanded[agent.token] && (
                       <>
                         <tr className='admin-row-missions'>
-                          <td colSpan={9}>
+                          <td colSpan={8}>
                             <div className='admin-mission-row'>
                               <div className='admin-mission-cell'>
                                 <span className='admin-mission-label'>Mission 1</span>
@@ -289,7 +287,7 @@ function AdminApp() {
                           </td>
                         </tr>
                         <tr className='admin-row-missions'>
-                          <td colSpan={9}>
+                          <td colSpan={8}>
                             <div className='admin-mission-row admin-notes-row'>
                               <div className='admin-mission-cell'>
                                 <span className='admin-mission-label'>Poor Feel Explanation</span>

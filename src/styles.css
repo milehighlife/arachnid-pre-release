@@ -1435,9 +1435,9 @@ button {
 }
 
 .admin-toggle {
-  border: 1px solid var(--border);
+  border: 1px solid var(--accent);
   background: transparent;
-  color: var(--text);
+  color: var(--accent);
   width: 24px;
   height: 24px;
   border-radius: 6px;
