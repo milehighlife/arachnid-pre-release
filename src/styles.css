@@ -1450,11 +1450,13 @@ button {
   display: grid;
   gap: 12px;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  align-items: start;
 }
 
 .admin-field-cell {
   display: grid;
   gap: 6px;
+  align-content: start;
 }
 
 .admin-field-label {
