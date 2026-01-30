@@ -46,7 +46,6 @@ function Hero({ firstName, agentToken, agentStatus, showCta }: HeroProps) {
           <p className='hero-subheading'>MISSION INTEL:</p>
           <ul className='hero-bullets'>
             <li>Low-profile, high-glide, stable mid-range</li>
-            <li>Forehand lasers</li>
             <li>Flight Numbers: 5, 6, -1, 1</li>
             <li>Pre-release variant</li>
             <li>Production release this March/April</li>
