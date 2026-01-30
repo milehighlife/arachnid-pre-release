@@ -599,7 +599,7 @@ function FeedbackForm({
           </div>
           {mission1FeelRating <= 2 && (
             <div className='field'>
-              <label htmlFor='mission1_feel_note'>Why is the feel poor?</label>
+              <label htmlFor='mission1_feel_note'>Why is the feel poor? (optional)</label>
               <textarea
                 id='mission1_feel_note'
                 name='mission1_feel_note'
@@ -710,7 +710,7 @@ function FeedbackForm({
           </div>
           {mission2FlightRating <= 2 && (
             <div className='field'>
-              <label htmlFor='mission2_flight_note'>Why was the flight poor?</label>
+              <label htmlFor='mission2_flight_note'>Why was the flight poor? (optional)</label>
               <textarea
                 id='mission2_flight_note'
                 name='mission2_flight_note'
