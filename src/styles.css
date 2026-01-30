@@ -1015,6 +1015,12 @@ button {
   font-weight: 500;
 }
 
+.field-subhead {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text);
+}
+
 .field input,
 .field select,
 .field textarea {
