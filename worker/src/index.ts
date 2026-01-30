@@ -1,6 +1,10 @@
 type Env = {
   ARACHNID_KV: KVNamespace
   ADMIN_TOKEN?: string
+  TWILIO_ACCOUNT_SID?: string
+  TWILIO_AUTH_TOKEN?: string
+  TWILIO_FROM_NUMBER?: string
+  TWILIO_TO_NUMBER?: string
 }
 
 type MissionId = 'm1' | 'm2' | 'm3'
@@ -92,6 +96,43 @@ const isHttpUrl = (value: string) => value.startsWith('http')
 const parseMissionId = (value: string): MissionId | null =>
   value === 'm1' || value === 'm2' || value === 'm3' ? value : null
 const buildProgressKey = (token: string) => `arachnid:progress:${token}`
+
+const sendMissionSms = async (
+  env: Env,
+  params: {
+    missionId: MissionId
+    token: string
+    first: string
+    last: string
+    codename: string
+  },
+) => {
+  const sid = env.TWILIO_ACCOUNT_SID
+  const authToken = env.TWILIO_AUTH_TOKEN
+  const from = env.TWILIO_FROM_NUMBER
+  const to = env.TWILIO_TO_NUMBER
+  if (!sid || !authToken || !from || !to) {
+    return
+  }
+
+  const agentName = [params.first, params.last].filter(Boolean).join(' ').trim() || params.token
+  const body = `Arachnid ${params.missionId.toUpperCase()} complete by ${agentName} (${params.codename}).`
+  const form = new URLSearchParams({
+    From: from,
+    To: to,
+    Body: body,
+  })
+
+  const auth = btoa(`${sid}:${authToken}`)
+  await fetch(`https://api.twilio.com/2010-04-01/Accounts/${sid}/Messages.json`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Basic ${auth}`,
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: form.toString(),
+  })
+}
 
 const defaultMissions = (): Record<MissionId, MissionProgress> => ({
   m1: { status: 'NOT_STARTED' },
@@ -586,6 +627,12 @@ export default {
       record.lastSeenAt = nowISO
 
       await env.ARACHNID_KV.put(key, JSON.stringify(record))
+
+      try {
+        await sendMissionSms(env, { missionId, token, first, last, codename })
+      } catch {
+        // SMS failure should not block mission submission.
+      }
 
       return jsonResponse({
         ok: true,
