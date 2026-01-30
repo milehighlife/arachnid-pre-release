@@ -325,7 +325,7 @@ button {
 
 .hatch-band {
   position: relative;
-  padding: 28px 0;
+  padding: 14px 0;
   background: repeating-linear-gradient(
     135deg,
     #0b0b0b 0px,
@@ -1469,7 +1469,7 @@ button {
   }
 
   .hatch-band {
-    padding: 34px 0;
+    padding: 17px 0;
   }
 
   .mission-grid {
