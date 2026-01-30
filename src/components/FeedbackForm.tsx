@@ -599,7 +599,7 @@ function FeedbackForm({
           </div>
           {mission1FeelRating <= 2 && (
             <div className='field'>
-              <label htmlFor='mission1_feel_note'>Why is the feel less than ideal?</label>
+              <label htmlFor='mission1_feel_note'>Why is the feel poor?</label>
               <textarea
                 id='mission1_feel_note'
                 name='mission1_feel_note'
