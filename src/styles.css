@@ -320,7 +320,7 @@ button {
 }
 
 .hero {
-  padding: 96px 0 72px;
+  padding: 96px 0 36px;
 }
 
 .confidential-banner {
@@ -531,7 +531,7 @@ button {
 }
 
 .missions {
-  padding: 72px 0 96px;
+  padding: 36px 0 96px;
 }
 
 .main {
@@ -1435,7 +1435,7 @@ button {
 
 @media (min-width: 960px) {
   .hero {
-    padding: 120px 0 90px;
+    padding: 120px 0 45px;
   }
 
   .mission-grid {
