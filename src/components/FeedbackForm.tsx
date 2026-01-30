@@ -583,7 +583,7 @@ function FeedbackForm({
               }}
               disabled={isMissionDisabled('m1')}
             />
-            <span className='field-hint'>1 = poor, 5 = perfect.</span>
+            <span className='field-hint'>1 = poor fit, 5 = perfect fit.</span>
           </div>
           <div className='mission-actions'>
             <button
