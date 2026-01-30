@@ -269,13 +269,17 @@ function FeedbackForm({
 
   const mission1WordCount = countWords(mission1Feel)
   const mission1Ready = mission1WordCount >= 25 && mission1Feel.trim().length <= 2000
+  const mission1Locked = missionStatus.m1 === 'LOCKED'
+  const mission2Locked = missionStatus.m2 === 'LOCKED'
   const mission2Ready =
+    mission1Locked &&
     mission2Flight.trim().length >= 10 &&
     isHttpUrl(mission2VideoUrl.trim()) &&
     Boolean(mission2ShirtSize.trim()) &&
     mission2ConfirmDistance &&
     mission2ConfirmRights
   const mission3Ready =
+    mission2Locked &&
     isHttpUrl(mission3AceUrl.trim()) &&
     Boolean(mission3HoodieSize.trim()) &&
     mission3ConfirmDistance &&
@@ -348,6 +352,10 @@ function FeedbackForm({
     }
 
     if (missionId === 'm2') {
+      if (!mission1Locked) {
+        nextErrors.m2 = 'Complete Mission 1 before submitting Mission 2.'
+        return nextErrors
+      }
       if (!mission2Flight.trim()) {
         nextErrors.m2 = 'Provide flight details to complete Mission 2.'
       } else if (mission2Flight.trim().length < 10) {
@@ -368,6 +376,10 @@ function FeedbackForm({
     }
 
     if (missionId === 'm3') {
+      if (!mission2Locked) {
+        nextErrors.m3 = 'Complete Mission 2 before submitting Mission 3.'
+        return nextErrors
+      }
       if (!mission3AceUrl.trim()) {
         nextErrors.m3 = 'Add a public ace video URL.'
       } else if (!isHttpUrl(mission3AceUrl.trim())) {
@@ -608,6 +620,7 @@ function FeedbackForm({
           award='Award: Maintain Tester Team Status and receive an Arachnid Tester T-shirt in your size.'
           requirements={
             <ul className='requirements-list'>
+              <li>Must complete Mission 1 in advance</li>
               <li>Hole must be greater than 200ft</li>
               <li>Published video must be public</li>
               <li>Innova has rights to share on social platforms</li>
@@ -793,6 +806,7 @@ function FeedbackForm({
           award='Award: Limited Arachnid Tester Hoodie customized with your full name, plus two first-run Arachnids.'
           requirements={
             <ul className='requirements-list'>
+              <li>Must complete Mission 2 in advance</li>
               <li>Hole must be over 200ft</li>
               <li>Published video must be public</li>
               <li>Innova has rights to share on social platforms</li>

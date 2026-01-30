@@ -452,6 +452,11 @@ export default {
       return jsonResponse({ ok: false, error: 'Invalid mission id' }, 400)
     }
 
+    const key = buildProgressKey(token)
+    const existing = (await env.ARACHNID_KV.get(key, 'json')) as ProgressRecord | null
+    const mission1Locked = existing?.missions?.m1?.status === 'LOCKED'
+    const mission2Locked = existing?.missions?.m2?.status === 'LOCKED'
+
     const mission = payload.mission ?? {}
 
     const mission1Feel = typeof mission.feel === 'string' ? mission.feel.trim() : ''
@@ -484,6 +489,9 @@ export default {
     }
 
     if (missionId === 'm2') {
+      if (!mission1Locked) {
+        return jsonResponse({ ok: false, error: 'Complete Mission 1 before Mission 2' }, 400)
+      }
       if (!mission2Flight || !mission2VideoUrl || !mission2ShirtSize) {
         return jsonResponse({ ok: false, error: 'Mission 2 requires all fields' }, 400)
       }
@@ -496,6 +504,9 @@ export default {
     }
 
     if (missionId === 'm3') {
+      if (!mission2Locked) {
+        return jsonResponse({ ok: false, error: 'Complete Mission 2 before Mission 3' }, 400)
+      }
       if (!mission3AceUrl || !mission3HoodieSize) {
         return jsonResponse({ ok: false, error: 'Mission 3 requires all fields' }, 400)
       }
@@ -527,8 +538,6 @@ export default {
                 confirmRights: mission3ConfirmRights,
               }
       const nowISO = new Date().toISOString()
-      const key = buildProgressKey(token)
-      const existing = (await env.ARACHNID_KV.get(key, 'json')) as ProgressRecord | null
       const record =
         existing ??
         buildProgressRecord({
