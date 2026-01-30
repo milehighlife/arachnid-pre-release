@@ -111,8 +111,8 @@ const sendMissionTelegram = async (
     return
   }
 
-  const agentName = [params.first, params.last].filter(Boolean).join(' ').trim() || params.token
-  const text = `Arachnid ${params.missionId.toUpperCase()} complete by ${agentName} (${params.codename}).`
+  const fullName = [params.first, params.last].filter(Boolean).join(' ').trim() || '—'
+  const text = `Mission ${params.missionId.toUpperCase()} complete\nToken: ${params.token}\nName: ${fullName}`
   await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
