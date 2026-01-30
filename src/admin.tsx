@@ -12,6 +12,7 @@ type MissionProgress = {
     feelNote?: string
     flight?: string
     flightRating?: number
+    flightNote?: string
     videoUrl?: string
     shirtSize?: string
     confirmDistance200?: boolean
@@ -84,6 +85,7 @@ const renderMission2 = (mission?: MissionProgress, fallbackTime?: string | null)
   const time = formatTimestamp(mission.lastSubmittedAt || fallbackTime || null)
   const rating =
     typeof data.flightRating === 'number' ? ` | Flight: ${data.flightRating}/5` : ''
+  const note = data.flightNote?.trim() ? ` | Note: ${data.flightNote}` : ''
   return (
     <div>
       <div>
@@ -91,6 +93,7 @@ const renderMission2 = (mission?: MissionProgress, fallbackTime?: string | null)
         {formatComplete(data.confirmDistance200)} | Public:{' '}
         {formatComplete(data.confirmRights)}
         {rating}
+        {note}
       </div>
       <div className='admin-meta'>{time}</div>
     </div>

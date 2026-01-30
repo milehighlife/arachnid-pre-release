@@ -15,6 +15,7 @@ type MissionProgress = {
     feelNote?: string
     flight?: string
     flightRating?: number
+    flightNote?: string
     videoUrl?: string
     shirtSize?: string
     confirmDistance200?: boolean
@@ -58,6 +59,7 @@ type FeedbackPayload = {
     feelNote?: string
     flight?: string
     flightRating?: number
+    flightNote?: string
     videoUrl?: string
     shirtSize?: string
     confirmDistance200?: boolean
@@ -475,6 +477,8 @@ export default {
       typeof mission.flightRating === 'number'
         ? Math.min(5, Math.max(1, Math.round(mission.flightRating)))
         : undefined
+    const mission2FlightNote =
+      typeof mission.flightNote === 'string' ? mission.flightNote.trim().slice(0, 500) : ''
     const mission2ConfirmDistance = Boolean(mission.confirmDistance200)
     const mission2ConfirmRights = Boolean(mission.confirmRights)
     const mission3AceUrl = typeof mission.aceUrl === 'string' ? mission.aceUrl.trim() : ''
@@ -536,6 +540,7 @@ export default {
             ? {
                 flight: mission2Flight,
                 flightRating: mission2FlightRating,
+                flightNote: mission2FlightNote,
                 videoUrl: mission2VideoUrl,
                 shirtSize: mission2ShirtSize,
                 confirmDistance200: mission2ConfirmDistance,

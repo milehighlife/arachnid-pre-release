@@ -39,6 +39,7 @@ export type MissionProgress = {
     feelNote?: string
     flight?: string
     flightRating?: number
+    flightNote?: string
     videoUrl?: string
     shirtSize?: string
     confirmDistance200?: boolean
@@ -119,6 +120,7 @@ function FeedbackForm({
   const [mission1FeelNote, setMission1FeelNote] = useState('')
   const [mission2Flight, setMission2Flight] = useState('')
   const [mission2FlightRating, setMission2FlightRating] = useState(3)
+  const [mission2FlightNote, setMission2FlightNote] = useState('')
   const [mission2VideoUrl, setMission2VideoUrl] = useState('')
   const [mission2ShirtSize, setMission2ShirtSize] = useState('')
   const [mission2ConfirmDistance, setMission2ConfirmDistance] = useState(false)
@@ -212,6 +214,9 @@ function FeedbackForm({
       }
       if (typeof m2Data.flightRating === 'number') {
         setMission2FlightRating(m2Data.flightRating)
+      }
+      if (typeof m2Data.flightNote === 'string' && !mission2FlightNote) {
+        setMission2FlightNote(m2Data.flightNote)
       }
       if (m2Data.videoUrl && !mission2VideoUrl) {
         setMission2VideoUrl(m2Data.videoUrl)
@@ -443,6 +448,7 @@ function FeedbackForm({
           ? {
               flight: mission2Flight.trim(),
               flightRating: mission2FlightRating,
+              flightNote: mission2FlightNote.trim(),
               videoUrl: mission2VideoUrl.trim(),
               shirtSize: mission2ShirtSize.trim(),
               confirmDistance200: mission2ConfirmDistance,
@@ -701,6 +707,22 @@ function FeedbackForm({
             />
             <span className='field-hint'>1 = poor flight, 5 = ideal flight.</span>
           </div>
+          {mission2FlightRating <= 2 && (
+            <div className='field'>
+              <label htmlFor='mission2_flight_note'>Why was the flight poor?</label>
+              <textarea
+                id='mission2_flight_note'
+                name='mission2_flight_note'
+                placeholder='Share what went wrong...'
+                value={mission2FlightNote}
+                onChange={(event) => {
+                  setMission2FlightNote(event.target.value)
+                  updateMissionTouched('m2')
+                }}
+                disabled={isMissionDisabled('m2')}
+              />
+            </div>
+          )}
           <div className='field'>
             <label htmlFor='mission2_video_url'>Published video URL (public)</label>
             <input
