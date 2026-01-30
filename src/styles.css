@@ -1512,6 +1512,7 @@ button {
   display: flex;
   justify-content: flex-end;
   padding: 12px 0 0;
+  border: none;
 }
 
 .admin-download button {
