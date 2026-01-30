@@ -12,6 +12,7 @@ type MissionProgress = {
   data?: {
     feel?: string
     feelRating?: number
+    feelNote?: string
     flight?: string
     flightRating?: number
     videoUrl?: string
@@ -54,6 +55,7 @@ type FeedbackPayload = {
   mission?: {
     feel?: string
     feelRating?: number
+    feelNote?: string
     flight?: string
     flightRating?: number
     videoUrl?: string
@@ -467,6 +469,8 @@ export default {
       typeof mission.feelRating === 'number'
         ? Math.min(5, Math.max(1, Math.round(mission.feelRating)))
         : undefined
+    const mission1FeelNote =
+      typeof mission.feelNote === 'string' ? mission.feelNote.trim().slice(0, 500) : ''
     const mission2FlightRating =
       typeof mission.flightRating === 'number'
         ? Math.min(5, Math.max(1, Math.round(mission.flightRating)))
@@ -527,7 +531,7 @@ export default {
     try {
       const missionData =
         missionId === 'm1'
-          ? { feel: mission1Feel, feelRating: mission1FeelRating }
+          ? { feel: mission1Feel, feelRating: mission1FeelRating, feelNote: mission1FeelNote }
           : missionId === 'm2'
             ? {
                 flight: mission2Flight,

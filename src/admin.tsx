@@ -9,6 +9,7 @@ type MissionProgress = {
   data?: {
     feel?: string
     feelRating?: number
+    feelNote?: string
     flight?: string
     flightRating?: number
     videoUrl?: string
@@ -61,12 +62,14 @@ const renderMission1 = (mission?: MissionProgress, fallbackTime?: string | null)
   const details = mission.data?.feel?.trim() || 'Complete'
   const rating =
     typeof mission.data?.feelRating === 'number' ? ` • Feel: ${mission.data.feelRating}/5` : ''
+  const note = mission.data?.feelNote?.trim() ? ` • Note: ${mission.data.feelNote}` : ''
   const time = formatTimestamp(mission.lastSubmittedAt || fallbackTime || null)
   return (
     <div>
       <div>
         {details}
         {rating}
+        {note}
       </div>
       <div className='admin-meta'>{time}</div>
     </div>

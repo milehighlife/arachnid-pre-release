@@ -36,6 +36,7 @@ export type MissionProgress = {
   data?: {
     feel?: string
     feelRating?: number
+    feelNote?: string
     flight?: string
     flightRating?: number
     videoUrl?: string
@@ -115,6 +116,7 @@ function FeedbackForm({
 
   const [mission1Feel, setMission1Feel] = useState('')
   const [mission1FeelRating, setMission1FeelRating] = useState(3)
+  const [mission1FeelNote, setMission1FeelNote] = useState('')
   const [mission2Flight, setMission2Flight] = useState('')
   const [mission2FlightRating, setMission2FlightRating] = useState(3)
   const [mission2VideoUrl, setMission2VideoUrl] = useState('')
@@ -198,6 +200,9 @@ function FeedbackForm({
     }
     if (typeof m1Data?.feelRating === 'number') {
       setMission1FeelRating(m1Data.feelRating)
+    }
+    if (typeof m1Data?.feelNote === 'string' && !missionTouched.m1 && !mission1FeelNote) {
+      setMission1FeelNote(m1Data.feelNote)
     }
 
     const m2Data = progress.missions.m2?.data
@@ -432,6 +437,7 @@ function FeedbackForm({
         ? {
             feel: mission1Feel.trim(),
             feelRating: mission1FeelRating,
+            feelNote: mission1FeelNote.trim(),
           }
         : missionId === 'm2'
           ? {
@@ -585,6 +591,22 @@ function FeedbackForm({
             />
             <span className='field-hint'>1 = poor fit, 5 = perfect fit.</span>
           </div>
+          {mission1FeelRating <= 2 && (
+            <div className='field'>
+              <label htmlFor='mission1_feel_note'>Why is the feel less than ideal?</label>
+              <textarea
+                id='mission1_feel_note'
+                name='mission1_feel_note'
+                placeholder='Share what felt off...'
+                value={mission1FeelNote}
+                onChange={(event) => {
+                  setMission1FeelNote(event.target.value)
+                  updateMissionTouched('m1')
+                }}
+                disabled={isMissionDisabled('m1')}
+              />
+            </div>
+          )}
           <div className='mission-actions'>
             <button
               type='button'
