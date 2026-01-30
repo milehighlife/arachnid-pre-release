@@ -124,6 +124,7 @@ function AdminApp() {
   const [error, setError] = useState('')
   const [agents, setAgents] = useState<AgentRecord[]>([])
   const [authed, setAuthed] = useState(false)
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({})
 
   useEffect(() => {
     const cached = sessionStorage.getItem('arachnid_admin_token') || ''
@@ -177,6 +178,10 @@ function AdminApp() {
     setError('')
   }
 
+  const toggleRow = (token: string) => {
+    setExpanded((prev) => ({ ...prev, [token]: !prev[token] }))
+  }
+
   return (
     <div className='admin-page'>
       <div className='container'>
@@ -227,7 +232,18 @@ function AdminApp() {
                   <Fragment key={agent.token}>
                     <tr className='admin-row-main'>
                       <td>
-                        {agent.last || '—'}, {agent.first || '—'}
+                        <button
+                          type='button'
+                          className='admin-toggle'
+                          onClick={() => toggleRow(agent.token)}
+                          aria-expanded={Boolean(expanded[agent.token])}
+                          aria-label='Toggle agent details'
+                        >
+                          {expanded[agent.token] ? '−' : '+'}
+                        </button>
+                        <span className='admin-name'>
+                          {agent.last || '—'}, {agent.first || '—'}
+                        </span>
                       </td>
                       <td>{agent.token}</td>
                       <td>
@@ -243,30 +259,53 @@ function AdminApp() {
                       <td>{formatTimestamp(agent.updatedAt)}</td>
                       <td>{agent.updateAction || 'Viewed page'}</td>
                     </tr>
-                    <tr className='admin-row-missions'>
-                      <td colSpan={8}>
-                        <div className='admin-mission-row'>
-                          <div className='admin-mission-cell'>
-                            <span className='admin-mission-label'>Mission 1</span>
-                            <div className='admin-mission-value'>
-                              {renderMission1(agent.missions?.m1, agent.updatedAt)}
+                    {expanded[agent.token] && (
+                      <>
+                        <tr className='admin-row-missions'>
+                          <td colSpan={8}>
+                            <div className='admin-mission-row'>
+                              <div className='admin-mission-cell'>
+                                <span className='admin-mission-label'>Mission 1</span>
+                                <div className='admin-mission-value'>
+                                  {renderMission1(agent.missions?.m1, agent.updatedAt)}
+                                </div>
+                              </div>
+                              <div className='admin-mission-cell'>
+                                <span className='admin-mission-label'>Mission 2</span>
+                                <div className='admin-mission-value'>
+                                  {renderMission2(agent.missions?.m2, agent.updatedAt)}
+                                </div>
+                              </div>
+                              <div className='admin-mission-cell'>
+                                <span className='admin-mission-label'>Mission 3</span>
+                                <div className='admin-mission-value'>
+                                  {renderMission3(agent.missions?.m3, agent.updatedAt)}
+                                </div>
+                              </div>
                             </div>
-                          </div>
-                          <div className='admin-mission-cell'>
-                            <span className='admin-mission-label'>Mission 2</span>
-                            <div className='admin-mission-value'>
-                              {renderMission2(agent.missions?.m2, agent.updatedAt)}
+                          </td>
+                        </tr>
+                        <tr className='admin-row-missions'>
+                          <td colSpan={8}>
+                            <div className='admin-mission-row admin-notes-row'>
+                              <div className='admin-mission-cell'>
+                                <span className='admin-mission-label'>Poor Feel Explanation</span>
+                                <div className='admin-mission-value'>
+                                  {agent.missions?.m1?.data?.feelNote?.trim() || 'None'}
+                                </div>
+                              </div>
+                              <div className='admin-mission-cell'>
+                                <span className='admin-mission-label'>Poor Flight Explanation</span>
+                                <div className='admin-mission-value'>
+                                  {agent.missions?.m2?.data?.flightNote?.trim() || 'None'}
+                                </div>
+                              </div>
+                              <div className='admin-mission-cell' />
                             </div>
-                          </div>
-                          <div className='admin-mission-cell'>
-                            <span className='admin-mission-label'>Mission 3</span>
-                            <div className='admin-mission-value'>
-                              {renderMission3(agent.missions?.m3, agent.updatedAt)}
-                            </div>
-                          </div>
-                        </div>
-                      </td>
-                    </tr>
+                          </td>
+                        </tr>
+                      </>
+                    )}
                   </Fragment>
                 ))
               )}
