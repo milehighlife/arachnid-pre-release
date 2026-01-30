@@ -306,6 +306,13 @@ function App() {
         agentStatus={agentStatus}
         showCta={!mission1Locked}
       />
+      <section className='hatch-band' aria-hidden='true'>
+        <div className='hatch-text'>
+          {Array.from({ length: 8 }).map((_, index) => (
+            <span key={index}>THROW YOUR BEST</span>
+          ))}
+        </div>
+      </section>
       <AnimatePresence>
         {showHeader && (
           <motion.div
