@@ -126,7 +126,7 @@ const sendMissionTelegram = async (
 
 const sendIntroTelegram = async (
   env: Env,
-  params: { token: string; action: 'INTRO_VIEWED' | 'INTRO_ACCEPTED' },
+  params: { token: string; action: 'INTRO_VIEWED' | 'INTRO_ACCEPTED'; name: string },
 ) => {
   const botToken = env.TELEGRAM_BOT_TOKEN
   const chatId = env.TELEGRAM_CHAT_ID
@@ -134,10 +134,8 @@ const sendIntroTelegram = async (
     return
   }
 
-  const text =
-    params.action === 'INTRO_VIEWED'
-      ? `Intro viewed\nAgent: ${params.token}`
-      : `Mission accepted\nAgent: ${params.token}`
+  const label = params.action === 'INTRO_VIEWED' ? 'Intro viewed' : 'Mission accepted'
+  const text = `${label}\nAgent: ${params.token}\nAgent name: ${params.name}`
 
   await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
     method: 'POST',
@@ -239,7 +237,8 @@ export default {
       await env.ARACHNID_KV.put(key, JSON.stringify(record))
 
       try {
-        await sendIntroTelegram(env, { token, action: 'INTRO_ACCEPTED' })
+        const agentName = [record.first, record.last].filter(Boolean).join(' ').trim() || '—'
+        await sendIntroTelegram(env, { token, action: 'INTRO_ACCEPTED', name: agentName })
       } catch {
         // Notification failure should not block flow.
       }
@@ -294,7 +293,8 @@ export default {
       await env.ARACHNID_KV.put(key, JSON.stringify(record))
 
       try {
-        await sendIntroTelegram(env, { token, action: 'INTRO_VIEWED' })
+        const agentName = [record.first, record.last].filter(Boolean).join(' ').trim() || '—'
+        await sendIntroTelegram(env, { token, action: 'INTRO_VIEWED', name: agentName })
       } catch {
         // Notification failure should not block flow.
       }
