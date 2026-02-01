@@ -112,7 +112,7 @@ const sendMissionTelegram = async (
   }
 
   const fullName = [params.first, params.last].filter(Boolean).join(' ').trim() || '—'
-  const text = `Mission ${params.missionId.toUpperCase()} complete\nToken: ${params.token}\nName: ${fullName}`
+  const text = `Mission ${params.missionId.toUpperCase()} complete\nAgent: ${params.token}\nName: ${fullName}`
   await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -136,8 +136,8 @@ const sendIntroTelegram = async (
 
   const text =
     params.action === 'INTRO_VIEWED'
-      ? `Intro viewed\nToken: ${params.token}`
-      : `Mission accepted\nToken: ${params.token}`
+      ? `Intro viewed\nAgent: ${params.token}`
+      : `Mission accepted\nAgent: ${params.token}`
 
   await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
     method: 'POST',
