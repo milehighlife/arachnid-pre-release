@@ -384,6 +384,43 @@ button {
   gap: 14px;
 }
 
+.hero-briefing-block {
+  display: grid;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(226, 226, 226, 0.12);
+  background: rgba(226, 226, 226, 0.04);
+  width: min(420px, 100%);
+}
+
+.hero-agent-stack {
+  display: grid;
+  gap: 8px;
+}
+
+.hero-agent-chip {
+  border: 1px solid var(--success);
+  border-radius: 14px;
+  padding: 10px 14px;
+  display: grid;
+  gap: 4px;
+  background: rgba(34, 197, 94, 0.08);
+}
+
+.hero-agent-chip-label {
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  font-size: 0.6rem;
+  color: var(--success);
+}
+
+.hero-agent-chip-value {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
 .confidential-sub {
   font-size: 0.6rem;
   letter-spacing: 0.18em;

@@ -38,10 +38,19 @@ function Hero({ firstName, agentToken, agentStatus, showCta }: HeroProps) {
           </div>
         </div>
         <div className='hero-copy'>
-          <div className='hero-eyebrow'>Mission Briefing</div>
-          <p className='hero-greeting hero-status'>
-            Agent: {agentToken || firstName}, Status: {agentStatus}
-          </p>
+          <div className='hero-briefing-block'>
+            <div className='hero-eyebrow'>Mission Briefing</div>
+            <div className='hero-agent-stack'>
+              <div className='hero-agent-chip'>
+                <span className='hero-agent-chip-label'>Agent Token</span>
+                <span className='hero-agent-chip-value'>{agentToken || firstName}</span>
+              </div>
+              <div className='hero-agent-chip'>
+                <span className='hero-agent-chip-label'>Current Rank</span>
+                <span className='hero-agent-chip-value'>{agentStatus}</span>
+              </div>
+            </div>
+          </div>
           <h1 className='hero-title'>Pre-Release Arachnid</h1>
           <p className='hero-subheading'>MISSION INTEL:</p>
           <ul className='hero-bullets'>
