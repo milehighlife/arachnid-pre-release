@@ -1663,4 +1663,8 @@ button {
   .mission-progress {
     padding: 14px;
   }
+
+  .hero-agent-stack {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
