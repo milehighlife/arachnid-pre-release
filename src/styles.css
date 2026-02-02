@@ -391,12 +391,14 @@ button {
   border-radius: 18px;
   border: 1px solid rgba(226, 226, 226, 0.12);
   background: rgba(226, 226, 226, 0.04);
-  width: min(420px, 100%);
+  width: calc(100% - 12px);
+  margin: 0 6px;
 }
 
 .hero-agent-stack {
   display: grid;
   gap: 8px;
+  width: 100%;
 }
 
 .hero-agent-chip {
@@ -406,6 +408,14 @@ button {
   display: grid;
   gap: 4px;
   background: rgba(34, 197, 94, 0.08);
+  width: 100%;
+}
+
+.hero-agent-chip-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
 }
 
 .hero-agent-chip-label {
@@ -419,6 +429,29 @@ button {
   font-size: 1rem;
   font-weight: 600;
   color: var(--text);
+}
+
+.hero-rank-track {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.55rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--success);
+  opacity: 0.8;
+}
+
+.hero-rank-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  border: 1px solid var(--success);
+  background: rgba(34, 197, 94, 0.18);
+}
+
+.hero-rank-track-text {
+  margin-left: 2px;
 }
 
 .confidential-sub {
