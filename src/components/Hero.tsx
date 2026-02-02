@@ -58,38 +58,38 @@ function Hero({ firstName, agentToken, agentStatus, showCta }: HeroProps) {
                 <span className='hero-agent-chip-value'>{agentStatus}</span>
               </div>
             </div>
+            <h1 className='hero-title'>Pre-Release Arachnid</h1>
+            <p className='hero-subheading'>MISSION INTEL:</p>
+            <ul className='hero-bullets'>
+              <li>Low-profile, high-glide, stable mid-range</li>
+              <li>Flight Numbers: 5, 6, -1, 1</li>
+              <li>Pre-release variant</li>
+              <li>Production release this March/April</li>
+              <li>Collab with @innovadiscs, @innovawombat</li>
+              <li>Tag all media #innovaarachnid</li>
+            </ul>
+            <p className='hero-intro'>
+              Mission Package: Use your skills for Arachnid field testing missions. Publish and
+              collab your findings. Maintain agent status, level up with agent Arachnid gear. Your
+              mission briefings are below.
+            </p>
+            <p className='hero-intro'>
+              Cypher Access: Tap your mission patch to return to this page and submit intel.
+            </p>
+            <p className='hero-goodluck'>Good luck!</p>
+            {showCta && (
+              <div className='hero-actions'>
+                <motion.a
+                  className='cta'
+                  href='#missions'
+                  whileHover={{ y: -2 }}
+                  whileTap={{ y: 0 }}
+                >
+                  Start Missions
+                </motion.a>
+              </div>
+            )}
           </div>
-          <h1 className='hero-title'>Pre-Release Arachnid</h1>
-          <p className='hero-subheading'>MISSION INTEL:</p>
-          <ul className='hero-bullets'>
-            <li>Low-profile, high-glide, stable mid-range</li>
-            <li>Flight Numbers: 5, 6, -1, 1</li>
-            <li>Pre-release variant</li>
-            <li>Production release this March/April</li>
-            <li>Collab with @innovadiscs, @innovawombat</li>
-            <li>Tag all media #innovaarachnid</li>
-          </ul>
-          <p className='hero-intro'>
-            Mission Package: Use your skills for Arachnid field testing missions. Publish and
-            collab your findings. Maintain agent status, level up with agent Arachnid gear. Your
-            mission briefings are below.
-          </p>
-          <p className='hero-intro'>
-            Cypher Access: Tap your mission patch to return to this page and submit intel.
-          </p>
-          <p className='hero-goodluck'>Good luck!</p>
-          {showCta && (
-            <div className='hero-actions'>
-              <motion.a
-                className='cta'
-                href='#missions'
-                whileHover={{ y: -2 }}
-                whileTap={{ y: 0 }}
-              >
-                Start Missions
-              </motion.a>
-            </div>
-          )}
         </div>
       </div>
     </section>
