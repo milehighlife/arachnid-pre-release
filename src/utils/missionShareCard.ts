@@ -3,7 +3,8 @@ import successBarUrl from '../assets/mission-success-graphics/success-bar.png'
 import discUrl from '../assets/mission-success-graphics/disc.png'
 import logoUrl from '../assets/mission-success-graphics/innova-arachnid-logo.png'
 
-const TEMPLATE_URL = '/templates/mission-success-template.svg'
+const TEMPLATE_VERSION = '2026-02-03-02'
+const TEMPLATE_URL = `/templates/mission-success-template.svg?v=${TEMPLATE_VERSION}`
 const CANVAS_WIDTH = 1080
 const CANVAS_HEIGHT = 1440
 
