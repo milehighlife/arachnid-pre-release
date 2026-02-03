@@ -127,7 +127,7 @@ function MissionSuccessModal({ isOpen, token, handle, missionNumber, rank, onClo
             aria-disabled={!downloadReady}
             onClick={handleShare}
           >
-            {canShare ? 'Share Image' : 'Open Image'}
+            {canShare ? 'Share/Save Image' : 'Open Image'}
           </button>
           <button type='button' className='mission-success-button secondary' onClick={onClose}>
             Close
