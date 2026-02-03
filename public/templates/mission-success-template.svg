@@ -16,13 +16,13 @@
   </defs>
 
   <!-- Background web -->
-  <image href="/assets/black-web-background.jpeg"
+  <image href="/assets/black-web-background.png"
          x="0" y="0"
          width="1080" height="1440"
          preserveAspectRatio="xMidYMid slice"/>
 
   <!-- Top success bar -->
-  <image href="/assets/success-bar-top.jpeg"
+  <image href="/assets/success-bar.png"
          x="0" y="0"
          width="1080" height="260"
          preserveAspectRatio="xMidYMin meet"/>
@@ -54,13 +54,13 @@
   </text>
 
   <!-- Arachnid logo -->
-  <image href="/assets/innova-arachnid-logo.jpeg"
+  <image href="/assets/innova-arachnid-logo.png"
          x="250" y="300"
          width="580" height="440"
          preserveAspectRatio="xMidYMid meet"/>
 
   <!-- Disc -->
-  <image href="/assets/disc.jpeg"
+  <image href="/assets/disc.png"
          x="90" y="780"
          width="900" height="200"
          preserveAspectRatio="xMidYMid meet"/>

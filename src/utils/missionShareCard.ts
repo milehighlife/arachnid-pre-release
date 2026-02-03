@@ -1,9 +1,21 @@
+import webBgUrl from '../assets/mission-success-graphics/black-web-background.png'
+import successBarUrl from '../assets/mission-success-graphics/success-bar.png'
+import discUrl from '../assets/mission-success-graphics/disc.png'
+import logoUrl from '../assets/mission-success-graphics/innova-arachnid-logo.png'
+
 const TEMPLATE_URL = '/templates/mission-success-template.svg'
 const CANVAS_WIDTH = 1080
 const CANVAS_HEIGHT = 1440
 
 let templateCache: string | null = null
 let templatePromise: Promise<string> | null = null
+let imageDataCache: {
+  webBg: string
+  successBar: string
+  disc: string
+  logo: string
+} | null = null
+let imageDataPromise: Promise<{ webBg: string; successBar: string; disc: string; logo: string }> | null = null
 
 const escapeXml = (value: string) =>
   value
@@ -31,6 +43,88 @@ const formatFilenameTimestamp = (date: Date) => {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}_${pad(
     date.getHours(),
   )}${pad(date.getMinutes())}${pad(date.getSeconds())}`
+}
+
+const urlToDataUri = async (url: string) => {
+  const response = await fetch(url)
+  if (!response.ok) {
+    throw new Error(`Unable to load asset: ${url}`)
+  }
+  const blob = await response.blob()
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => {
+      if (typeof reader.result === 'string') {
+        resolve(reader.result)
+      } else {
+        reject(new Error('Unable to read asset data'))
+      }
+    }
+    reader.onerror = () => reject(new Error('Unable to read asset data'))
+    reader.readAsDataURL(blob)
+  })
+}
+
+const loadImageData = async () => {
+  if (imageDataCache) {
+    return imageDataCache
+  }
+  if (!imageDataPromise) {
+    imageDataPromise = Promise.all([
+      urlToDataUri(webBgUrl),
+      urlToDataUri(successBarUrl),
+      urlToDataUri(discUrl),
+      urlToDataUri(logoUrl),
+    ]).then(([webBg, successBar, disc, logo]) => {
+      imageDataCache = { webBg, successBar, disc, logo }
+      return imageDataCache
+    })
+  }
+  return imageDataPromise
+}
+
+const replaceImageHref = (svg: string, token: string, dataUri: string) => {
+  const pattern = new RegExp(`(href|xlink:href)=("|')([^"']*${escapeRegExp(token)}[^"']*)\\2`, 'gi')
+  let replaced = false
+  const nextSvg = svg.replace(pattern, (_match, attr, quote) => {
+    replaced = true
+    return `${attr}=${quote}${dataUri}${quote}`
+  })
+  return { svg: nextSvg, replaced }
+}
+
+const embedImages = (
+  svg: string,
+  data: { webBg: string; successBar: string; disc: string; logo: string },
+) => {
+  let nextSvg = svg
+  const replacements = [
+    { token: 'black-web-background', dataUri: data.webBg, label: 'web background' },
+    { token: 'success-bar', dataUri: data.successBar, label: 'success bar' },
+    { token: 'disc', dataUri: data.disc, label: 'disc' },
+    { token: 'innova-arachnid-logo', dataUri: data.logo, label: 'logo' },
+  ]
+
+  for (const replacement of replacements) {
+    const result = replaceImageHref(nextSvg, replacement.token, replacement.dataUri)
+    nextSvg = result.svg
+    if (!result.replaced) {
+      console.warn(`Share card: ${replacement.label} not embedded`)
+    }
+  }
+
+  return nextSvg
+}
+
+const ensureSvgNamespaces = (svg: string) => {
+  let nextSvg = svg
+  if (!/xmlns=/.test(nextSvg)) {
+    nextSvg = nextSvg.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"')
+  }
+  if (!/xmlns:xlink=/.test(nextSvg)) {
+    nextSvg = nextSvg.replace('<svg', '<svg xmlns:xlink="http://www.w3.org/1999/xlink"')
+  }
+  return nextSvg
 }
 
 export const fetchTemplateSvg = async (): Promise<string> => {
@@ -63,25 +157,47 @@ export const fillSvgPlaceholders = (svg: string, vars: Record<string, string>) =
 
 export const svgToPngBlob = (svgText: string): Promise<Blob> => {
   return new Promise((resolve, reject) => {
-    const svgBlob = new Blob([svgText], { type: 'image/svg+xml;charset=utf-8' })
+    const svgWithNamespaces = ensureSvgNamespaces(svgText)
+    const svgBlob = new Blob([svgWithNamespaces], { type: 'image/svg+xml;charset=utf-8' })
     const svgUrl = URL.createObjectURL(svgBlob)
     const img = new Image()
     img.crossOrigin = 'anonymous'
 
-    img.onload = () => {
+    let settled = false
+
+    const cleanup = () => {
+      URL.revokeObjectURL(svgUrl)
+    }
+
+    const handleError = () => {
+      if (settled) {
+        return
+      }
+      settled = true
+      window.clearTimeout(retryTimeout)
+      cleanup()
+      reject(new Error('Failed to render image'))
+    }
+
+    const handleLoad = () => {
+      if (settled) {
+        return
+      }
+      settled = true
+      window.clearTimeout(retryTimeout)
       const canvas = document.createElement('canvas')
       canvas.width = CANVAS_WIDTH
       canvas.height = CANVAS_HEIGHT
       const ctx = canvas.getContext('2d')
       if (!ctx) {
-        URL.revokeObjectURL(svgUrl)
+        cleanup()
         reject(new Error('Canvas not supported'))
         return
       }
       ctx.drawImage(img, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
       canvas.toBlob(
         (blob) => {
-          URL.revokeObjectURL(svgUrl)
+          cleanup()
           if (!blob) {
             reject(new Error('Unable to export image'))
             return
@@ -93,12 +209,21 @@ export const svgToPngBlob = (svgText: string): Promise<Blob> => {
       )
     }
 
-    img.onerror = () => {
-      URL.revokeObjectURL(svgUrl)
-      reject(new Error('Failed to render image'))
-    }
+    img.onload = handleLoad
+    img.onerror = handleError
+
+    const retryTimeout = window.setTimeout(() => {
+      if (settled) {
+        return
+      }
+      img.src = svgUrl
+    }, 2000)
 
     img.src = svgUrl
+
+    if (typeof img.decode === 'function') {
+      img.decode().then(handleLoad).catch(() => {})
+    }
   })
 }
 
@@ -122,7 +247,10 @@ export const buildMissionSuccessCardPng = async ({
     TIMESTAMP: displayTimestamp,
   })
 
-  const blob = await svgToPngBlob(filled)
+  const imageData = await loadImageData()
+  const embedded = embedImages(filled, imageData)
+  const blob = await svgToPngBlob(embedded)
+
   const filenameHandle = safeHandle
     .replace(/[^a-z0-9._-]+/gi, '-')
     .replace(/^-+/, '')
