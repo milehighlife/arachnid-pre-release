@@ -14,7 +14,7 @@ const agentProfiles = import.meta.glob('../assets/agent-profile-images/*.png', {
   import: 'default',
 }) as Record<string, string>
 
-const TEMPLATE_VERSION = '2026-02-03-14'
+const TEMPLATE_VERSION = '2026-02-03-15'
 const TEMPLATE_URL = `/templates/mission-success-template.svg?v=${TEMPLATE_VERSION}`
 const CANVAS_WIDTH = 1080
 const CANVAS_HEIGHT = 1440
@@ -260,6 +260,9 @@ const embedImages = (
 ) => {
   let nextSvg = svg
   const replacements = [
+    { token: '__WEB_BG__', dataUri: data.webBg, label: 'web background' },
+    { token: '__DISC__', dataUri: data.disc, label: 'disc' },
+    { token: '__LOGO__', dataUri: data.logo, label: 'logo' },
     { token: 'black-web-background', dataUri: data.webBg, label: 'web background' },
     { token: 'disc', dataUri: data.disc, label: 'disc' },
     { token: 'innova-arachnid-logo', dataUri: data.logo, label: 'logo' },

@@ -17,19 +17,22 @@
   </defs>
 
   <!-- Background web -->
-  <image href="/assets/black-web-background.png"
+  <image href="__WEB_BG__"
+         xlink:href="__WEB_BG__"
          x="0" y="0"
          width="1080" height="1440"
          preserveAspectRatio="none"/>
 
   <!-- Arachnid logo -->
-  <image href="/assets/innova-arachnid-logo.png"
+  <image href="__LOGO__"
+         xlink:href="__LOGO__"
          x="0" y="0"
          width="1080" height="1440"
          preserveAspectRatio="none"/>
 
   <!-- Disc -->
-  <image href="/assets/disc.png"
+  <image href="__DISC__"
+         xlink:href="__DISC__"
          x="0" y="0"
          width="1080" height="1440"
          preserveAspectRatio="none"/>
