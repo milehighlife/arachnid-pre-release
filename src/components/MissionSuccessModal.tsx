@@ -106,7 +106,7 @@ function MissionSuccessModal({ isOpen, token, handle, missionNumber, rank, onClo
   return (
     <div className='mission-success-overlay' role='dialog' aria-modal='true'>
       <div className='mission-success-modal'>
-        <div className='mission-success-confidential mono'>CONFIDENTIAL</div>
+        <div className='mission-success-confidential mono'>PROMOTION BADGE • SOCIAL SHARE</div>
         {status === 'loading' && (
           <div className='mission-success-loading'>Generating mission file…</div>
         )}
