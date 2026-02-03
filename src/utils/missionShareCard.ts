@@ -1,11 +1,11 @@
 import webBgUrl from '../assets/mission-success-graphics/black-web-background.png'
-import webBgUrlM2 from '../assets/mission-success-graphics/black-web-background_m2.png'
+import webBgUrlM2 from '../assets/mission-success-graphics/silver-web-background.png'
 import webBgUrlM3 from '../assets/mission-success-graphics/black-web-background_m3.png'
 import discUrl from '../assets/mission-success-graphics/disc.png'
-import discUrlM2 from '../assets/mission-success-graphics/disc_m2.png'
+import discUrlM2 from '../assets/mission-success-graphics/silver-disc.png'
 import discUrlM3 from '../assets/mission-success-graphics/disc_m3.png'
 import logoUrl from '../assets/mission-success-graphics/innova-arachnid-logo.png'
-import logoUrlM2 from '../assets/mission-success-graphics/innova-arachnid-logo_m2.png'
+import logoUrlM2 from '../assets/mission-success-graphics/innova-arachnid-logo_silver.png'
 import logoUrlM3 from '../assets/mission-success-graphics/innova-arachnid-logo_m3.png'
 import defaultProfileUrl from '../assets/agent-profile-images/default.png'
 
@@ -14,7 +14,7 @@ const agentProfiles = import.meta.glob('../assets/agent-profile-images/*.png', {
   import: 'default',
 }) as Record<string, string>
 
-const TEMPLATE_VERSION = '2026-02-03-17'
+const TEMPLATE_VERSION = '2026-02-03-18'
 const TEMPLATE_URL = `/templates/mission-success-template.svg?v=${TEMPLATE_VERSION}`
 const CANVAS_WIDTH = 1080
 const CANVAS_HEIGHT = 1440
