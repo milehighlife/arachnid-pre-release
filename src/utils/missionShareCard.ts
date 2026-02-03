@@ -484,12 +484,9 @@ export const buildMissionSuccessCardPng = async ({
   const withBarcode = filled.replaceAll('{{BARCODE_SVG}}', barcodeSvg)
 
   const imageData = await loadImageData(missionNumber)
-  const drawBackgroundSeparately = missionNumber === 3
-  const backgroundDataUri = null
-  const backgroundUrl = drawBackgroundSeparately ? webBgUrlM3 : null
-  const embedData = drawBackgroundSeparately
-    ? { ...imageData, webBg: TRANSPARENT_PNG }
-    : imageData
+  const backgroundDataUri = missionNumber === 3 ? imageData.webBg : null
+  const backgroundUrl = missionNumber === 3 ? webBgUrlM3 : null
+  const embedData = imageData
   const agentProfile = await loadProfileData(safeToken)
   if (!agentProfile || agentProfile.length < 50) {
     console.warn('Share card: profile data URI missing/too short', { token: safeToken })
