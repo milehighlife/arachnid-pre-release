@@ -8,7 +8,7 @@ const agentProfiles = import.meta.glob('../assets/agent-profile-images/*.png', {
   import: 'default',
 }) as Record<string, string>
 
-const TEMPLATE_VERSION = '2026-02-03-24'
+const TEMPLATE_VERSION = '2026-02-03-25'
 const TEMPLATE_URL = `/templates/mission-success-template.svg?v=${TEMPLATE_VERSION}`
 const CANVAS_WIDTH = 1080
 const CANVAS_HEIGHT = 1440
@@ -128,8 +128,20 @@ const missionCardBackgrounds: Record<1 | 2 | 3, string> = {
   3: mission3CardBg,
 }
 
-const loadMissionBackground = (missionNumber: 1 | 2 | 3) =>
-  missionCardBackgrounds[missionNumber] || null
+const missionBackgroundCache = new Map<number, string>()
+
+const loadMissionBackgroundData = async (missionNumber: 1 | 2 | 3) => {
+  if (missionBackgroundCache.has(missionNumber)) {
+    return missionBackgroundCache.get(missionNumber) || TRANSPARENT_PNG
+  }
+  const source = missionCardBackgrounds[missionNumber]
+  if (!source) {
+    return TRANSPARENT_PNG
+  }
+  const dataUri = source.startsWith('data:image') ? source : await urlToDataUri(source)
+  missionBackgroundCache.set(missionNumber, dataUri)
+  return dataUri
+}
 
 const getMissionColors = (missionNumber: 1 | 2 | 3) => {
   if (missionNumber === 2) {
@@ -232,9 +244,10 @@ const replaceImageHref = (svg: string, token: string, dataUri: string) => {
   return { svg: nextSvg, replaced }
 }
 
-const embedImages = (svg: string, data: { agentProfile: string }) => {
+const embedImages = (svg: string, data: { agentProfile: string; cardBackground: string }) => {
   let nextSvg = svg
   const replacements = [
+    { token: '__CARD_BG__', dataUri: data.cardBackground, label: 'card background' },
     { token: '__AGENT_PROFILE__', dataUri: data.agentProfile, label: 'agent profile' },
   ]
 
@@ -412,20 +425,24 @@ export const buildMissionSuccessCardPng = async ({
   })
   const withBarcode = filled.replaceAll('{{BARCODE_SVG}}', barcodeSvg)
 
-  const backgroundDataUri = await loadMissionBackground(missionNumber)
+  const backgroundDataUri = await loadMissionBackgroundData(missionNumber)
   const agentProfile = await loadProfileData(safeToken)
   if (!agentProfile || agentProfile.length < 50) {
     console.warn('Share card: profile data URI missing/too short', { token: safeToken })
   }
-  let embedded = embedImages(withBarcode, { agentProfile })
+  let embedded = embedImages(withBarcode, { agentProfile, cardBackground: backgroundDataUri })
+  embedded = embedded.replaceAll('__CARD_BG__', backgroundDataUri)
   embedded = embedded.replaceAll('__AGENT_PROFILE__', agentProfile)
+  if (embedded.includes('__CARD_BG__')) {
+    console.warn('Share card: CARD_BG token not replaced')
+  }
   if (embedded.includes('__AGENT_PROFILE__')) {
     console.warn('Share card: AGENT_PROFILE token not replaced')
   }
   if (!embedded.includes('data:image/png')) {
     console.warn('Share card: no data URIs embedded (profile likely missing)')
   }
-  const blob = await svgToPngBlob(embedded, backgroundDataUri)
+  const blob = await svgToPngBlob(embedded)
 
   const filenameHandle = safeHandle
     .replace(/[^a-z0-9._-]+/gi, '-')

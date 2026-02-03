@@ -16,6 +16,13 @@
     </clipPath>
   </defs>
 
+  <!-- Mission card background -->
+  <image href="__CARD_BG__"
+         xlink:href="__CARD_BG__"
+         x="0" y="0"
+         width="1080" height="1440"
+         preserveAspectRatio="none"/>
+
   <!-- Agent profile -->
   <image href="__AGENT_PROFILE__"
          xlink:href="__AGENT_PROFILE__"
