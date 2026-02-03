@@ -11,26 +11,13 @@
                      "Liberation Mono", "Courier New", monospace;
       }
     </style>
-    <pattern id="agentPattern"
-             x="54" y="54"
-             width="72" height="72"
-             patternUnits="userSpaceOnUse"
-             patternContentUnits="userSpaceOnUse">
-      <image href="__AGENT_PROFILE__"
-             x="0" y="0"
-             width="72" height="72"
-             preserveAspectRatio="xMidYMid slice"/>
-    </pattern>
+    <clipPath id="agentCircle">
+      <circle cx="90" cy="90" r="36"></circle>
+    </clipPath>
   </defs>
 
   <!-- Background web -->
   <image href="/assets/black-web-background.png"
-         x="0" y="0"
-         width="1080" height="1440"
-         preserveAspectRatio="none"/>
-
-  <!-- Top success bar -->
-  <image href="/assets/success-bar.png"
          x="0" y="0"
          width="1080" height="1440"
          preserveAspectRatio="none"/>
@@ -48,11 +35,16 @@
          preserveAspectRatio="none"/>
 
   <!-- Agent profile -->
-  <circle cx="90" cy="90" r="36" fill="url(#agentPattern)"/>
+  <image href="__AGENT_PROFILE__"
+         xlink:href="__AGENT_PROFILE__"
+         x="54" y="54"
+         width="72" height="72"
+         clip-path="url(#agentCircle)"
+         preserveAspectRatio="xMidYMid slice"/>
 
   <!-- Timestamp (right) -->
   <text class="mono"
-        x="990" y="132"
+        x="990" y="120"
         font-size="28"
         fill="#18b77a"
         text-anchor="end">

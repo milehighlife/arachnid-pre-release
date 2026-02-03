@@ -1,16 +1,15 @@
 import webBgUrl from '../assets/mission-success-graphics/black-web-background.png'
-import successBarUrl from '../assets/mission-success-graphics/success-bar.png'
 import discUrl from '../assets/mission-success-graphics/disc.png'
 import logoUrl from '../assets/mission-success-graphics/innova-arachnid-logo.png'
 import defaultProfileUrl from '../assets/agent-profile-images/default.png'
 
-const profileImages = import.meta.glob('../assets/agent-profile-images/*.png', {
+const agentProfiles = import.meta.glob('../assets/agent-profile-images/*.png', {
   eager: true,
   query: '?url',
   import: 'default',
 }) as Record<string, string>
 
-const TEMPLATE_VERSION = '2026-02-03-07'
+const TEMPLATE_VERSION = '2026-02-03-08'
 const TEMPLATE_URL = `/templates/mission-success-template.svg?v=${TEMPLATE_VERSION}`
 const CANVAS_WIDTH = 1080
 const CANVAS_HEIGHT = 1440
@@ -19,14 +18,12 @@ let templateCache: string | null = null
 let templatePromise: Promise<string> | null = null
 let imageDataCache: {
   webBg: string
-  successBar: string
   disc: string
   logo: string
   agentProfile: string
 } | null = null
 let imageDataPromise: Promise<{
   webBg: string
-  successBar: string
   disc: string
   logo: string
   agentProfile: string
@@ -92,25 +89,30 @@ const loadImageData = async () => {
   if (!imageDataPromise) {
     imageDataPromise = Promise.all([
       urlToDataUri(webBgUrl),
-      urlToDataUri(successBarUrl),
       urlToDataUri(discUrl),
       urlToDataUri(logoUrl),
-    ]).then(([webBg, successBar, disc, logo]) => {
-      imageDataCache = { webBg, successBar, disc, logo, agentProfile: TRANSPARENT_PNG }
+    ]).then(([webBg, disc, logo]) => {
+      imageDataCache = { webBg, disc, logo, agentProfile: TRANSPARENT_PNG }
       return imageDataCache
     })
   }
   return imageDataPromise
 }
 
-const getProfileImageUrl = (token: string) => {
-  const normalized = token.toLowerCase()
-  const entry = Object.entries(profileImages).find(([path]) => {
+const sanitizeTokenForFile = (token: string) =>
+  token.replace(/^@+/, '').trim().toLowerCase().replace(/\s+/g, '')
+
+const getAgentProfileUrl = (token: string) => {
+  const normalized = sanitizeTokenForFile(token)
+  if (!normalized) {
+    return defaultProfileUrl
+  }
+  const entry = Object.entries(agentProfiles).find(([path]) => {
     const filename = path.split('/').pop() || ''
     const name = filename.replace(/\\.png$/i, '').toLowerCase()
     return name === normalized
   })
-  return entry?.[1] ?? ''
+  return entry?.[1] ?? defaultProfileUrl
 }
 
 const profileDataCache = new Map<string, string>()
@@ -129,14 +131,14 @@ const loadDefaultProfileData = async () => {
 }
 
 const loadProfileData = async (token: string) => {
-  const normalized = token.toLowerCase()
+  const normalized = sanitizeTokenForFile(token)
   if (!normalized) {
     return loadDefaultProfileData()
   }
   if (profileDataCache.has(normalized)) {
     return profileDataCache.get(normalized) || TRANSPARENT_PNG
   }
-  const url = getProfileImageUrl(normalized)
+  const url = getAgentProfileUrl(normalized)
   if (!url) {
     const fallback = await loadDefaultProfileData()
     profileDataCache.set(normalized, fallback)
@@ -159,12 +161,11 @@ const replaceImageHref = (svg: string, token: string, dataUri: string) => {
 
 const embedImages = (
   svg: string,
-  data: { webBg: string; successBar: string; disc: string; logo: string; agentProfile: string },
+  data: { webBg: string; disc: string; logo: string; agentProfile: string },
 ) => {
   let nextSvg = svg
   const replacements = [
     { token: 'black-web-background', dataUri: data.webBg, label: 'web background' },
-    { token: 'success-bar', dataUri: data.successBar, label: 'success bar' },
     { token: 'disc', dataUri: data.disc, label: 'disc' },
     { token: 'innova-arachnid-logo', dataUri: data.logo, label: 'logo' },
     { token: '__AGENT_PROFILE__', dataUri: data.agentProfile, label: 'agent profile' },
@@ -309,7 +310,7 @@ export const buildMissionSuccessCardPng = async ({
   const rawHandle = (handle || '').replace(/^@+/, '').trim()
   const rawToken = (token || '').replace(/^@+/, '').trim()
   const safeHandle = rawHandle || 'agent'
-  const safeToken = rawToken || safeHandle
+  const safeToken = sanitizeTokenForFile(rawToken || safeHandle)
   const displayHandle = `@${safeHandle}`
   const date = timestamp ? new Date(timestamp) : new Date()
   const safeDate = Number.isNaN(date.getTime()) ? new Date() : date
@@ -325,7 +326,14 @@ export const buildMissionSuccessCardPng = async ({
 
   const imageData = await loadImageData()
   const agentProfile = await loadProfileData(safeToken)
-  const embedded = embedImages(filled, { ...imageData, agentProfile })
+  if (!agentProfile || agentProfile.length < 50) {
+    console.warn('Share card: profile data URI missing/too short', { token: safeToken })
+  }
+  let embedded = embedImages(filled, { ...imageData, agentProfile })
+  embedded = embedded.replaceAll('__AGENT_PROFILE__', agentProfile)
+  if (!embedded.includes('data:image/png')) {
+    console.warn('Share card: no data URIs embedded (profile likely missing)')
+  }
   const blob = await svgToPngBlob(embedded)
 
   const filenameHandle = safeHandle
