@@ -16,27 +16,6 @@
     </clipPath>
   </defs>
 
-  <!-- Background web -->
-  <image href="__WEB_BG__"
-         xlink:href="__WEB_BG__"
-         x="0" y="0"
-         width="1080" height="1440"
-         preserveAspectRatio="none"/>
-
-  <!-- Arachnid logo -->
-  <image href="__LOGO__"
-         xlink:href="__LOGO__"
-         x="0" y="0"
-         width="1080" height="1440"
-         preserveAspectRatio="none"/>
-
-  <!-- Disc -->
-  <image href="__DISC__"
-         xlink:href="__DISC__"
-         x="0" y="0"
-         width="1080" height="1440"
-         preserveAspectRatio="none"/>
-
   <!-- Agent profile -->
   <image href="__AGENT_PROFILE__"
          xlink:href="__AGENT_PROFILE__"

@@ -1,12 +1,6 @@
-import webBgUrl from '../assets/mission-success-graphics/black-web-background.png'
-import webBgUrlM2 from '../assets/mission-success-graphics/silver-web-background.png'
-import webBgUrlM3 from '../assets/mission-success-graphics/black-web-background_m3.png'
-import discUrl from '../assets/mission-success-graphics/disc.png'
-import discUrlM2 from '../assets/mission-success-graphics/silver-disc.png'
-import discUrlM3 from '../assets/mission-success-graphics/disc_m3.png'
-import logoUrl from '../assets/mission-success-graphics/innova-arachnid-logo.png'
-import logoUrlM2 from '../assets/mission-success-graphics/innova-arachnid-logo_silver.png'
-import logoUrlM3 from '../assets/mission-success-graphics/innova-arachnid-logo_m3.png'
+import mission1CardBg from '../assets/mission-success-graphics/mission-1-card-bg.png?inline'
+import mission2CardBg from '../assets/mission-success-graphics/mission-2-card-bg.png?inline'
+import mission3CardBg from '../assets/mission-success-graphics/mission-3-card-bg.png?inline'
 import defaultProfileUrl from '../assets/agent-profile-images/default.png'
 
 const agentProfiles = import.meta.glob('../assets/agent-profile-images/*.png', {
@@ -14,15 +8,13 @@ const agentProfiles = import.meta.glob('../assets/agent-profile-images/*.png', {
   import: 'default',
 }) as Record<string, string>
 
-const TEMPLATE_VERSION = '2026-02-03-21'
+const TEMPLATE_VERSION = '2026-02-03-22'
 const TEMPLATE_URL = `/templates/mission-success-template.svg?v=${TEMPLATE_VERSION}`
 const CANVAS_WIDTH = 1080
 const CANVAS_HEIGHT = 1440
 
 let templateCache: string | null = null
 let templatePromise: Promise<string> | null = null
-const imageDataCache = new Map<number, { webBg: string; disc: string; logo: string; agentProfile: string }>()
-const imageDataPromise = new Map<number, Promise<{ webBg: string; disc: string; logo: string; agentProfile: string }>>()
 let defaultProfileCache: string | null = null
 let defaultProfilePromise: Promise<string> | null = null
 
@@ -130,27 +122,10 @@ const urlToDataUri = async (url: string) => {
   })
 }
 
-const loadImageData = async (missionNumber: 1 | 2 | 3) => {
-  if (imageDataCache.has(missionNumber)) {
-    return imageDataCache.get(missionNumber)!
-  }
-  if (!imageDataPromise.has(missionNumber)) {
-    const assetsByMission: Record<1 | 2 | 3, [string, string, string]> = {
-      1: [webBgUrl, discUrl, logoUrl],
-      2: [webBgUrlM2, discUrlM2, logoUrlM2],
-      3: [webBgUrlM3, discUrlM3, logoUrlM3],
-    }
-    const assets = assetsByMission[missionNumber]
-    imageDataPromise.set(
-      missionNumber,
-      Promise.all(assets.map((asset) => urlToDataUri(asset))).then(([webBg, disc, logo]) => {
-        const payload = { webBg, disc, logo, agentProfile: TRANSPARENT_PNG }
-        imageDataCache.set(missionNumber, payload)
-        return payload
-      }),
-    )
-  }
-  return imageDataPromise.get(missionNumber)!
+const missionCardBackgrounds: Record<1 | 2 | 3, string> = {
+  1: mission1CardBg,
+  2: mission2CardBg,
+  3: mission3CardBg,
 }
 
 const getMissionColors = (missionNumber: 1 | 2 | 3) => {
@@ -254,18 +229,9 @@ const replaceImageHref = (svg: string, token: string, dataUri: string) => {
   return { svg: nextSvg, replaced }
 }
 
-const embedImages = (
-  svg: string,
-  data: { webBg: string; disc: string; logo: string; agentProfile: string },
-) => {
+const embedImages = (svg: string, data: { agentProfile: string }) => {
   let nextSvg = svg
   const replacements = [
-    { token: '__WEB_BG__', dataUri: data.webBg, label: 'web background' },
-    { token: '__DISC__', dataUri: data.disc, label: 'disc' },
-    { token: '__LOGO__', dataUri: data.logo, label: 'logo' },
-    { token: 'black-web-background', dataUri: data.webBg, label: 'web background' },
-    { token: 'disc', dataUri: data.disc, label: 'disc' },
-    { token: 'innova-arachnid-logo', dataUri: data.logo, label: 'logo' },
     { token: '__AGENT_PROFILE__', dataUri: data.agentProfile, label: 'agent profile' },
   ]
 
@@ -319,7 +285,7 @@ export const fillSvgPlaceholders = (svg: string, vars: Record<string, string>) =
   }, svg)
 }
 
-export const svgToPngBlob = (svgText: string, underlaySources?: string[] | null): Promise<Blob> => {
+export const svgToPngBlob = (svgText: string, backgroundDataUri?: string | null): Promise<Blob> => {
   return new Promise((resolve, reject) => {
     const svgWithNamespaces = ensureSvgNamespaces(svgText)
     const svgBlob = new Blob([svgWithNamespaces], { type: 'image/svg+xml;charset=utf-8' })
@@ -342,30 +308,6 @@ export const svgToPngBlob = (svgText: string, underlaySources?: string[] | null)
       cleanup()
       reject(new Error('Failed to render image'))
     }
-
-    const loadCanvasImage = (src: string) =>
-      new Promise<HTMLImageElement>((resolveImage, rejectImage) => {
-        const image = new Image()
-        image.crossOrigin = 'anonymous'
-        let done = false
-        const finalize = (success: boolean) => {
-          if (done) {
-            return
-          }
-          done = true
-          if (success) {
-            resolveImage(image)
-          } else {
-            rejectImage(new Error('Image failed to load'))
-          }
-        }
-        image.onload = () => finalize(true)
-        image.onerror = () => finalize(false)
-        image.src = src
-        if (typeof image.decode === 'function') {
-          image.decode().then(() => finalize(true)).catch(() => {})
-        }
-      })
 
     const handleLoad = () => {
       if (settled) {
@@ -399,23 +341,34 @@ export const svgToPngBlob = (svgText: string, underlaySources?: string[] | null)
         )
       }
 
-      const sources = (underlaySources || []).filter(Boolean)
-      if (!sources.length) {
+      if (!backgroundDataUri) {
         finish()
         return
       }
 
-      ;(async () => {
-        for (const src of sources) {
-          try {
-            const image = await loadCanvasImage(src)
-            ctx.drawImage(image, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
-          } catch (error) {
-            console.warn('Share card: underlay image failed to load', error)
-          }
+      const bgImg = new Image()
+      bgImg.crossOrigin = 'anonymous'
+      let bgHandled = false
+      const drawBackground = () => {
+        if (bgHandled) {
+          return
         }
+        bgHandled = true
+        ctx.drawImage(bgImg, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
         finish()
-      })()
+      }
+      bgImg.onload = drawBackground
+      bgImg.onerror = () => {
+        if (!bgHandled) {
+          bgHandled = true
+          console.warn('Share card: background image failed to load')
+          finish()
+        }
+      }
+      bgImg.src = backgroundDataUri
+      if (typeof bgImg.decode === 'function') {
+        bgImg.decode().then(drawBackground).catch(() => {})
+      }
     }
 
     img.onload = handleLoad
@@ -478,21 +431,12 @@ export const buildMissionSuccessCardPng = async ({
   })
   const withBarcode = filled.replaceAll('{{BARCODE_SVG}}', barcodeSvg)
 
-  const imageData = await loadImageData(missionNumber)
-  const underlaySources: string[] = []
-  let embedData = imageData
-  if (missionNumber === 3) {
-    underlaySources.push(imageData.webBg)
-    embedData = { ...imageData, webBg: TRANSPARENT_PNG }
-  } else if (missionNumber === 2) {
-    underlaySources.push(imageData.webBg, webBgUrlM2)
-    embedData = { ...imageData, webBg: TRANSPARENT_PNG }
-  }
+  const backgroundDataUri = missionCardBackgrounds[missionNumber] || TRANSPARENT_PNG
   const agentProfile = await loadProfileData(safeToken)
   if (!agentProfile || agentProfile.length < 50) {
     console.warn('Share card: profile data URI missing/too short', { token: safeToken })
   }
-  let embedded = embedImages(withBarcode, { ...embedData, agentProfile })
+  let embedded = embedImages(withBarcode, { agentProfile })
   embedded = embedded.replaceAll('__AGENT_PROFILE__', agentProfile)
   if (embedded.includes('__AGENT_PROFILE__')) {
     console.warn('Share card: AGENT_PROFILE token not replaced')
@@ -500,7 +444,7 @@ export const buildMissionSuccessCardPng = async ({
   if (!embedded.includes('data:image/png')) {
     console.warn('Share card: no data URIs embedded (profile likely missing)')
   }
-  const blob = await svgToPngBlob(embedded, underlaySources)
+  const blob = await svgToPngBlob(embedded, backgroundDataUri)
 
   const filenameHandle = safeHandle
     .replace(/[^a-z0-9._-]+/gi, '-')
