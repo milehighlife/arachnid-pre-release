@@ -3,7 +3,13 @@ import successBarUrl from '../assets/mission-success-graphics/success-bar.png'
 import discUrl from '../assets/mission-success-graphics/disc.png'
 import logoUrl from '../assets/mission-success-graphics/innova-arachnid-logo.png'
 
-const TEMPLATE_VERSION = '2026-02-03-02'
+const profileImages = import.meta.glob('../assets/agent-profile-images/*.png', {
+  eager: true,
+  query: '?url',
+  import: 'default',
+}) as Record<string, string>
+
+const TEMPLATE_VERSION = '2026-02-03-04'
 const TEMPLATE_URL = `/templates/mission-success-template.svg?v=${TEMPLATE_VERSION}`
 const CANVAS_WIDTH = 1080
 const CANVAS_HEIGHT = 1440
@@ -15,8 +21,18 @@ let imageDataCache: {
   successBar: string
   disc: string
   logo: string
+  agentProfile: string
 } | null = null
-let imageDataPromise: Promise<{ webBg: string; successBar: string; disc: string; logo: string }> | null = null
+let imageDataPromise: Promise<{
+  webBg: string
+  successBar: string
+  disc: string
+  logo: string
+  agentProfile: string
+}> | null = null
+
+const TRANSPARENT_PNG =
+  'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/wcAAwAB/2kW0F4AAAAASUVORK5CYII='
 
 const escapeXml = (value: string) =>
   value
@@ -77,11 +93,41 @@ const loadImageData = async () => {
       urlToDataUri(discUrl),
       urlToDataUri(logoUrl),
     ]).then(([webBg, successBar, disc, logo]) => {
-      imageDataCache = { webBg, successBar, disc, logo }
+      imageDataCache = { webBg, successBar, disc, logo, agentProfile: TRANSPARENT_PNG }
       return imageDataCache
     })
   }
   return imageDataPromise
+}
+
+const getProfileImageUrl = (handle: string) => {
+  const normalized = handle.toLowerCase()
+  const entry = Object.entries(profileImages).find(([path]) => {
+    const filename = path.split('/').pop() || ''
+    const name = filename.replace(/\\.png$/i, '').toLowerCase()
+    return name === normalized
+  })
+  return entry?.[1] ?? ''
+}
+
+const profileDataCache = new Map<string, string>()
+
+const loadProfileData = async (handle: string) => {
+  const normalized = handle.toLowerCase()
+  if (!normalized) {
+    return TRANSPARENT_PNG
+  }
+  if (profileDataCache.has(normalized)) {
+    return profileDataCache.get(normalized) || TRANSPARENT_PNG
+  }
+  const url = getProfileImageUrl(normalized)
+  if (!url) {
+    profileDataCache.set(normalized, TRANSPARENT_PNG)
+    return TRANSPARENT_PNG
+  }
+  const dataUri = await urlToDataUri(url)
+  profileDataCache.set(normalized, dataUri)
+  return dataUri
 }
 
 const replaceImageHref = (svg: string, token: string, dataUri: string) => {
@@ -96,7 +142,7 @@ const replaceImageHref = (svg: string, token: string, dataUri: string) => {
 
 const embedImages = (
   svg: string,
-  data: { webBg: string; successBar: string; disc: string; logo: string },
+  data: { webBg: string; successBar: string; disc: string; logo: string; agentProfile: string },
 ) => {
   let nextSvg = svg
   const replacements = [
@@ -104,6 +150,7 @@ const embedImages = (
     { token: 'success-bar', dataUri: data.successBar, label: 'success bar' },
     { token: 'disc', dataUri: data.disc, label: 'disc' },
     { token: 'innova-arachnid-logo', dataUri: data.logo, label: 'logo' },
+    { token: 'agent-profile', dataUri: data.agentProfile, label: 'agent profile' },
   ]
 
   for (const replacement of replacements) {
@@ -252,10 +299,12 @@ export const buildMissionSuccessCardPng = async ({
     TIMESTAMP: displayTimestamp,
     MISSION_NUMBER: String(missionNumber),
     RANK: rank,
+    AGENT: displayHandle,
   })
 
   const imageData = await loadImageData()
-  const embedded = embedImages(filled, imageData)
+  const agentProfile = await loadProfileData(safeHandle)
+  const embedded = embedImages(filled, { ...imageData, agentProfile })
   const blob = await svgToPngBlob(embedded)
 
   const filenameHandle = safeHandle

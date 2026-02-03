@@ -41,33 +41,47 @@
     {{TIMESTAMP}}
   </text>
 
+  <!-- Agent profile -->
+  <image href="/assets/agent-profile.png"
+         x="60" y="300"
+         width="140" height="140"
+         preserveAspectRatio="xMidYMid slice"/>
+
   <!-- Arachnid logo -->
   <image href="/assets/innova-arachnid-logo.png"
-         x="290" y="330.35"
-         width="500" height="379.3"
+         x="240" y="292.4"
+         width="600" height="455.2"
          preserveAspectRatio="xMidYMid meet"/>
 
   <!-- Disc -->
   <image href="/assets/disc.png"
-         x="140" y="1000"
+         x="140" y="908"
          width="800" height="178"
          preserveAspectRatio="xMidYMid meet"/>
 
   <!-- Headline -->
-  <text x="90" y="1240"
+  <text x="90" y="1230"
         font-family="system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif"
-        font-size="100"
+        font-size="96"
         fill="#ffffff"
         font-weight="500">
-    Mission {{MISSION_NUMBER}} Complete
+    Mission {{MISSION_NUMBER}} Success
   </text>
 
   <text class="mono"
-        x="90" y="1290"
-        font-size="32"
+        x="90" y="1284"
+        font-size="30"
         fill="#18b77a"
-        letter-spacing="3">
-    PROMOTED: {{RANK}}
+        letter-spacing="2">
+    Agent: {{AGENT}}
+  </text>
+
+  <text class="mono"
+        x="90" y="1322"
+        font-size="30"
+        fill="#18b77a"
+        letter-spacing="2">
+    Rank: {{RANK}}
   </text>
 
   <!-- Vertical tagline -->
