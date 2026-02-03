@@ -106,12 +106,12 @@ const deriveMissionStatus = (active: boolean, ready: boolean): MissionStatus => 
 
 const getMissionSuccessMeta = (missionId: MissionId): MissionSuccessMeta => {
   if (missionId === 'm1') {
-    return { missionNumber: 1, rank: 'FIELD TESTER' }
+    return { missionNumber: 1, rank: 'Qualified' }
   }
   if (missionId === 'm2') {
-    return { missionNumber: 2, rank: 'OPERATIVE' }
+    return { missionNumber: 2, rank: 'Operator' }
   }
-  return { missionNumber: 3, rank: 'SHARPSHOOTER' }
+  return { missionNumber: 3, rank: 'Tier One' }
 }
 
 function FeedbackForm({

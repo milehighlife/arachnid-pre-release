@@ -64,24 +64,26 @@ const mulberry32 = (seed: number) => {
 }
 
 const makeTimestampBarcodeSvg = (timestamp: string) => {
-  const width = 360
-  const height = 54
-  const originX = 1080 - 90 - width
+  const width = 450
+  const height = 30
+  const originX = 1080 - 30 - width
   const originY = 1440 - height
   const rand = mulberry32(hashString(timestamp))
   const rects: string[] = []
   let cursor = 0
 
   while (cursor < width) {
-    const barWidth = 2 + Math.floor(rand() * 4)
-    const gap = 1 + Math.floor(rand() * 2)
-    const heightScale = 0.7 + rand() * 0.3
-    const barHeight = Math.max(1, Math.round(height * heightScale))
+    const barWidth = rand() < 0.5 ? 3 : 7
+    const gap = 3
+    const barHeight = height
+    if (cursor + barWidth > width) {
+      break
+    }
     const barX = originX + cursor
-    const barY = originY + (height - barHeight)
+    const barY = originY
 
     rects.push(
-      `<rect x="${barX}" y="${barY}" width="${barWidth}" height="${barHeight}" fill="#666666" opacity="0.85"/>`,
+      `<rect x="${barX}" y="${barY}" width="${barWidth}" height="${barHeight}" fill="#333333"/>`,
     )
 
     cursor += barWidth + gap
