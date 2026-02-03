@@ -341,6 +341,7 @@ function App() {
           last={personalization.last}
           fullName={personalization.fullName}
           token={personalization.token}
+          handle={personalization.handle}
           progress={progress}
           onProgressUpdate={setProgress}
           codename={personalization.codename}

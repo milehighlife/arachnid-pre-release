@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
 import MissionCard, { type MissionStatus } from './MissionCard'
+import MissionSuccessModal from './MissionSuccessModal'
 import { getApiUrl } from '../utils/api'
 
 type FeedbackFormProps = {
@@ -9,6 +10,7 @@ type FeedbackFormProps = {
   fullName: string
   codename: string
   token: string
+  handle: string
   progress: ProgressPayload | null
   onProgressUpdate: (progress: ProgressPayload) => void
   onStatusChange?: (statusMap: MissionStatusMap) => void
@@ -103,11 +105,16 @@ function FeedbackForm({
   fullName,
   codename,
   token,
+  handle,
   progress,
   onProgressUpdate,
   onStatusChange,
 }: FeedbackFormProps) {
   const tokenValue = useMemo(() => token.trim(), [token])
+  const shareHandle = useMemo(
+    () => (handle || codename || tokenValue || 'tester').trim(),
+    [handle, codename, tokenValue],
+  )
   const feedbackUrl = useMemo(() => getApiUrl('/api/feedback'), [])
   const timeoutsRef = useRef<number[]>([])
   const [missionStatus, setMissionStatus] = useState<MissionStatusMap>(defaultStatus)
@@ -129,6 +136,7 @@ function FeedbackForm({
   const [mission3HoodieSize, setMission3HoodieSize] = useState('')
   const [mission3ConfirmDistance, setMission3ConfirmDistance] = useState(false)
   const [mission3ConfirmRights, setMission3ConfirmRights] = useState(false)
+  const [showSuccessModal, setShowSuccessModal] = useState(false)
   const [company, setCompany] = useState('')
   const [hasAttempted, setHasAttempted] = useState<MissionTouchedMap>(defaultTouched)
   const tokenMissing = !tokenValue
@@ -345,6 +353,10 @@ function FeedbackForm({
     setMissionTouched((prev) => ({ ...prev, [missionId]: true }))
   }
 
+  const handleOpenShare = () => {
+    setShowSuccessModal(true)
+  }
+
   const validateMission = (missionId: MissionId) => {
     const nextErrors: ErrorMap = {}
 
@@ -505,6 +517,7 @@ function FeedbackForm({
 
       setMissionStages((prev) => ({ ...prev, [missionId]: 'sent' }))
       setMissionStatus((prev) => ({ ...prev, [missionId]: 'LOCKED' }))
+      setShowSuccessModal(true)
 
       if (data?.progress?.missions) {
         onProgressUpdate({
@@ -540,8 +553,9 @@ function FeedbackForm({
     hasAttempted[missionId] && missionErrors[missionId]
 
   return (
-    <form className='mission-form' onSubmit={(event: FormEvent<HTMLFormElement>) => event.preventDefault()}>
-      <div className='mission-grid'>
+    <>
+      <form className='mission-form' onSubmit={(event: FormEvent<HTMLFormElement>) => event.preventDefault()}>
+        <div className='mission-grid'>
         <MissionCard
           label='Mission 1'
           title='Shape Assessment'
@@ -625,6 +639,11 @@ function FeedbackForm({
             {missionStatus.m1 === 'LOCKED' && (
               <button type='button' className='mission-edit' onClick={() => handleEdit('m1')}>
                 Edit
+              </button>
+            )}
+            {missionStatus.m1 === 'LOCKED' && (
+              <button type='button' className='mission-share' onClick={handleOpenShare}>
+                Get Share Image
               </button>
             )}
             {missionStatus.m1 === 'LOCKED' && (
@@ -832,6 +851,11 @@ function FeedbackForm({
               </button>
             )}
             {missionStatus.m2 === 'LOCKED' && (
+              <button type='button' className='mission-share' onClick={handleOpenShare}>
+                Get Share Image
+              </button>
+            )}
+            {missionStatus.m2 === 'LOCKED' && (
               <span className='mission-status-message'>Locked. Transmission received, {codename}.</span>
             )}
             {showMissionError('m2') && missionStatus.m2 === 'ERROR' && (
@@ -974,6 +998,11 @@ function FeedbackForm({
               </button>
             )}
             {missionStatus.m3 === 'LOCKED' && (
+              <button type='button' className='mission-share' onClick={handleOpenShare}>
+                Get Share Image
+              </button>
+            )}
+            {missionStatus.m3 === 'LOCKED' && (
               <span className='mission-status-message'>Locked. Transmission received, {codename}.</span>
             )}
             {showMissionError('m3') && missionStatus.m3 === 'ERROR' && (
@@ -989,21 +1018,27 @@ function FeedbackForm({
             )}
           </div>
         </MissionCard>
-      </div>
+        </div>
 
-      <div className='honeypot' aria-hidden='true'>
-        <label htmlFor='company'>Company</label>
-        <input
-          id='company'
-          name='company'
-          type='text'
-          value={company}
-          onChange={(event) => setCompany(event.target.value)}
-          tabIndex={-1}
-          autoComplete='off'
-        />
-      </div>
-    </form>
+        <div className='honeypot' aria-hidden='true'>
+          <label htmlFor='company'>Company</label>
+          <input
+            id='company'
+            name='company'
+            type='text'
+            value={company}
+            onChange={(event) => setCompany(event.target.value)}
+            tabIndex={-1}
+            autoComplete='off'
+          />
+        </div>
+      </form>
+      <MissionSuccessModal
+        isOpen={showSuccessModal}
+        handle={shareHandle}
+        onClose={() => setShowSuccessModal(false)}
+      />
+    </>
   )
 }
 

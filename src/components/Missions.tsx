@@ -13,11 +13,12 @@ type MissionsProps = {
   fullName: string
   codename: string
   token: string
+  handle: string
   progress: ProgressPayload | null
   onProgressUpdate: (progress: ProgressPayload) => void
 }
 
-function Missions({ first, last, fullName, codename, token, progress, onProgressUpdate }: MissionsProps) {
+function Missions({ first, last, fullName, codename, token, handle, progress, onProgressUpdate }: MissionsProps) {
   const [statusMap, setStatusMap] = useState<MissionStatusMap>(defaultStatus)
   const tokenLabel = token.trim().replace(/^@+/, '') || 'tester'
 
@@ -108,6 +109,7 @@ function Missions({ first, last, fullName, codename, token, progress, onProgress
           fullName={fullName}
           codename={codename}
           token={token}
+          handle={handle}
           progress={progress}
           onProgressUpdate={onProgressUpdate}
           onStatusChange={handleStatusChange}
