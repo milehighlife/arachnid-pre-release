@@ -34,7 +34,7 @@ function MissionSuccessModal({ isOpen, token, handle, missionNumber, rank, onClo
     const normalizedToken = (token || handle || '')
       .trim()
       .toLowerCase()
-      .replace(/^@/, '')
+      .replace(/^@+/, '')
       .replace(/\s+/g, '')
 
     buildMissionSuccessCardPng({ token: normalizedToken, handle, timestamp: new Date(), missionNumber, rank })

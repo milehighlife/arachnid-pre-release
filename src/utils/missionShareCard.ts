@@ -8,7 +8,7 @@ const agentProfiles = import.meta.glob('../assets/agent-profile-images/*.png', {
   import: 'default',
 }) as Record<string, string>
 
-const TEMPLATE_VERSION = '2026-02-03-09'
+const TEMPLATE_VERSION = '2026-02-03-10'
 const TEMPLATE_URL = `/templates/mission-success-template.svg?v=${TEMPLATE_VERSION}`
 const CANVAS_WIDTH = 1080
 const CANVAS_HEIGHT = 1440
@@ -103,7 +103,12 @@ const loadImageData = async () => {
 }
 
 const normalizeToken = (raw: string) =>
-  (raw || '').trim().toLowerCase().replace(/^@/, '').replace(/\s+/g, '')
+  (raw || '')
+    .trim()
+    .toLowerCase()
+    .replace(/^@+/, '')
+    .replace(/\.png$/i, '')
+    .replace(/\s+/g, '')
 
 const getProfileUrl = (token: string) => {
   const normalized = normalizeToken(token)
@@ -113,6 +118,7 @@ const getProfileUrl = (token: string) => {
     if (hitKey) {
       return agentProfiles[hitKey] as string
     }
+    console.warn('Share card: profile URL not found for token', token)
   }
   const defaultKey = keys.find((key) => key.toLowerCase().endsWith('/default.png'))
   if (defaultKey) {

@@ -135,7 +135,7 @@ function FeedbackForm({
       (tokenValue || handle || '')
         .trim()
         .toLowerCase()
-        .replace(/^@/, '')
+        .replace(/^@+/, '')
         .replace(/\s+/g, ''),
     [tokenValue, handle],
   )
