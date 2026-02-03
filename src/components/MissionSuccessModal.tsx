@@ -16,6 +16,7 @@ function MissionSuccessModal({ isOpen, token, handle, missionNumber, rank, onClo
   const [status, setStatus] = useState<ModalStatus>('idle')
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [filename, setFilename] = useState<string>('')
+  const [imageBlob, setImageBlob] = useState<Blob | null>(null)
 
   useEffect(() => {
     if (!isOpen) {
@@ -24,6 +25,7 @@ function MissionSuccessModal({ isOpen, token, handle, missionNumber, rank, onClo
       }
       setPreviewUrl(null)
       setFilename('')
+      setImageBlob(null)
       setStatus('idle')
       return
     }
@@ -50,6 +52,7 @@ function MissionSuccessModal({ isOpen, token, handle, missionNumber, rank, onClo
           return url
         })
         setFilename(nextFilename)
+        setImageBlob(blob)
         setStatus('ready')
       })
       .catch(() => {
@@ -80,6 +83,25 @@ function MissionSuccessModal({ isOpen, token, handle, missionNumber, rank, onClo
   }
 
   const downloadReady = status === 'ready' && Boolean(previewUrl)
+  const canShare = downloadReady && Boolean(imageBlob) && typeof navigator !== 'undefined' && 'share' in navigator
+
+  const handleShare = async () => {
+    if (!downloadReady || !previewUrl || !imageBlob) {
+      return
+    }
+    const file = new File([imageBlob], filename || 'mission-success.png', { type: 'image/png' })
+    const shareData: ShareData = { files: [file] }
+    const navigatorAny = navigator as Navigator & { canShare?: (data: ShareData) => boolean }
+    if (navigatorAny.share && (!navigatorAny.canShare || navigatorAny.canShare(shareData))) {
+      try {
+        await navigatorAny.share(shareData)
+        return
+      } catch (error) {
+        console.warn('Share canceled or failed', error)
+      }
+    }
+    window.open(previewUrl, '_blank', 'noopener,noreferrer')
+  }
 
   return (
     <div className='mission-success-overlay' role='dialog' aria-modal='true'>
@@ -99,6 +121,14 @@ function MissionSuccessModal({ isOpen, token, handle, missionNumber, rank, onClo
           />
         )}
         <div className='mission-success-actions'>
+          <button
+            type='button'
+            className={`mission-success-button primary${downloadReady ? '' : ' is-disabled'}`}
+            aria-disabled={!downloadReady}
+            onClick={handleShare}
+          >
+            {canShare ? 'Share Image' : 'Open Image'}
+          </button>
           <a
             className={`mission-success-button primary${downloadReady ? '' : ' is-disabled'}`}
             href={previewUrl || '#'}
