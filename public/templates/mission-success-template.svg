@@ -24,14 +24,6 @@
          width="1080" height="260"
          preserveAspectRatio="xMidYMin meet"/>
 
-  <!-- Username (left) -->
-  <text class="mono"
-        x="90" y="132"
-        font-size="34"
-        fill="#18b77a">
-    {{USERNAME}}
-  </text>
-
   <!-- Timestamp (right) -->
   <text class="mono"
         x="990" y="132"
@@ -43,20 +35,20 @@
 
   <!-- Agent profile -->
   <image href="/assets/agent-profile.png"
-         x="60" y="300"
+         x="60" y="60"
          width="140" height="140"
          preserveAspectRatio="xMidYMid slice"/>
 
-  <!-- Arachnid logo -->
-  <image href="/assets/innova-arachnid-logo.png"
-         x="240" y="292.4"
-         width="600" height="455.2"
-         preserveAspectRatio="xMidYMid meet"/>
-
   <!-- Disc -->
   <image href="/assets/disc.png"
-         x="140" y="908"
-         width="800" height="178"
+         x="0" y="0"
+         width="1080" height="1440"
+         preserveAspectRatio="xMidYMid meet"/>
+
+  <!-- Arachnid logo -->
+  <image href="/assets/innova-arachnid-logo.png"
+         x="0" y="0"
+         width="1080" height="1440"
          preserveAspectRatio="xMidYMid meet"/>
 
   <!-- Headline -->
