@@ -8,7 +8,7 @@ const agentProfiles = import.meta.glob('../assets/agent-profile-images/*.png', {
   import: 'default',
 }) as Record<string, string>
 
-const TEMPLATE_VERSION = '2026-02-03-23'
+const TEMPLATE_VERSION = '2026-02-03-24'
 const TEMPLATE_URL = `/templates/mission-success-template.svg?v=${TEMPLATE_VERSION}`
 const CANVAS_WIDTH = 1080
 const CANVAS_HEIGHT = 1440
@@ -127,6 +127,9 @@ const missionCardBackgrounds: Record<1 | 2 | 3, string> = {
   2: mission2CardBg,
   3: mission3CardBg,
 }
+
+const loadMissionBackground = (missionNumber: 1 | 2 | 3) =>
+  missionCardBackgrounds[missionNumber] || null
 
 const getMissionColors = (missionNumber: 1 | 2 | 3) => {
   if (missionNumber === 2) {
@@ -326,7 +329,12 @@ export const svgToPngBlob = async (
   try {
     const [svgImage, backgroundImage] = await Promise.all([
       loadCanvasImage(svgUrl),
-      backgroundSrc ? loadCanvasImage(backgroundSrc).catch(() => null) : Promise.resolve(null),
+      backgroundSrc
+        ? loadCanvasImage(backgroundSrc).catch((error) => {
+            console.warn('Share card: background image failed to load', error)
+            return null
+          })
+        : Promise.resolve(null),
     ])
 
     const canvas = document.createElement('canvas')
@@ -404,7 +412,7 @@ export const buildMissionSuccessCardPng = async ({
   })
   const withBarcode = filled.replaceAll('{{BARCODE_SVG}}', barcodeSvg)
 
-  const backgroundDataUri = missionCardBackgrounds[missionNumber] || TRANSPARENT_PNG
+  const backgroundDataUri = await loadMissionBackground(missionNumber)
   const agentProfile = await loadProfileData(safeToken)
   if (!agentProfile || agentProfile.length < 50) {
     console.warn('Share card: profile data URI missing/too short', { token: safeToken })
