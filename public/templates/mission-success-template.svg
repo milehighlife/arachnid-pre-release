@@ -46,7 +46,7 @@
   <text class="mono"
         x="990" y="96"
         font-size="28"
-        fill="#18b77a"
+        fill="{{TIMESTAMP_COLOR}}"
         text-anchor="end">
     {{TIMESTAMP}}
   </text>
@@ -55,7 +55,7 @@
   <text x="90" y="1230"
         font-family="system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif"
         font-size="96"
-        fill="#ffffff"
+        fill="{{HEADLINE_COLOR}}"
         font-weight="500">
     Mission {{MISSION_NUMBER}} Success
   </text>
@@ -63,7 +63,7 @@
   <text class="mono"
         x="90" y="1284"
         font-size="30"
-        fill="#18b77a"
+        fill="{{ACCENT_COLOR}}"
         letter-spacing="2">
     Agent: {{AGENT}}
   </text>
@@ -71,7 +71,7 @@
   <text class="mono"
         x="90" y="1322"
         font-size="30"
-        fill="#18b77a"
+        fill="{{ACCENT_COLOR}}"
         letter-spacing="2">
     Rank: {{RANK}}
   </text>
@@ -86,7 +86,7 @@
   <text class="mono"
         x="1040" y="1380"
         font-size="22"
-        fill="#ffffff"
+        fill="{{TAGLINE_COLOR}}"
         opacity="0.75"
         transform="rotate(-90 1040 1380)"
         letter-spacing="6">

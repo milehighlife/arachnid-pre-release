@@ -1,6 +1,12 @@
 import webBgUrl from '../assets/mission-success-graphics/black-web-background.png'
+import webBgUrlM2 from '../assets/mission-success-graphics/black-web-background_m2.png'
+import webBgUrlM3 from '../assets/mission-success-graphics/black-web-background_m3.png'
 import discUrl from '../assets/mission-success-graphics/disc.png'
+import discUrlM2 from '../assets/mission-success-graphics/disc_m2.png'
+import discUrlM3 from '../assets/mission-success-graphics/disc_m3.png'
 import logoUrl from '../assets/mission-success-graphics/innova-arachnid-logo.png'
+import logoUrlM2 from '../assets/mission-success-graphics/innova-arachnid-logo_m2.png'
+import logoUrlM3 from '../assets/mission-success-graphics/innova-arachnid-logo_m3.png'
 import defaultProfileUrl from '../assets/agent-profile-images/default.png'
 
 const agentProfiles = import.meta.glob('../assets/agent-profile-images/*.png', {
@@ -8,25 +14,15 @@ const agentProfiles = import.meta.glob('../assets/agent-profile-images/*.png', {
   import: 'default',
 }) as Record<string, string>
 
-const TEMPLATE_VERSION = '2026-02-03-12'
+const TEMPLATE_VERSION = '2026-02-03-13'
 const TEMPLATE_URL = `/templates/mission-success-template.svg?v=${TEMPLATE_VERSION}`
 const CANVAS_WIDTH = 1080
 const CANVAS_HEIGHT = 1440
 
 let templateCache: string | null = null
 let templatePromise: Promise<string> | null = null
-let imageDataCache: {
-  webBg: string
-  disc: string
-  logo: string
-  agentProfile: string
-} | null = null
-let imageDataPromise: Promise<{
-  webBg: string
-  disc: string
-  logo: string
-  agentProfile: string
-}> | null = null
+const imageDataCache = new Map<number, { webBg: string; disc: string; logo: string; agentProfile: string }>()
+const imageDataPromise = new Map<number, Promise<{ webBg: string; disc: string; logo: string; agentProfile: string }>>()
 let defaultProfileCache: string | null = null
 let defaultProfilePromise: Promise<string> | null = null
 
@@ -63,7 +59,7 @@ const mulberry32 = (seed: number) => {
   }
 }
 
-const makeTimestampBarcodeSvg = (timestamp: string) => {
+const makeTimestampBarcodeSvg = (timestamp: string, color: string) => {
   const width = 690
   const height = 36
   const originX = 1080 - 36 - width
@@ -83,7 +79,7 @@ const makeTimestampBarcodeSvg = (timestamp: string) => {
     const barY = originY
 
     rects.push(
-      `<rect x="${barX}" y="${barY}" width="${barWidth}" height="${barHeight}" fill="#333333"/>`,
+      `<rect x="${barX}" y="${barY}" width="${barWidth}" height="${barHeight}" fill="${color}"/>`,
     )
 
     cursor += barWidth + gap
@@ -134,21 +130,55 @@ const urlToDataUri = async (url: string) => {
   })
 }
 
-const loadImageData = async () => {
-  if (imageDataCache) {
-    return imageDataCache
+const loadImageData = async (missionNumber: 1 | 2 | 3) => {
+  if (imageDataCache.has(missionNumber)) {
+    return imageDataCache.get(missionNumber)!
   }
-  if (!imageDataPromise) {
-    imageDataPromise = Promise.all([
-      urlToDataUri(webBgUrl),
-      urlToDataUri(discUrl),
-      urlToDataUri(logoUrl),
-    ]).then(([webBg, disc, logo]) => {
-      imageDataCache = { webBg, disc, logo, agentProfile: TRANSPARENT_PNG }
-      return imageDataCache
-    })
+  if (!imageDataPromise.has(missionNumber)) {
+    const assets =
+      missionNumber === 2
+        ? [webBgUrlM2, discUrlM2, logoUrlM2]
+        : missionNumber === 3
+          ? [webBgUrlM3, discUrlM3, logoUrlM3]
+          : [webBgUrl, discUrl, logoUrl]
+    imageDataPromise.set(
+      missionNumber,
+      Promise.all(assets.map((asset) => urlToDataUri(asset))).then(([webBg, disc, logo]) => {
+        const payload = { webBg, disc, logo, agentProfile: TRANSPARENT_PNG }
+        imageDataCache.set(missionNumber, payload)
+        return payload
+      }),
+    )
   }
-  return imageDataPromise
+  return imageDataPromise.get(missionNumber)!
+}
+
+const getMissionColors = (missionNumber: 1 | 2 | 3) => {
+  if (missionNumber === 2) {
+    return {
+      timestamp: '#cccccc',
+      headline: '#cccccc',
+      accent: '#cccccc',
+      tagline: '#cccccc',
+      barcode: '#cccccc',
+    }
+  }
+  if (missionNumber === 3) {
+    return {
+      timestamp: '#000000',
+      headline: '#000000',
+      accent: '#000000',
+      tagline: '#000000',
+      barcode: '#000000',
+    }
+  }
+  return {
+    timestamp: '#18b77a',
+    headline: '#ffffff',
+    accent: '#18b77a',
+    tagline: '#ffffff',
+    barcode: '#333333',
+  }
 }
 
 const normalizeToken = (raw: string) =>
@@ -381,7 +411,8 @@ export const buildMissionSuccessCardPng = async ({
   const safeDate = Number.isNaN(date.getTime()) ? new Date() : date
   const displayTimestamp = formatDisplayTimestamp(safeDate)
   const timestampLabel = `M${missionNumber}: ${displayTimestamp.replace(',', ' •')}`
-  const barcodeSvg = makeTimestampBarcodeSvg(timestampLabel)
+  const colors = getMissionColors(missionNumber)
+  const barcodeSvg = makeTimestampBarcodeSvg(timestampLabel, colors.barcode)
 
   const filled = fillSvgPlaceholders(template, {
     USERNAME: displayHandle,
@@ -392,10 +423,14 @@ export const buildMissionSuccessCardPng = async ({
     DOT1_FILL: missionNumber >= 1 ? '#18b77a' : 'none',
     DOT2_FILL: missionNumber >= 2 ? '#18b77a' : 'none',
     DOT3_FILL: missionNumber >= 3 ? '#18b77a' : 'none',
+    TIMESTAMP_COLOR: colors.timestamp,
+    HEADLINE_COLOR: colors.headline,
+    ACCENT_COLOR: colors.accent,
+    TAGLINE_COLOR: colors.tagline,
   })
   const withBarcode = filled.replaceAll('{{BARCODE_SVG}}', barcodeSvg)
 
-  const imageData = await loadImageData()
+  const imageData = await loadImageData(missionNumber)
   const agentProfile = await loadProfileData(safeToken)
   if (!agentProfile || agentProfile.length < 50) {
     console.warn('Share card: profile data URI missing/too short', { token: safeToken })
