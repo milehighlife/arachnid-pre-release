@@ -129,21 +129,6 @@ function MissionSuccessModal({ isOpen, token, handle, missionNumber, rank, onClo
           >
             {canShare ? 'Share Image' : 'Open Image'}
           </button>
-          <a
-            className={`mission-success-button primary${downloadReady ? '' : ' is-disabled'}`}
-            href={previewUrl || '#'}
-            download={filename}
-            target='_blank'
-            rel='noreferrer'
-            aria-disabled={!downloadReady}
-            onClick={(event) => {
-              if (!downloadReady) {
-                event.preventDefault()
-              }
-            }}
-          >
-            Download Image
-          </a>
           <button type='button' className='mission-success-button secondary' onClick={onClose}>
             Close
           </button>
