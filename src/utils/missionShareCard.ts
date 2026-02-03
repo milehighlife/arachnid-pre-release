@@ -485,8 +485,8 @@ export const buildMissionSuccessCardPng = async ({
     underlaySources.push(imageData.webBg, webBgUrlM3)
     embedData = { ...imageData, webBg: TRANSPARENT_PNG }
   } else if (missionNumber === 2) {
-    underlaySources.push(imageData.logo, logoUrlM2)
-    embedData = { ...imageData, logo: TRANSPARENT_PNG }
+    underlaySources.push(imageData.webBg, webBgUrlM2, imageData.logo, logoUrlM2)
+    embedData = { ...imageData, webBg: TRANSPARENT_PNG, logo: TRANSPARENT_PNG }
   }
   const agentProfile = await loadProfileData(safeToken)
   if (!agentProfile || agentProfile.length < 50) {
