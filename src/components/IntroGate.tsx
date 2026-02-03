@@ -76,6 +76,7 @@ const VIDEO_MAP: Record<string, string> = {
   silverfoxpdga25617: 'twuMquoPruU',
   scott_oxspring: '7P1F5CWJ65Q',
   anotherroundatx: '04dFa0VMC6U',
+  maximillianpotter: 'lU6k4ML_IF0',
 }
 
 const resolveVideoId = (token?: string | null) => {
