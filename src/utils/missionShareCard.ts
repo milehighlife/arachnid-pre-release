@@ -230,9 +230,13 @@ export const svgToPngBlob = (svgText: string): Promise<Blob> => {
 export const buildMissionSuccessCardPng = async ({
   handle,
   timestamp,
+  missionNumber,
+  rank,
 }: {
   handle: string
   timestamp?: Date | string | number
+  missionNumber: 1 | 2 | 3
+  rank: string
 }) => {
   const template = await fetchTemplateSvg()
   const rawHandle = (handle || '').replace(/^@+/, '').trim()
@@ -245,6 +249,8 @@ export const buildMissionSuccessCardPng = async ({
   const filled = fillSvgPlaceholders(template, {
     USERNAME: displayHandle,
     TIMESTAMP: displayTimestamp,
+    MISSION_NUMBER: String(missionNumber),
+    RANK: rank,
   })
 
   const imageData = await loadImageData()

@@ -9,9 +9,6 @@
         font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
                      "Liberation Mono", "Courier New", monospace;
       }
-      .status {
-        letter-spacing: 8px;
-      }
     </style>
   </defs>
 
@@ -35,15 +32,6 @@
     {{USERNAME}}
   </text>
 
-  <!-- SUCCESS (center) -->
-  <text class="mono status"
-        x="540" y="132"
-        font-size="40"
-        fill="#18b77a"
-        text-anchor="middle">
-    SUCCESS
-  </text>
-
   <!-- Timestamp (right) -->
   <text class="mono"
         x="990" y="132"
@@ -55,31 +43,31 @@
 
   <!-- Arachnid logo -->
   <image href="/assets/innova-arachnid-logo.png"
-         x="250" y="300"
-         width="580" height="440"
+         x="290" y="330.35"
+         width="500" height="379.3"
          preserveAspectRatio="xMidYMid meet"/>
 
   <!-- Disc -->
   <image href="/assets/disc.png"
-         x="90" y="780"
-         width="900" height="200"
+         x="140" y="1000"
+         width="800" height="178"
          preserveAspectRatio="xMidYMid meet"/>
 
   <!-- Headline -->
-  <text x="90" y="1180"
+  <text x="90" y="1240"
         font-family="system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif"
-        font-size="120"
+        font-size="100"
         fill="#ffffff"
         font-weight="500">
-    Mission
+    Mission {{MISSION_NUMBER}} Complete
   </text>
 
-  <text x="90" y="1320"
-        font-family="system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif"
-        font-size="120"
-        fill="#ffffff"
-        font-weight="500">
-    Complete
+  <text class="mono"
+        x="90" y="1290"
+        font-size="32"
+        fill="#18b77a"
+        letter-spacing="3">
+    PROMOTED: {{RANK}}
   </text>
 
   <!-- Vertical tagline -->

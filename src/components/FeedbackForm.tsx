@@ -30,6 +30,11 @@ type MissionStringMap = Record<MissionId, string>
 
 type MissionTouchedMap = Record<MissionId, boolean>
 
+type MissionSuccessMeta = {
+  missionNumber: 1 | 2 | 3
+  rank: string
+}
+
 export type MissionProgressStatus = 'NOT_STARTED' | 'LOCKED'
 
 export type MissionProgress = {
@@ -99,6 +104,16 @@ const deriveMissionStatus = (active: boolean, ready: boolean): MissionStatus => 
   return ready ? 'READY' : 'IN PROGRESS'
 }
 
+const getMissionSuccessMeta = (missionId: MissionId): MissionSuccessMeta => {
+  if (missionId === 'm1') {
+    return { missionNumber: 1, rank: 'FIELD TESTER' }
+  }
+  if (missionId === 'm2') {
+    return { missionNumber: 2, rank: 'OPERATIVE' }
+  }
+  return { missionNumber: 3, rank: 'SHARPSHOOTER' }
+}
+
 function FeedbackForm({
   first,
   last,
@@ -137,6 +152,7 @@ function FeedbackForm({
   const [mission3ConfirmDistance, setMission3ConfirmDistance] = useState(false)
   const [mission3ConfirmRights, setMission3ConfirmRights] = useState(false)
   const [showSuccessModal, setShowSuccessModal] = useState(false)
+  const [successMeta, setSuccessMeta] = useState<MissionSuccessMeta>(getMissionSuccessMeta('m1'))
   const [company, setCompany] = useState('')
   const [hasAttempted, setHasAttempted] = useState<MissionTouchedMap>(defaultTouched)
   const tokenMissing = !tokenValue
@@ -353,7 +369,8 @@ function FeedbackForm({
     setMissionTouched((prev) => ({ ...prev, [missionId]: true }))
   }
 
-  const handleOpenShare = () => {
+  const handleOpenShare = (missionId: MissionId) => {
+    setSuccessMeta(getMissionSuccessMeta(missionId))
     setShowSuccessModal(true)
   }
 
@@ -517,7 +534,7 @@ function FeedbackForm({
 
       setMissionStages((prev) => ({ ...prev, [missionId]: 'sent' }))
       setMissionStatus((prev) => ({ ...prev, [missionId]: 'LOCKED' }))
-      setShowSuccessModal(true)
+      handleOpenShare(missionId)
 
       if (data?.progress?.missions) {
         onProgressUpdate({
@@ -642,7 +659,7 @@ function FeedbackForm({
               </button>
             )}
             {missionStatus.m1 === 'LOCKED' && (
-              <button type='button' className='mission-share' onClick={handleOpenShare}>
+              <button type='button' className='mission-share' onClick={() => handleOpenShare('m1')}>
                 Get Share Image
               </button>
             )}
@@ -851,7 +868,7 @@ function FeedbackForm({
               </button>
             )}
             {missionStatus.m2 === 'LOCKED' && (
-              <button type='button' className='mission-share' onClick={handleOpenShare}>
+              <button type='button' className='mission-share' onClick={() => handleOpenShare('m2')}>
                 Get Share Image
               </button>
             )}
@@ -998,7 +1015,7 @@ function FeedbackForm({
               </button>
             )}
             {missionStatus.m3 === 'LOCKED' && (
-              <button type='button' className='mission-share' onClick={handleOpenShare}>
+              <button type='button' className='mission-share' onClick={() => handleOpenShare('m3')}>
                 Get Share Image
               </button>
             )}
@@ -1036,6 +1053,8 @@ function FeedbackForm({
       <MissionSuccessModal
         isOpen={showSuccessModal}
         handle={shareHandle}
+        missionNumber={successMeta.missionNumber}
+        rank={successMeta.rank}
         onClose={() => setShowSuccessModal(false)}
       />
     </>
