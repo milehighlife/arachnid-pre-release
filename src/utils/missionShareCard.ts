@@ -14,7 +14,7 @@ const agentProfiles = import.meta.glob('../assets/agent-profile-images/*.png', {
   import: 'default',
 }) as Record<string, string>
 
-const TEMPLATE_VERSION = '2026-02-03-15'
+const TEMPLATE_VERSION = '2026-02-03-16'
 const TEMPLATE_URL = `/templates/mission-success-template.svg?v=${TEMPLATE_VERSION}`
 const CANVAS_WIDTH = 1080
 const CANVAS_HEIGHT = 1440
@@ -319,7 +319,11 @@ export const fillSvgPlaceholders = (svg: string, vars: Record<string, string>) =
   }, svg)
 }
 
-export const svgToPngBlob = (svgText: string, backgroundDataUri?: string | null): Promise<Blob> => {
+export const svgToPngBlob = (
+  svgText: string,
+  backgroundDataUri?: string | null,
+  backgroundUrl?: string | null,
+): Promise<Blob> => {
   return new Promise((resolve, reject) => {
     const svgWithNamespaces = ensureSvgNamespaces(svgText)
     const svgBlob = new Blob([svgWithNamespaces], { type: 'image/svg+xml;charset=utf-8' })
@@ -375,34 +379,48 @@ export const svgToPngBlob = (svgText: string, backgroundDataUri?: string | null)
         )
       }
 
-      if (!backgroundDataUri) {
+      if (!backgroundDataUri && !backgroundUrl) {
         finish()
         return
       }
 
-      const bgImg = new Image()
-      bgImg.crossOrigin = 'anonymous'
-      let bgHandled = false
-      const drawBackground = () => {
-        if (bgHandled) {
-          return
-        }
-        bgHandled = true
-        ctx.drawImage(bgImg, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
-        finish()
-      }
-      bgImg.onload = drawBackground
-      bgImg.onerror = () => {
-        if (!bgHandled) {
-          bgHandled = true
+      const sources = [backgroundDataUri, backgroundUrl].filter(Boolean) as string[]
+      let sourceIndex = 0
+
+      const tryLoadBackground = () => {
+        if (sourceIndex >= sources.length) {
           console.warn('Share card: background image failed to load')
           finish()
+          return
+        }
+        const src = sources[sourceIndex]
+        sourceIndex += 1
+        const bgImg = new Image()
+        bgImg.crossOrigin = 'anonymous'
+        let bgHandled = false
+        const drawBackground = () => {
+          if (bgHandled) {
+            return
+          }
+          bgHandled = true
+          ctx.drawImage(bgImg, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
+          finish()
+        }
+        bgImg.onload = drawBackground
+        bgImg.onerror = () => {
+          if (bgHandled) {
+            return
+          }
+          bgHandled = true
+          tryLoadBackground()
+        }
+        bgImg.src = src
+        if (typeof bgImg.decode === 'function') {
+          bgImg.decode().then(drawBackground).catch(() => {})
         }
       }
-      bgImg.src = backgroundDataUri
-      if (typeof bgImg.decode === 'function') {
-        bgImg.decode().then(drawBackground).catch(() => {})
-      }
+
+      tryLoadBackground()
     }
 
     img.onload = handleLoad
@@ -467,7 +485,8 @@ export const buildMissionSuccessCardPng = async ({
 
   const imageData = await loadImageData(missionNumber)
   const drawBackgroundSeparately = missionNumber === 3
-  const backgroundDataUri = drawBackgroundSeparately ? imageData.webBg : null
+  const backgroundDataUri = null
+  const backgroundUrl = drawBackgroundSeparately ? webBgUrlM3 : null
   const embedData = drawBackgroundSeparately
     ? { ...imageData, webBg: TRANSPARENT_PNG }
     : imageData
@@ -483,7 +502,7 @@ export const buildMissionSuccessCardPng = async ({
   if (!embedded.includes('data:image/png')) {
     console.warn('Share card: no data URIs embedded (profile likely missing)')
   }
-  const blob = await svgToPngBlob(embedded, backgroundDataUri)
+  const blob = await svgToPngBlob(embedded, backgroundDataUri, backgroundUrl)
 
   const filenameHandle = safeHandle
     .replace(/[^a-z0-9._-]+/gi, '-')
