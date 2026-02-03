@@ -319,7 +319,7 @@ export const fillSvgPlaceholders = (svg: string, vars: Record<string, string>) =
   }, svg)
 }
 
-export const svgToPngBlob = (svgText: string): Promise<Blob> => {
+export const svgToPngBlob = (svgText: string, backgroundDataUri?: string | null): Promise<Blob> => {
   return new Promise((resolve, reject) => {
     const svgWithNamespaces = ensureSvgNamespaces(svgText)
     const svgBlob = new Blob([svgWithNamespaces], { type: 'image/svg+xml;charset=utf-8' })
@@ -358,19 +358,51 @@ export const svgToPngBlob = (svgText: string): Promise<Blob> => {
         reject(new Error('Canvas not supported'))
         return
       }
-      ctx.drawImage(img, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
-      canvas.toBlob(
-        (blob) => {
-          cleanup()
-          if (!blob) {
-            reject(new Error('Unable to export image'))
-            return
-          }
-          resolve(blob)
-        },
-        'image/png',
-        0.92,
-      )
+
+      const finish = () => {
+        ctx.drawImage(img, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
+        canvas.toBlob(
+          (blob) => {
+            cleanup()
+            if (!blob) {
+              reject(new Error('Unable to export image'))
+              return
+            }
+            resolve(blob)
+          },
+          'image/png',
+          0.92,
+        )
+      }
+
+      if (!backgroundDataUri) {
+        finish()
+        return
+      }
+
+      const bgImg = new Image()
+      bgImg.crossOrigin = 'anonymous'
+      let bgHandled = false
+      const drawBackground = () => {
+        if (bgHandled) {
+          return
+        }
+        bgHandled = true
+        ctx.drawImage(bgImg, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
+        finish()
+      }
+      bgImg.onload = drawBackground
+      bgImg.onerror = () => {
+        if (!bgHandled) {
+          bgHandled = true
+          console.warn('Share card: background image failed to load')
+          finish()
+        }
+      }
+      bgImg.src = backgroundDataUri
+      if (typeof bgImg.decode === 'function') {
+        bgImg.decode().then(drawBackground).catch(() => {})
+      }
     }
 
     img.onload = handleLoad
@@ -434,11 +466,16 @@ export const buildMissionSuccessCardPng = async ({
   const withBarcode = filled.replaceAll('{{BARCODE_SVG}}', barcodeSvg)
 
   const imageData = await loadImageData(missionNumber)
+  const drawBackgroundSeparately = missionNumber === 3
+  const backgroundDataUri = drawBackgroundSeparately ? imageData.webBg : null
+  const embedData = drawBackgroundSeparately
+    ? { ...imageData, webBg: TRANSPARENT_PNG }
+    : imageData
   const agentProfile = await loadProfileData(safeToken)
   if (!agentProfile || agentProfile.length < 50) {
     console.warn('Share card: profile data URI missing/too short', { token: safeToken })
   }
-  let embedded = embedImages(withBarcode, { ...imageData, agentProfile })
+  let embedded = embedImages(withBarcode, { ...embedData, agentProfile })
   embedded = embedded.replaceAll('__AGENT_PROFILE__', agentProfile)
   if (embedded.includes('__AGENT_PROFILE__')) {
     console.warn('Share card: AGENT_PROFILE token not replaced')
@@ -446,7 +483,7 @@ export const buildMissionSuccessCardPng = async ({
   if (!embedded.includes('data:image/png')) {
     console.warn('Share card: no data URIs embedded (profile likely missing)')
   }
-  const blob = await svgToPngBlob(embedded)
+  const blob = await svgToPngBlob(embedded, backgroundDataUri)
 
   const filenameHandle = safeHandle
     .replace(/[^a-z0-9._-]+/gi, '-')
