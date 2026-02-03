@@ -8,7 +8,7 @@ const agentProfiles = import.meta.glob('../assets/agent-profile-images/*.png', {
   import: 'default',
 }) as Record<string, string>
 
-const TEMPLATE_VERSION = '2026-02-03-11'
+const TEMPLATE_VERSION = '2026-02-03-12'
 const TEMPLATE_URL = `/templates/mission-success-template.svg?v=${TEMPLATE_VERSION}`
 const CANVAS_WIDTH = 1080
 const CANVAS_HEIGHT = 1440
@@ -42,6 +42,53 @@ const escapeXml = (value: string) =>
     .replace(/'/g, '&apos;')
 
 const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
+const hashString = (value: string) => {
+  let hash = 0
+  for (let i = 0; i < value.length; i += 1) {
+    hash = (hash << 5) - hash + value.charCodeAt(i)
+    hash |= 0
+  }
+  return hash >>> 0
+}
+
+const mulberry32 = (seed: number) => {
+  let t = seed >>> 0
+  return () => {
+    t += 0x6d2b79f5
+    let result = t
+    result = Math.imul(result ^ (result >>> 15), result | 1)
+    result ^= result + Math.imul(result ^ (result >>> 7), result | 61)
+    return ((result ^ (result >>> 14)) >>> 0) / 4294967296
+  }
+}
+
+const makeTimestampBarcodeSvg = (timestamp: string) => {
+  const width = 360
+  const height = 54
+  const originX = 1080 - 90 - width
+  const originY = 1440 - height
+  const rand = mulberry32(hashString(timestamp))
+  const rects: string[] = []
+  let cursor = 0
+
+  while (cursor < width) {
+    const barWidth = 2 + Math.floor(rand() * 4)
+    const gap = 1 + Math.floor(rand() * 2)
+    const heightScale = 0.7 + rand() * 0.3
+    const barHeight = Math.max(1, Math.round(height * heightScale))
+    const barX = originX + cursor
+    const barY = originY + (height - barHeight)
+
+    rects.push(
+      `<rect x="${barX}" y="${barY}" width="${barWidth}" height="${barHeight}" fill="#666666" opacity="0.85"/>`,
+    )
+
+    cursor += barWidth + gap
+  }
+
+  return rects.join('')
+}
 
 const formatDisplayTimestamp = (date: Date) =>
   date.toLocaleString('en-US', {
@@ -331,6 +378,7 @@ export const buildMissionSuccessCardPng = async ({
   const date = timestamp ? new Date(timestamp) : new Date()
   const safeDate = Number.isNaN(date.getTime()) ? new Date() : date
   const displayTimestamp = formatDisplayTimestamp(safeDate)
+  const barcodeSvg = makeTimestampBarcodeSvg(displayTimestamp)
 
   const filled = fillSvgPlaceholders(template, {
     USERNAME: displayHandle,
@@ -342,13 +390,14 @@ export const buildMissionSuccessCardPng = async ({
     DOT2_FILL: missionNumber >= 2 ? '#18b77a' : 'none',
     DOT3_FILL: missionNumber >= 3 ? '#18b77a' : 'none',
   })
+  const withBarcode = filled.replaceAll('{{BARCODE_SVG}}', barcodeSvg)
 
   const imageData = await loadImageData()
   const agentProfile = await loadProfileData(safeToken)
   if (!agentProfile || agentProfile.length < 50) {
     console.warn('Share card: profile data URI missing/too short', { token: safeToken })
   }
-  let embedded = embedImages(filled, { ...imageData, agentProfile })
+  let embedded = embedImages(withBarcode, { ...imageData, agentProfile })
   embedded = embedded.replaceAll('__AGENT_PROFILE__', agentProfile)
   if (embedded.includes('__AGENT_PROFILE__')) {
     console.warn('Share card: AGENT_PROFILE token not replaced')

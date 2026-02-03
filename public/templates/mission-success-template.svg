@@ -93,4 +93,8 @@
     THROW YOUR BEST
   </text>
 
+  <g id="timestampBarcode">
+    {{BARCODE_SVG}}
+  </g>
+
 </svg>
