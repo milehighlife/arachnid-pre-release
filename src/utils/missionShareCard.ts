@@ -14,7 +14,7 @@ const agentProfiles = import.meta.glob('../assets/agent-profile-images/*.png', {
   import: 'default',
 }) as Record<string, string>
 
-const TEMPLATE_VERSION = '2026-02-03-13'
+const TEMPLATE_VERSION = '2026-02-03-14'
 const TEMPLATE_URL = `/templates/mission-success-template.svg?v=${TEMPLATE_VERSION}`
 const CANVAS_WIDTH = 1080
 const CANVAS_HEIGHT = 1440
@@ -135,12 +135,12 @@ const loadImageData = async (missionNumber: 1 | 2 | 3) => {
     return imageDataCache.get(missionNumber)!
   }
   if (!imageDataPromise.has(missionNumber)) {
-    const assets =
-      missionNumber === 2
-        ? [webBgUrlM2, discUrlM2, logoUrlM2]
-        : missionNumber === 3
-          ? [webBgUrlM3, discUrlM3, logoUrlM3]
-          : [webBgUrl, discUrl, logoUrl]
+    const assetsByMission: Record<1 | 2 | 3, [string, string, string]> = {
+      1: [webBgUrl, discUrl, logoUrl],
+      2: [webBgUrlM2, discUrlM2, logoUrlM2],
+      3: [webBgUrlM3, discUrlM3, logoUrlM3],
+    }
+    const assets = assetsByMission[missionNumber]
     imageDataPromise.set(
       missionNumber,
       Promise.all(assets.map((asset) => urlToDataUri(asset))).then(([webBg, disc, logo]) => {
