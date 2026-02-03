@@ -64,9 +64,9 @@ const mulberry32 = (seed: number) => {
 }
 
 const makeTimestampBarcodeSvg = (timestamp: string) => {
-  const width = 450
-  const height = 30
-  const originX = 1080 - 30 - width
+  const width = 690
+  const height = 36
+  const originX = 1080 - 36 - width
   const originY = 1440 - height
   const rand = mulberry32(hashString(timestamp))
   const rects: string[] = []
@@ -74,7 +74,7 @@ const makeTimestampBarcodeSvg = (timestamp: string) => {
 
   while (cursor < width) {
     const barWidth = rand() < 0.5 ? 3 : 7
-    const gap = 3
+    const gap = 4
     const barHeight = height
     if (cursor + barWidth > width) {
       break
