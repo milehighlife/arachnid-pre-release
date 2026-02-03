@@ -31,7 +31,13 @@ function MissionSuccessModal({ isOpen, token, handle, missionNumber, rank, onClo
     let active = true
     setStatus('loading')
 
-    buildMissionSuccessCardPng({ token, handle, timestamp: new Date(), missionNumber, rank })
+    const normalizedToken = (token || handle || '')
+      .trim()
+      .toLowerCase()
+      .replace(/^@/, '')
+      .replace(/\s+/g, '')
+
+    buildMissionSuccessCardPng({ token: normalizedToken, handle, timestamp: new Date(), missionNumber, rank })
       .then(({ blob, filename: nextFilename }) => {
         if (!active) {
           return

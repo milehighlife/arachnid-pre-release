@@ -5,11 +5,10 @@ import defaultProfileUrl from '../assets/agent-profile-images/default.png'
 
 const agentProfiles = import.meta.glob('../assets/agent-profile-images/*.png', {
   eager: true,
-  query: '?url',
   import: 'default',
 }) as Record<string, string>
 
-const TEMPLATE_VERSION = '2026-02-03-08'
+const TEMPLATE_VERSION = '2026-02-03-09'
 const TEMPLATE_URL = `/templates/mission-success-template.svg?v=${TEMPLATE_VERSION}`
 const CANVAS_WIDTH = 1080
 const CANVAS_HEIGHT = 1440
@@ -72,6 +71,10 @@ const urlToDataUri = async (url: string) => {
     const reader = new FileReader()
     reader.onload = () => {
       if (typeof reader.result === 'string') {
+        if (!reader.result.startsWith('data:image')) {
+          reject(new Error('Asset data URL invalid'))
+          return
+        }
         resolve(reader.result)
       } else {
         reject(new Error('Unable to read asset data'))
@@ -99,20 +102,23 @@ const loadImageData = async () => {
   return imageDataPromise
 }
 
-const sanitizeTokenForFile = (token: string) =>
-  token.replace(/^@+/, '').trim().toLowerCase().replace(/\s+/g, '')
+const normalizeToken = (raw: string) =>
+  (raw || '').trim().toLowerCase().replace(/^@/, '').replace(/\s+/g, '')
 
-const getAgentProfileUrl = (token: string) => {
-  const normalized = sanitizeTokenForFile(token)
-  if (!normalized) {
-    return defaultProfileUrl
+const getProfileUrl = (token: string) => {
+  const normalized = normalizeToken(token)
+  const keys = Object.keys(agentProfiles)
+  if (normalized) {
+    const hitKey = keys.find((key) => key.toLowerCase().endsWith(`/${normalized}.png`))
+    if (hitKey) {
+      return agentProfiles[hitKey] as string
+    }
   }
-  const entry = Object.entries(agentProfiles).find(([path]) => {
-    const filename = path.split('/').pop() || ''
-    const name = filename.replace(/\\.png$/i, '').toLowerCase()
-    return name === normalized
-  })
-  return entry?.[1] ?? defaultProfileUrl
+  const defaultKey = keys.find((key) => key.toLowerCase().endsWith('/default.png'))
+  if (defaultKey) {
+    return agentProfiles[defaultKey] as string
+  }
+  return null
 }
 
 const profileDataCache = new Map<string, string>()
@@ -131,20 +137,24 @@ const loadDefaultProfileData = async () => {
 }
 
 const loadProfileData = async (token: string) => {
-  const normalized = sanitizeTokenForFile(token)
+  const normalized = normalizeToken(token)
   if (!normalized) {
     return loadDefaultProfileData()
   }
   if (profileDataCache.has(normalized)) {
     return profileDataCache.get(normalized) || TRANSPARENT_PNG
   }
-  const url = getAgentProfileUrl(normalized)
+  const url = getProfileUrl(normalized)
   if (!url) {
+    console.warn('Share card: profile URL not found for token', token)
     const fallback = await loadDefaultProfileData()
     profileDataCache.set(normalized, fallback)
     return fallback
   }
   const dataUri = await urlToDataUri(url)
+  if (!dataUri || !dataUri.startsWith('data:image')) {
+    console.warn('Share card: profile data URI invalid', token)
+  }
   profileDataCache.set(normalized, dataUri)
   return dataUri
 }
@@ -310,7 +320,7 @@ export const buildMissionSuccessCardPng = async ({
   const rawHandle = (handle || '').replace(/^@+/, '').trim()
   const rawToken = (token || '').replace(/^@+/, '').trim()
   const safeHandle = rawHandle || 'agent'
-  const safeToken = sanitizeTokenForFile(rawToken || safeHandle)
+  const safeToken = normalizeToken(rawToken || safeHandle)
   const displayHandle = `@${safeHandle}`
   const date = timestamp ? new Date(timestamp) : new Date()
   const safeDate = Number.isNaN(date.getTime()) ? new Date() : date
@@ -331,6 +341,9 @@ export const buildMissionSuccessCardPng = async ({
   }
   let embedded = embedImages(filled, { ...imageData, agentProfile })
   embedded = embedded.replaceAll('__AGENT_PROFILE__', agentProfile)
+  if (embedded.includes('__AGENT_PROFILE__')) {
+    console.warn('Share card: AGENT_PROFILE token not replaced')
+  }
   if (!embedded.includes('data:image/png')) {
     console.warn('Share card: no data URIs embedded (profile likely missing)')
   }

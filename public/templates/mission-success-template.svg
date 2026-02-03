@@ -44,7 +44,7 @@
 
   <!-- Timestamp (right) -->
   <text class="mono"
-        x="990" y="120"
+        x="990" y="108"
         font-size="28"
         fill="#18b77a"
         text-anchor="end">

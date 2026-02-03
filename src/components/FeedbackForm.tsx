@@ -130,7 +130,15 @@ function FeedbackForm({
     () => (handle || codename || tokenValue || 'tester').trim(),
     [handle, codename, tokenValue],
   )
-  const profileToken = useMemo(() => (tokenValue || handle || '').trim(), [tokenValue, handle])
+  const profileToken = useMemo(
+    () =>
+      (tokenValue || handle || '')
+        .trim()
+        .toLowerCase()
+        .replace(/^@/, '')
+        .replace(/\s+/g, ''),
+    [tokenValue, handle],
+  )
   const feedbackUrl = useMemo(() => getApiUrl('/api/feedback'), [])
   const timeoutsRef = useRef<number[]>([])
   const [missionStatus, setMissionStatus] = useState<MissionStatusMap>(defaultStatus)
