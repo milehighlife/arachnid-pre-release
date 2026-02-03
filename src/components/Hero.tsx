@@ -5,10 +5,11 @@ type HeroProps = {
   firstName: string
   agentToken: string
   agentStatus: string
+  missionCount: number
   showCta: boolean
 }
 
-function Hero({ firstName, agentToken, agentStatus, showCta }: HeroProps) {
+function Hero({ firstName, agentToken, agentStatus, missionCount, showCta }: HeroProps) {
   return (
     <section className='hero'>
       <motion.div
@@ -49,9 +50,12 @@ function Hero({ firstName, agentToken, agentStatus, showCta }: HeroProps) {
                 <div className='hero-agent-chip-header'>
                   <span className='hero-agent-chip-label'>Current</span>
                   <div className='hero-rank-track' aria-hidden='true'>
-                    <span className='hero-rank-dot' />
-                    <span className='hero-rank-dot' />
-                    <span className='hero-rank-dot' />
+                    {[0, 1, 2].map((index) => (
+                      <span
+                        key={index}
+                        className={`hero-rank-dot${missionCount > index ? ' is-filled' : ''}`}
+                      />
+                    ))}
                   </div>
                 </div>
                 <span className='hero-agent-chip-value'>{agentStatus}</span>

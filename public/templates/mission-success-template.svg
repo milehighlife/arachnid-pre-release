@@ -76,6 +76,12 @@
     Rank: {{RANK}}
   </text>
 
+  <g>
+    <circle cx="96" cy="1360" r="6" stroke="#18b77a" stroke-width="2" fill="{{DOT1_FILL}}"/>
+    <circle cx="120" cy="1360" r="6" stroke="#18b77a" stroke-width="2" fill="{{DOT2_FILL}}"/>
+    <circle cx="144" cy="1360" r="6" stroke="#18b77a" stroke-width="2" fill="{{DOT3_FILL}}"/>
+  </g>
+
   <!-- Vertical tagline -->
   <text class="mono"
         x="1040" y="1380"

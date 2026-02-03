@@ -8,7 +8,7 @@ const agentProfiles = import.meta.glob('../assets/agent-profile-images/*.png', {
   import: 'default',
 }) as Record<string, string>
 
-const TEMPLATE_VERSION = '2026-02-03-10'
+const TEMPLATE_VERSION = '2026-02-03-11'
 const TEMPLATE_URL = `/templates/mission-success-template.svg?v=${TEMPLATE_VERSION}`
 const CANVAS_WIDTH = 1080
 const CANVAS_HEIGHT = 1440
@@ -338,6 +338,9 @@ export const buildMissionSuccessCardPng = async ({
     MISSION_NUMBER: String(missionNumber),
     RANK: rank,
     AGENT: displayHandle,
+    DOT1_FILL: missionNumber >= 1 ? '#18b77a' : 'none',
+    DOT2_FILL: missionNumber >= 2 ? '#18b77a' : 'none',
+    DOT3_FILL: missionNumber >= 3 ? '#18b77a' : 'none',
   })
 
   const imageData = await loadImageData()

@@ -450,7 +450,12 @@ button {
   height: 8px;
   border-radius: 999px;
   border: 1px solid var(--success);
-  background: rgba(34, 197, 94, 0.18);
+  background: transparent;
+}
+
+.hero-rank-dot.is-filled {
+  background: var(--success);
+  box-shadow: 0 0 8px rgba(34, 197, 94, 0.5);
 }
 
 .confidential-sub {

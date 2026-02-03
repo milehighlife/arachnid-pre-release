@@ -87,6 +87,9 @@ function App() {
   const agentToken = sanitizeToken(personalization.token) || personalization.firstName
   const agentStatus = getAgentStatus(progress)
   const mission1Locked = progress?.missions?.m1?.status === 'LOCKED'
+  const missionCount = ['m1', 'm2', 'm3'].filter(
+    (key) => progress?.missions?.[key as keyof ProgressPayload['missions']]?.status === 'LOCKED',
+  ).length
 
   useEffect(() => {
     if (briefingSeen) {
@@ -304,6 +307,7 @@ function App() {
         firstName={personalization.firstName}
         agentToken={agentToken}
         agentStatus={agentStatus}
+        missionCount={missionCount}
         showCta={!mission1Locked}
       />
       <section className='hatch-band' aria-hidden='true'>
