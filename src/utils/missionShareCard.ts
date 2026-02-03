@@ -380,11 +380,12 @@ export const buildMissionSuccessCardPng = async ({
   const date = timestamp ? new Date(timestamp) : new Date()
   const safeDate = Number.isNaN(date.getTime()) ? new Date() : date
   const displayTimestamp = formatDisplayTimestamp(safeDate)
-  const barcodeSvg = makeTimestampBarcodeSvg(displayTimestamp)
+  const timestampLabel = `M${missionNumber}: ${displayTimestamp.replace(',', ' •')}`
+  const barcodeSvg = makeTimestampBarcodeSvg(timestampLabel)
 
   const filled = fillSvgPlaceholders(template, {
     USERNAME: displayHandle,
-    TIMESTAMP: displayTimestamp,
+    TIMESTAMP: timestampLabel,
     MISSION_NUMBER: String(missionNumber),
     RANK: rank,
     AGENT: displayHandle,
