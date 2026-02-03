@@ -14,7 +14,7 @@ const agentProfiles = import.meta.glob('../assets/agent-profile-images/*.png', {
   import: 'default',
 }) as Record<string, string>
 
-const TEMPLATE_VERSION = '2026-02-03-20'
+const TEMPLATE_VERSION = '2026-02-03-21'
 const TEMPLATE_URL = `/templates/mission-success-template.svg?v=${TEMPLATE_VERSION}`
 const CANVAS_WIDTH = 1080
 const CANVAS_HEIGHT = 1440
@@ -482,7 +482,8 @@ export const buildMissionSuccessCardPng = async ({
   const underlaySources: string[] = []
   let embedData = imageData
   if (missionNumber === 3) {
-    embedData = { ...imageData, webBg: webBgUrlM3 }
+    underlaySources.push(imageData.webBg)
+    embedData = { ...imageData, webBg: TRANSPARENT_PNG }
   } else if (missionNumber === 2) {
     underlaySources.push(imageData.webBg, webBgUrlM2)
     embedData = { ...imageData, webBg: TRANSPARENT_PNG }
