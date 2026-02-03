@@ -1,6 +1,6 @@
-import mission1CardBg from '../assets/mission-success-graphics/mission-1-card-bg.png?inline'
-import mission2CardBg from '../assets/mission-success-graphics/mission-2-card-bg.png?inline'
-import mission3CardBg from '../assets/mission-success-graphics/mission-3-card-bg.png?inline'
+import mission1CardBg from '../assets/mission-success-graphics/mission-1-card-bg.png'
+import mission2CardBg from '../assets/mission-success-graphics/mission-2-card-bg.png'
+import mission3CardBg from '../assets/mission-success-graphics/mission-3-card-bg.png'
 import defaultProfileUrl from '../assets/agent-profile-images/default.png'
 
 const agentProfiles = import.meta.glob('../assets/agent-profile-images/*.png', {
@@ -8,7 +8,7 @@ const agentProfiles = import.meta.glob('../assets/agent-profile-images/*.png', {
   import: 'default',
 }) as Record<string, string>
 
-const TEMPLATE_VERSION = '2026-02-03-22'
+const TEMPLATE_VERSION = '2026-02-03-23'
 const TEMPLATE_URL = `/templates/mission-success-template.svg?v=${TEMPLATE_VERSION}`
 const CANVAS_WIDTH = 1080
 const CANVAS_HEIGHT = 1440
@@ -285,108 +285,81 @@ export const fillSvgPlaceholders = (svg: string, vars: Record<string, string>) =
   }, svg)
 }
 
-export const svgToPngBlob = (svgText: string, backgroundDataUri?: string | null): Promise<Blob> => {
-  return new Promise((resolve, reject) => {
-    const svgWithNamespaces = ensureSvgNamespaces(svgText)
-    const svgBlob = new Blob([svgWithNamespaces], { type: 'image/svg+xml;charset=utf-8' })
-    const svgUrl = URL.createObjectURL(svgBlob)
-    const img = new Image()
-    img.crossOrigin = 'anonymous'
-
+const loadCanvasImage = (src: string) =>
+  new Promise<HTMLImageElement>((resolve, reject) => {
+    const image = new Image()
+    image.crossOrigin = 'anonymous'
     let settled = false
-
-    const cleanup = () => {
-      URL.revokeObjectURL(svgUrl)
-    }
-
-    const handleError = () => {
-      if (settled) {
-        return
-      }
-      settled = true
-      window.clearTimeout(retryTimeout)
-      cleanup()
-      reject(new Error('Failed to render image'))
-    }
-
-    const handleLoad = () => {
-      if (settled) {
-        return
-      }
-      settled = true
-      window.clearTimeout(retryTimeout)
-      const canvas = document.createElement('canvas')
-      canvas.width = CANVAS_WIDTH
-      canvas.height = CANVAS_HEIGHT
-      const ctx = canvas.getContext('2d')
-      if (!ctx) {
-        cleanup()
-        reject(new Error('Canvas not supported'))
-        return
-      }
-
-      const finish = () => {
-        ctx.drawImage(img, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
-        canvas.toBlob(
-          (blob) => {
-            cleanup()
-            if (!blob) {
-              reject(new Error('Unable to export image'))
-              return
-            }
-            resolve(blob)
-          },
-          'image/png',
-          0.92,
-        )
-      }
-
-      if (!backgroundDataUri) {
-        finish()
-        return
-      }
-
-      const bgImg = new Image()
-      bgImg.crossOrigin = 'anonymous'
-      let bgHandled = false
-      const drawBackground = () => {
-        if (bgHandled) {
-          return
-        }
-        bgHandled = true
-        ctx.drawImage(bgImg, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
-        finish()
-      }
-      bgImg.onload = drawBackground
-      bgImg.onerror = () => {
-        if (!bgHandled) {
-          bgHandled = true
-          console.warn('Share card: background image failed to load')
-          finish()
-        }
-      }
-      bgImg.src = backgroundDataUri
-      if (typeof bgImg.decode === 'function') {
-        bgImg.decode().then(drawBackground).catch(() => {})
-      }
-    }
-
-    img.onload = handleLoad
-    img.onerror = handleError
-
     const retryTimeout = window.setTimeout(() => {
+      if (!settled) {
+        image.src = src
+      }
+    }, 2000)
+    const finalize = (success: boolean) => {
       if (settled) {
         return
       }
-      img.src = svgUrl
-    }, 2000)
-
-    img.src = svgUrl
-
-    if (typeof img.decode === 'function') {
-      img.decode().then(handleLoad).catch(() => {})
+      settled = true
+      window.clearTimeout(retryTimeout)
+      if (success) {
+        resolve(image)
+      } else {
+        reject(new Error('Image failed to load'))
+      }
+    }
+    image.onload = () => finalize(true)
+    image.onerror = () => finalize(false)
+    image.src = src
+    if (typeof image.decode === 'function') {
+      image.decode().then(() => finalize(true)).catch(() => {})
     }
   })
+
+export const svgToPngBlob = async (
+  svgText: string,
+  backgroundSrc?: string | null,
+): Promise<Blob> => {
+  const svgWithNamespaces = ensureSvgNamespaces(svgText)
+  const svgBlob = new Blob([svgWithNamespaces], { type: 'image/svg+xml;charset=utf-8' })
+  const svgUrl = URL.createObjectURL(svgBlob)
+
+  try {
+    const [svgImage, backgroundImage] = await Promise.all([
+      loadCanvasImage(svgUrl),
+      backgroundSrc ? loadCanvasImage(backgroundSrc).catch(() => null) : Promise.resolve(null),
+    ])
+
+    const canvas = document.createElement('canvas')
+    canvas.width = CANVAS_WIDTH
+    canvas.height = CANVAS_HEIGHT
+    const ctx = canvas.getContext('2d')
+    if (!ctx) {
+      throw new Error('Canvas not supported')
+    }
+
+    if (backgroundImage) {
+      ctx.drawImage(backgroundImage, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
+    }
+    ctx.drawImage(svgImage, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
+
+    const blob = await new Promise<Blob>((resolve, reject) => {
+      canvas.toBlob(
+        (result) => {
+          if (!result) {
+            reject(new Error('Unable to export image'))
+            return
+          }
+          resolve(result)
+        },
+        'image/png',
+        0.92,
+      )
+    })
+
+    return blob
+  } finally {
+    URL.revokeObjectURL(svgUrl)
+  }
 }
 
 export const buildMissionSuccessCardPng = async ({
