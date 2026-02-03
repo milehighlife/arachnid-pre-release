@@ -14,7 +14,7 @@ const agentProfiles = import.meta.glob('../assets/agent-profile-images/*.png', {
   import: 'default',
 }) as Record<string, string>
 
-const TEMPLATE_VERSION = '2026-02-03-16'
+const TEMPLATE_VERSION = '2026-02-03-17'
 const TEMPLATE_URL = `/templates/mission-success-template.svg?v=${TEMPLATE_VERSION}`
 const CANVAS_WIDTH = 1080
 const CANVAS_HEIGHT = 1440
@@ -319,11 +319,7 @@ export const fillSvgPlaceholders = (svg: string, vars: Record<string, string>) =
   }, svg)
 }
 
-export const svgToPngBlob = (
-  svgText: string,
-  backgroundDataUri?: string | null,
-  backgroundUrl?: string | null,
-): Promise<Blob> => {
+export const svgToPngBlob = (svgText: string, underlaySources?: string[] | null): Promise<Blob> => {
   return new Promise((resolve, reject) => {
     const svgWithNamespaces = ensureSvgNamespaces(svgText)
     const svgBlob = new Blob([svgWithNamespaces], { type: 'image/svg+xml;charset=utf-8' })
@@ -346,6 +342,30 @@ export const svgToPngBlob = (
       cleanup()
       reject(new Error('Failed to render image'))
     }
+
+    const loadCanvasImage = (src: string) =>
+      new Promise<HTMLImageElement>((resolveImage, rejectImage) => {
+        const image = new Image()
+        image.crossOrigin = 'anonymous'
+        let done = false
+        const finalize = (success: boolean) => {
+          if (done) {
+            return
+          }
+          done = true
+          if (success) {
+            resolveImage(image)
+          } else {
+            rejectImage(new Error('Image failed to load'))
+          }
+        }
+        image.onload = () => finalize(true)
+        image.onerror = () => finalize(false)
+        image.src = src
+        if (typeof image.decode === 'function') {
+          image.decode().then(() => finalize(true)).catch(() => {})
+        }
+      })
 
     const handleLoad = () => {
       if (settled) {
@@ -379,48 +399,23 @@ export const svgToPngBlob = (
         )
       }
 
-      if (!backgroundDataUri && !backgroundUrl) {
+      const sources = (underlaySources || []).filter(Boolean)
+      if (!sources.length) {
         finish()
         return
       }
 
-      const sources = [backgroundDataUri, backgroundUrl].filter(Boolean) as string[]
-      let sourceIndex = 0
-
-      const tryLoadBackground = () => {
-        if (sourceIndex >= sources.length) {
-          console.warn('Share card: background image failed to load')
-          finish()
-          return
-        }
-        const src = sources[sourceIndex]
-        sourceIndex += 1
-        const bgImg = new Image()
-        bgImg.crossOrigin = 'anonymous'
-        let bgHandled = false
-        const drawBackground = () => {
-          if (bgHandled) {
-            return
+      ;(async () => {
+        for (const src of sources) {
+          try {
+            const image = await loadCanvasImage(src)
+            ctx.drawImage(image, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
+          } catch (error) {
+            console.warn('Share card: underlay image failed to load', error)
           }
-          bgHandled = true
-          ctx.drawImage(bgImg, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
-          finish()
         }
-        bgImg.onload = drawBackground
-        bgImg.onerror = () => {
-          if (bgHandled) {
-            return
-          }
-          bgHandled = true
-          tryLoadBackground()
-        }
-        bgImg.src = src
-        if (typeof bgImg.decode === 'function') {
-          bgImg.decode().then(drawBackground).catch(() => {})
-        }
-      }
-
-      tryLoadBackground()
+        finish()
+      })()
     }
 
     img.onload = handleLoad
@@ -484,9 +479,15 @@ export const buildMissionSuccessCardPng = async ({
   const withBarcode = filled.replaceAll('{{BARCODE_SVG}}', barcodeSvg)
 
   const imageData = await loadImageData(missionNumber)
-  const backgroundDataUri = missionNumber === 3 ? imageData.webBg : null
-  const backgroundUrl = missionNumber === 3 ? webBgUrlM3 : null
-  const embedData = imageData
+  const underlaySources: string[] = []
+  let embedData = imageData
+  if (missionNumber === 3) {
+    underlaySources.push(imageData.webBg, webBgUrlM3)
+    embedData = { ...imageData, webBg: TRANSPARENT_PNG }
+  } else if (missionNumber === 2) {
+    underlaySources.push(imageData.logo, logoUrlM2)
+    embedData = { ...imageData, logo: TRANSPARENT_PNG }
+  }
   const agentProfile = await loadProfileData(safeToken)
   if (!agentProfile || agentProfile.length < 50) {
     console.warn('Share card: profile data URI missing/too short', { token: safeToken })
@@ -499,7 +500,7 @@ export const buildMissionSuccessCardPng = async ({
   if (!embedded.includes('data:image/png')) {
     console.warn('Share card: no data URIs embedded (profile likely missing)')
   }
-  const blob = await svgToPngBlob(embedded, backgroundDataUri, backgroundUrl)
+  const blob = await svgToPngBlob(embedded, underlaySources)
 
   const filenameHandle = safeHandle
     .replace(/[^a-z0-9._-]+/gi, '-')
