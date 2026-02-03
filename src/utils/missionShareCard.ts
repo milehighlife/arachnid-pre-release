@@ -2,6 +2,7 @@ import webBgUrl from '../assets/mission-success-graphics/black-web-background.pn
 import successBarUrl from '../assets/mission-success-graphics/success-bar.png'
 import discUrl from '../assets/mission-success-graphics/disc.png'
 import logoUrl from '../assets/mission-success-graphics/innova-arachnid-logo.png'
+import defaultProfileUrl from '../assets/agent-profile-images/default.png'
 
 const profileImages = import.meta.glob('../assets/agent-profile-images/*.png', {
   eager: true,
@@ -9,7 +10,7 @@ const profileImages = import.meta.glob('../assets/agent-profile-images/*.png', {
   import: 'default',
 }) as Record<string, string>
 
-const TEMPLATE_VERSION = '2026-02-03-05'
+const TEMPLATE_VERSION = '2026-02-03-06'
 const TEMPLATE_URL = `/templates/mission-success-template.svg?v=${TEMPLATE_VERSION}`
 const CANVAS_WIDTH = 1080
 const CANVAS_HEIGHT = 1440
@@ -30,6 +31,8 @@ let imageDataPromise: Promise<{
   logo: string
   agentProfile: string
 }> | null = null
+let defaultProfileCache: string | null = null
+let defaultProfilePromise: Promise<string> | null = null
 
 const TRANSPARENT_PNG =
   'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/wcAAwAB/2kW0F4AAAAASUVORK5CYII='
@@ -100,8 +103,8 @@ const loadImageData = async () => {
   return imageDataPromise
 }
 
-const getProfileImageUrl = (handle: string) => {
-  const normalized = handle.toLowerCase()
+const getProfileImageUrl = (token: string) => {
+  const normalized = token.toLowerCase()
   const entry = Object.entries(profileImages).find(([path]) => {
     const filename = path.split('/').pop() || ''
     const name = filename.replace(/\\.png$/i, '').toLowerCase()
@@ -112,18 +115,32 @@ const getProfileImageUrl = (handle: string) => {
 
 const profileDataCache = new Map<string, string>()
 
-const loadProfileData = async (handle: string) => {
-  const normalized = handle.toLowerCase()
+const loadDefaultProfileData = async () => {
+  if (defaultProfileCache) {
+    return defaultProfileCache
+  }
+  if (!defaultProfilePromise) {
+    defaultProfilePromise = urlToDataUri(defaultProfileUrl).then((data) => {
+      defaultProfileCache = data
+      return data
+    })
+  }
+  return defaultProfilePromise
+}
+
+const loadProfileData = async (token: string) => {
+  const normalized = token.toLowerCase()
   if (!normalized) {
-    return TRANSPARENT_PNG
+    return loadDefaultProfileData()
   }
   if (profileDataCache.has(normalized)) {
     return profileDataCache.get(normalized) || TRANSPARENT_PNG
   }
   const url = getProfileImageUrl(normalized)
   if (!url) {
-    profileDataCache.set(normalized, TRANSPARENT_PNG)
-    return TRANSPARENT_PNG
+    const fallback = await loadDefaultProfileData()
+    profileDataCache.set(normalized, fallback)
+    return fallback
   }
   const dataUri = await urlToDataUri(url)
   profileDataCache.set(normalized, dataUri)
@@ -150,7 +167,7 @@ const embedImages = (
     { token: 'success-bar', dataUri: data.successBar, label: 'success bar' },
     { token: 'disc', dataUri: data.disc, label: 'disc' },
     { token: 'innova-arachnid-logo', dataUri: data.logo, label: 'logo' },
-    { token: 'agent-profile', dataUri: data.agentProfile, label: 'agent profile' },
+    { token: '__AGENT_PROFILE__', dataUri: data.agentProfile, label: 'agent profile' },
   ]
 
   for (const replacement of replacements) {
@@ -276,11 +293,13 @@ export const svgToPngBlob = (svgText: string): Promise<Blob> => {
 }
 
 export const buildMissionSuccessCardPng = async ({
+  token,
   handle,
   timestamp,
   missionNumber,
   rank,
 }: {
+  token: string
   handle: string
   timestamp?: Date | string | number
   missionNumber: 1 | 2 | 3
@@ -288,7 +307,9 @@ export const buildMissionSuccessCardPng = async ({
 }) => {
   const template = await fetchTemplateSvg()
   const rawHandle = (handle || '').replace(/^@+/, '').trim()
+  const rawToken = (token || '').replace(/^@+/, '').trim()
   const safeHandle = rawHandle || 'agent'
+  const safeToken = rawToken || safeHandle
   const displayHandle = `@${safeHandle}`
   const date = timestamp ? new Date(timestamp) : new Date()
   const safeDate = Number.isNaN(date.getTime()) ? new Date() : date
@@ -303,7 +324,7 @@ export const buildMissionSuccessCardPng = async ({
   })
 
   const imageData = await loadImageData()
-  const agentProfile = await loadProfileData(safeHandle)
+  const agentProfile = await loadProfileData(safeToken)
   const embedded = embedImages(filled, { ...imageData, agentProfile })
   const blob = await svgToPngBlob(embedded)
 

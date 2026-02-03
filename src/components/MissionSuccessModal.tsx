@@ -3,6 +3,7 @@ import { buildMissionSuccessCardPng } from '../utils/missionShareCard'
 
 type MissionSuccessModalProps = {
   isOpen: boolean
+  token: string
   handle: string
   missionNumber: 1 | 2 | 3
   rank: string
@@ -11,7 +12,7 @@ type MissionSuccessModalProps = {
 
 type ModalStatus = 'idle' | 'loading' | 'ready' | 'error'
 
-function MissionSuccessModal({ isOpen, handle, missionNumber, rank, onClose }: MissionSuccessModalProps) {
+function MissionSuccessModal({ isOpen, token, handle, missionNumber, rank, onClose }: MissionSuccessModalProps) {
   const [status, setStatus] = useState<ModalStatus>('idle')
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [filename, setFilename] = useState<string>('')
@@ -30,7 +31,7 @@ function MissionSuccessModal({ isOpen, handle, missionNumber, rank, onClose }: M
     let active = true
     setStatus('loading')
 
-    buildMissionSuccessCardPng({ handle, timestamp: new Date(), missionNumber, rank })
+    buildMissionSuccessCardPng({ token, handle, timestamp: new Date(), missionNumber, rank })
       .then(({ blob, filename: nextFilename }) => {
         if (!active) {
           return
@@ -55,7 +56,7 @@ function MissionSuccessModal({ isOpen, handle, missionNumber, rank, onClose }: M
     return () => {
       active = false
     }
-  }, [isOpen, handle, missionNumber, rank])
+  }, [isOpen, token, handle, missionNumber, rank])
 
   useEffect(() => {
     if (!isOpen) {

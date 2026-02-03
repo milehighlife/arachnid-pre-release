@@ -1,4 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
      width="1080"
      height="1440"
      viewBox="0 0 1080 1440">
@@ -10,19 +11,41 @@
                      "Liberation Mono", "Courier New", monospace;
       }
     </style>
+    <clipPath id="agentCircle">
+      <circle cx="90" cy="90" r="36"></circle>
+    </clipPath>
   </defs>
 
   <!-- Background web -->
   <image href="/assets/black-web-background.png"
          x="0" y="0"
          width="1080" height="1440"
-         preserveAspectRatio="xMidYMid slice"/>
+         preserveAspectRatio="none"/>
 
   <!-- Top success bar -->
   <image href="/assets/success-bar.png"
          x="0" y="0"
-         width="1080" height="260"
-         preserveAspectRatio="xMidYMin meet"/>
+         width="1080" height="1440"
+         preserveAspectRatio="none"/>
+
+  <!-- Arachnid logo -->
+  <image href="/assets/innova-arachnid-logo.png"
+         x="0" y="0"
+         width="1080" height="1440"
+         preserveAspectRatio="none"/>
+
+  <!-- Disc -->
+  <image href="/assets/disc.png"
+         x="0" y="0"
+         width="1080" height="1440"
+         preserveAspectRatio="none"/>
+
+  <!-- Agent profile -->
+  <image href="__AGENT_PROFILE__"
+         x="54" y="54"
+         width="72" height="72"
+         clip-path="url(#agentCircle)"
+         preserveAspectRatio="xMidYMid slice"/>
 
   <!-- Timestamp (right) -->
   <text class="mono"
@@ -32,24 +55,6 @@
         text-anchor="end">
     {{TIMESTAMP}}
   </text>
-
-  <!-- Agent profile -->
-  <image href="/assets/agent-profile.png"
-         x="60" y="60"
-         width="140" height="140"
-         preserveAspectRatio="xMidYMid slice"/>
-
-  <!-- Disc -->
-  <image href="/assets/disc.png"
-         x="0" y="0"
-         width="1080" height="1440"
-         preserveAspectRatio="xMidYMid meet"/>
-
-  <!-- Arachnid logo -->
-  <image href="/assets/innova-arachnid-logo.png"
-         x="0" y="0"
-         width="1080" height="1440"
-         preserveAspectRatio="xMidYMid meet"/>
 
   <!-- Headline -->
   <text x="90" y="1230"

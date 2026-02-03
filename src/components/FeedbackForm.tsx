@@ -130,6 +130,7 @@ function FeedbackForm({
     () => (handle || codename || tokenValue || 'tester').trim(),
     [handle, codename, tokenValue],
   )
+  const profileToken = useMemo(() => (tokenValue || handle || '').trim(), [tokenValue, handle])
   const feedbackUrl = useMemo(() => getApiUrl('/api/feedback'), [])
   const timeoutsRef = useRef<number[]>([])
   const [missionStatus, setMissionStatus] = useState<MissionStatusMap>(defaultStatus)
@@ -1052,6 +1053,7 @@ function FeedbackForm({
       </form>
       <MissionSuccessModal
         isOpen={showSuccessModal}
+        token={profileToken}
         handle={shareHandle}
         missionNumber={successMeta.missionNumber}
         rank={successMeta.rank}
