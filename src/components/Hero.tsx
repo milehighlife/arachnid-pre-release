@@ -64,20 +64,19 @@ function Hero({ firstName, agentToken, agentStatus, missionCount, showCta }: Her
             <h1 className='hero-title'>Pre-Release Arachnid</h1>
             <p className='hero-subheading'>MISSION INTEL:</p>
             <ul className='hero-bullets'>
-              <li>Low-profile, high-glide, stable mid-range</li>
+              <li>Innova&apos;s new low-profile, high-glide, stable mid-range disc</li>
               <li>Flight Numbers: 5, 6, -1, 1</li>
               <li>Pre-release variant</li>
               <li>Production release this March/April</li>
-              <li>Collab with @innovadiscs, @innovawombat</li>
+              <li>Publish video(s) and collab with @innovadiscs, @innovawombat</li>
               <li>Tag all media #innovaarachnid</li>
             </ul>
             <p className='hero-intro'>
-              Mission Package: Use your skills for Arachnid field testing missions. Publish and
-              collab your findings. Maintain agent status, level up with agent Arachnid gear. Your
-              mission briefings are below.
+              Use your skills for Arachnid field testing missions listed below. Publish and collab
+              your findings.
             </p>
             <p className='hero-intro'>
-              Cypher Access: Tap your mission patch to return to this page and submit intel.
+              To revisit this page: Tap your Agent Patch again and submit mission intel.
             </p>
             <p className='hero-goodluck'>Good luck!</p>
             {showCta && (
