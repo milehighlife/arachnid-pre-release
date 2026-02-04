@@ -311,7 +311,9 @@ function FeedbackForm({
     mission3ConfirmRights
 
   const mission1WordCount = countWords(mission1Feel)
-  const mission1Ready = mission1WordCount >= 20 && mission1Feel.trim().length <= 2000
+  const mission1MinWords = 20
+  const mission1Ready = mission1WordCount >= mission1MinWords && mission1Feel.trim().length <= 2000
+  const mission1SubmitReady = mission1WordCount >= mission1MinWords + 1
   const mission1Locked = missionStatus.m1 === 'LOCKED'
   const mission2Locked = missionStatus.m2 === 'LOCKED'
   const mission2Ready =
@@ -393,8 +395,8 @@ function FeedbackForm({
     if (missionId === 'm1') {
       const length = mission1Feel.trim().length
       const words = countWords(mission1Feel)
-      if (words < 25 || length > 2000) {
-        nextErrors.m1 = 'Mission 1 notes must be at least 20 words (max 2000 characters).'
+      if (words < mission1MinWords || length > 2000) {
+        nextErrors.m1 = `Mission 1 notes must be at least ${mission1MinWords} words (max 2000 characters).`
       }
       return nextErrors
     }
@@ -586,9 +588,8 @@ function FeedbackForm({
           label='Mission 1'
           title='Shape Assessment'
           description='Your first impression matters.'
-              requirements={
+          requirements={
             <ul className='requirements-list'>
-              <li>Submission required to maintain Agent status</li>
               <li>Minimum 20 words</li>
             </ul>
           }
@@ -657,11 +658,13 @@ function FeedbackForm({
           <div className='mission-actions'>
             <button
               type='button'
-              className={`submit${missionStatus.m1 === 'LOCKED' ? ' is-locked' : ''}`}
-              disabled={!mission1Ready || isMissionDisabled('m1') || tokenMissing}
+              className={`submit${missionStatus.m1 === 'LOCKED' ? ' is-locked' : ''}${
+                mission1SubmitReady ? '' : ' is-pending'
+              }`}
+              disabled={!mission1SubmitReady || isMissionDisabled('m1') || tokenMissing}
               onClick={() => submitMission('m1')}
             >
-              {getSubmitLabel('m1', 'Submit Mission 1')}
+              {mission1SubmitReady ? getSubmitLabel('m1', 'Submit Mission 1') : 'Min 20 Words'}
             </button>
             {missionStatus.m1 === 'LOCKED' && (
               <button type='button' className='mission-edit' onClick={() => handleEdit('m1')}>

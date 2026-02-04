@@ -1450,6 +1450,13 @@ button {
   color: var(--success);
 }
 
+.submit.is-pending {
+  border-color: var(--border);
+  color: var(--muted);
+  background: rgba(226, 226, 226, 0.04);
+  box-shadow: none;
+}
+
 .submit:hover:not(:disabled) {
   transform: translateY(-2px);
   box-shadow: 0 12px 24px rgba(255, 0, 0, 0.16);
