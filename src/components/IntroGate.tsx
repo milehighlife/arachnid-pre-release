@@ -9,6 +9,7 @@ type IntroGateProps = {
 
 type PlayerInstance = {
   playVideo?: () => void
+  pauseVideo?: () => void
   mute?: () => void
   unMute?: () => void
   isMuted?: () => boolean
@@ -133,6 +134,7 @@ function IntroGate({ token, codename, onAccepted }: IntroGateProps) {
   const [soundEnabled, setSoundEnabled] = useState(false)
   const videoId = resolveVideoId(token)
   const hasReportedView = useRef(false)
+  const soundEnabledRef = useRef(false)
 
   useEffect(() => {
     let active = true
@@ -146,15 +148,21 @@ function IntroGate({ token, codename, onAccepted }: IntroGateProps) {
         playerRef.current = new window.YT.Player('introPlayer', {
           videoId,
           playerVars: {
-            autoplay: 1,
+            autoplay: 0,
             mute: 1,
             playsinline: 1,
-            controls: 0,
+            controls: 1,
             rel: 0,
             modestbranding: 1,
             fs: 0,
           },
           events: {
+            onReady: () => {
+              if (soundEnabledRef.current) {
+                playerRef.current?.unMute?.()
+                playerRef.current?.playVideo?.()
+              }
+            },
             onStateChange: (event: { data: number }) => {
               if (event.data === window.YT?.PlayerState?.ENDED) {
                 setVideoEnded(true)
@@ -175,8 +183,9 @@ function IntroGate({ token, codename, onAccepted }: IntroGateProps) {
   }, [])
 
   const handleStart = () => {
-    playerRef.current?.unMute?.()
+    soundEnabledRef.current = true
     setSoundEnabled(true)
+    playerRef.current?.unMute?.()
     playerRef.current?.playVideo?.()
   }
 
