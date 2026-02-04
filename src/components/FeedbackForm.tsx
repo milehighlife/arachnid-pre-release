@@ -904,8 +904,7 @@ function FeedbackForm({
         <MissionCard
           label='Mission 3'
           title='Sharpshooter'
-          description='For elite agents only. Score an ace over 200ft. Capture and publish video. Collab with @innovadiscs and @innovawombat. Award: Level 2 Agent uniform (hoodie) and two (2) first-run Arachnids.'
-          award='Award: Limited Arachnid Tester Hoodie customized with your full name, plus two first-run Arachnids.'
+          description='For elite agents only. Hit an ace over 200ft. Capture it and publish video. Collab with @innovadiscs and @innovawombat. Award: Level 2 Arachnid Agent hoodie and two (2) first-run Arachnids.'
           requirements={
             <ul className='requirements-list'>
               <li>Must complete Mission 2 in advance</li>
