@@ -100,7 +100,7 @@ function Missions({ first, last, fullName, codename, token, handle, progress, on
               })}
             </div>
           </div>
-          <div className='progress-label mono'>DATA ENCRYPTED AT REST</div>
+          <div className='progress-label mono'>AGENT DATA ENCRYPTED</div>
         </div>
 
         <FeedbackForm
