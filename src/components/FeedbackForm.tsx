@@ -672,12 +672,12 @@ function FeedbackForm({
               </button>
             )}
             {missionStatus.m1 === 'LOCKED' && (
-              <button type='button' className='mission-share' onClick={() => handleOpenShare('m1')}>
-                Get Share Image
-              </button>
+              <span className='mission-status-message'>Locked. Transmission received, {codename}.</span>
             )}
             {missionStatus.m1 === 'LOCKED' && (
-              <span className='mission-status-message'>Locked. Transmission received, {codename}.</span>
+              <button type='button' className='mission-share' onClick={() => handleOpenShare('m1')}>
+                Download Promotion Badge
+              </button>
             )}
             {showMissionError('m1') && missionStatus.m1 === 'ERROR' && (
               <span className='mission-status-message'>
@@ -880,12 +880,12 @@ function FeedbackForm({
               </button>
             )}
             {missionStatus.m2 === 'LOCKED' && (
-              <button type='button' className='mission-share' onClick={() => handleOpenShare('m2')}>
-                Get Share Image
-              </button>
+              <span className='mission-status-message'>Locked. Transmission received, {codename}.</span>
             )}
             {missionStatus.m2 === 'LOCKED' && (
-              <span className='mission-status-message'>Locked. Transmission received, {codename}.</span>
+              <button type='button' className='mission-share' onClick={() => handleOpenShare('m2')}>
+                Download Promotion Badge
+              </button>
             )}
             {showMissionError('m2') && missionStatus.m2 === 'ERROR' && (
               <span className='mission-status-message'>
@@ -1026,12 +1026,12 @@ function FeedbackForm({
               </button>
             )}
             {missionStatus.m3 === 'LOCKED' && (
-              <button type='button' className='mission-share' onClick={() => handleOpenShare('m3')}>
-                Get Share Image
-              </button>
+              <span className='mission-status-message'>Locked. Transmission received, {codename}.</span>
             )}
             {missionStatus.m3 === 'LOCKED' && (
-              <span className='mission-status-message'>Locked. Transmission received, {codename}.</span>
+              <button type='button' className='mission-share' onClick={() => handleOpenShare('m3')}>
+                Download Promotion Badge
+              </button>
             )}
             {showMissionError('m3') && missionStatus.m3 === 'ERROR' && (
               <span className='mission-status-message'>
