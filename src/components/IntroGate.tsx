@@ -234,7 +234,9 @@ function IntroGate({ token, codename, onAccepted }: IntroGateProps) {
 
   return (
     <div className='intro-gate'>
-      <div className={`intro-video${videoEnded ? ' is-ended' : ''}`}>
+      <div
+        className={`intro-video${soundEnabled ? ' is-active' : ''}${videoEnded ? ' is-ended' : ''}`}
+      >
         <div id='introPlayer' className='intro-player' />
       </div>
       <div className='intro-overlay'>
