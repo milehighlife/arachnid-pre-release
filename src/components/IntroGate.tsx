@@ -243,7 +243,7 @@ function IntroGate({ token, codename, onAccepted }: IntroGateProps) {
       )}
       <div className={`intro-accept${videoEnded ? ' is-visible' : ''}`}>
         <button
-          className='intro-accept-button'
+          className={`intro-accept-button${accepting ? ' is-confirming' : ''}`}
           type='button'
           onClick={handleAccept}
           disabled={accepting}

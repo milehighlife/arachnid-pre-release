@@ -297,6 +297,10 @@ button {
   cursor: wait;
 }
 
+.intro-accept-button.is-confirming {
+  border-color: transparent;
+}
+
 .intro-error {
   font-size: 0.75rem;
   color: var(--muted);
