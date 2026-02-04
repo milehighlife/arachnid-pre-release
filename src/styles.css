@@ -876,7 +876,7 @@ button {
   height: 6px;
   border-radius: 999px;
   background: rgba(226, 226, 226, 0.12);
-  overflow: hidden;
+  overflow: visible;
 }
 
 .mission-progress-fill {
