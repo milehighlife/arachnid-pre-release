@@ -311,7 +311,7 @@ function FeedbackForm({
     mission3ConfirmRights
 
   const mission1WordCount = countWords(mission1Feel)
-  const mission1Ready = mission1WordCount >= 25 && mission1Feel.trim().length <= 2000
+  const mission1Ready = mission1WordCount >= 20 && mission1Feel.trim().length <= 2000
   const mission1Locked = missionStatus.m1 === 'LOCKED'
   const mission2Locked = missionStatus.m2 === 'LOCKED'
   const mission2Ready =
@@ -394,7 +394,7 @@ function FeedbackForm({
       const length = mission1Feel.trim().length
       const words = countWords(mission1Feel)
       if (words < 25 || length > 2000) {
-        nextErrors.m1 = 'Mission 1 notes must be at least 25 words (max 2000 characters).'
+        nextErrors.m1 = 'Mission 1 notes must be at least 20 words (max 2000 characters).'
       }
       return nextErrors
     }
@@ -586,18 +586,19 @@ function FeedbackForm({
           label='Mission 1'
           title='Shape Assessment'
           description='Your first impression matters.'
-          requirements={
+              requirements={
             <ul className='requirements-list'>
               <li>Submission required to maintain Agent status</li>
-              <li>Minimum 25 words</li>
+              <li>Minimum 20 words</li>
             </ul>
           }
           status={missionStatus.m1}
         >
           <div className='field'>
             <label htmlFor='mission1_feel'>
-              Describe the Arachnid’s form, fit, and geometry, then assess expected pre-flight
-              behavior—how you think it will fly. Text-only submission. Min 25 words.
+              Describe the Star Arachnid&apos;s shape, rim feel, and hand fit. Then explain how you
+              expect it to fly before throwing it—lines, stability, and finish. Text only. Minimum
+              20 words.
             </label>
             <textarea
               id='mission1_feel'
