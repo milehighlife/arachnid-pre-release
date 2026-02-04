@@ -696,8 +696,7 @@ function FeedbackForm({
         <MissionCard
           label='Mission 2'
           title='Flight Test'
-          description='Show us how it flies in the wild.'
-          award='Award: Maintain Tester Team Status and receive an Arachnid Tester T-shirt in your size.'
+          description='Show us how it flies in the wild. Complete this mission and receive a limited edition Arachnid Agent t-shirt.'
           requirements={
             <ul className='requirements-list'>
               <li>Must complete Mission 1 in advance</li>
