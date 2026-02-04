@@ -320,7 +320,7 @@ button {
 }
 
 .hero {
-  padding: 96px 0 36px;
+  padding: 10px 0 36px;
 }
 
 .hatch-band {
@@ -1738,7 +1738,7 @@ button {
 
 @media (min-width: 960px) {
   .hero {
-    padding: 120px 0 45px;
+    padding: 10px 0 45px;
   }
 
   .hatch-band {
