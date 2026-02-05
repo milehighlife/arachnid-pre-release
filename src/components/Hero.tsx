@@ -61,7 +61,7 @@ function Hero({ firstName, agentToken, agentStatus, missionCount, showCta }: Her
                 <span className='hero-agent-chip-value'>{agentStatus}</span>
               </div>
             </div>
-            <h1 className='hero-title'>Pre-Release Arachnid</h1>
+            <h1 className='hero-title'>Pre-Release Star Arachnid</h1>
             <p className='hero-subheading'>MISSION INTEL:</p>
             <ul className='hero-bullets'>
               <li>Innova&apos;s new low-profile, high-glide, stable mid-range disc</li>
