@@ -48,7 +48,7 @@ function Hero({ firstName, agentToken, agentStatus, missionCount, showCta }: Her
               </div>
               <div className='hero-agent-chip'>
                 <div className='hero-agent-chip-header'>
-                  <span className='hero-agent-chip-label'>Current</span>
+                  <span className='hero-agent-chip-label'>Current Rank</span>
                   <div className='hero-rank-track' aria-hidden='true'>
                     {[0, 1, 2].map((index) => (
                       <span
@@ -72,8 +72,8 @@ function Hero({ firstName, agentToken, agentStatus, missionCount, showCta }: Her
               <li>Tag all media #innovaarachnid</li>
             </ul>
             <p className='hero-intro'>
-              Use your skills for Arachnid field testing missions listed below. Publish and collab
-              your findings.
+              Use your skills for Star Arachnid field testing missions listed below. Publish and
+              collab your findings.
             </p>
             <p className='hero-intro'>
               To revisit this page: Tap your Agent Patch again and submit mission intel.
