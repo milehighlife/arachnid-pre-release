@@ -166,6 +166,21 @@ function App() {
   useEffect(() => {
     const token = personalization.token
     if (!token) {
+      const visitToken = sanitizeToken(personalization.handle) || 'tester'
+      if (visitToken) {
+        const params = new URLSearchParams()
+        params.set('token', visitToken)
+        if (personalization.first) {
+          params.set('first', personalization.first)
+        }
+        if (personalization.last) {
+          params.set('last', personalization.last)
+        }
+        if (personalization.handle) {
+          params.set('handle', personalization.handle)
+        }
+        fetch(`${getApiUrl('/api/status')}?${params.toString()}`).catch(() => {})
+      }
       setProgress(null)
       setIntroAccepted(false)
       setIntroDismissed(false)
@@ -217,7 +232,7 @@ function App() {
     return () => {
       active = false
     }
-  }, [personalization.first, personalization.last, personalization.token])
+  }, [personalization.first, personalization.handle, personalization.last, personalization.token])
 
   const handleSkipBriefing = () => {
     setBriefingSeen(true)
